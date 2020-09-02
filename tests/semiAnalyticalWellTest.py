@@ -1,17 +1,17 @@
 import unittest
+import numpy as np
 
 from src.semiAnalyticalWell import SemiAnalyticalWell
 from utils.globalProperties import *
-from utils.globalTools import *
 
 class semiAnalyticalWellTest(unittest.TestCase):
 
     def assertMessages(self, fluid, max_error, pressure, temperature, enthalpy):
-        self.assertTrue(check_rel_error(max_error, *pressure),\
+        self.assertTrue(np.isclose([pressure[0]], [pressure[1]], rtol=max_error),\
             '%s_Pressure %.4e Pa instead of %.4e Pa'%(fluid, *pressure))
-        self.assertTrue(check_rel_error(max_error, *temperature),\
+        self.assertTrue(np.isclose([temperature[0]], [temperature[1]], rtol=max_error),\
             '%s_Temp %.4e C instead of %.4e C'%(fluid, *temperature))
-        self.assertTrue(check_rel_error(max_error, *enthalpy),\
+        self.assertTrue(np.isclose([enthalpy[0]], [enthalpy[1]], rtol=max_error),\
             '%s_Enthalpy %.4e J instead of %.4e J'%(fluid, *enthalpy))
 
     def testProductionWell(self):
