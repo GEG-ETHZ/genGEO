@@ -1,4 +1,3 @@
-import os
 import math
 import numpy as np
 
@@ -12,15 +11,21 @@ class SemiAnalyticalWell(object):
         self.params = params
         self.alpha_rock = self.params.k_rock/self.params.density_rock/self.params.C_rock  #D rock
 
-
+    # INPUT functions
     def initializeWellDims(self, N_dx, dz_total, dr_total, wellRadius):
         self.wellRadius = wellRadius
         self.N_dx = N_dx
-        self.dz = dz_total/self.N_dx                #m
-        self.dr = dr_total/self.N_dx                #m
-        self.dL = (self.dz**2 + self.dr**2)**0.5    #m
-        self.A_c = np.pi * self.wellRadius**2       #m**2
-        self.P_c = np.pi * 2 * self.wellRadius      #m
+        self.dz = dz_total/self.N_dx                # m
+        self.dr = dr_total/self.N_dx                # m
+        self.dL = (self.dz**2 + self.dr**2)**0.5    # m
+        self.A_c = np.pi * self.wellRadius**2       # m**2
+        self.P_c = np.pi * 2 * self.wellRadius      # m
+
+    def initializeStates(self, fluid, P_f_initial, T_f_initial, T_e_initial):
+        self.fluid = fluid
+        self.T_f_initial = T_f_initial
+        self.T_e_initial = T_e_initial
+        self.P_f_initial = P_f_initial
 
     def createEmptyArrays(self):
         # create zero arrays of the size of N_dz+1 to iterate through all n+1 well segments.
@@ -38,18 +43,18 @@ class SemiAnalyticalWell(object):
         self.v              = np.zeros(self.N_dx+1)
         self.delta_P_loss   = np.zeros(self.N_dx+1)
 
-    def initializeStates(self, fluid, P_f_initial, T_f_initial, T_e_initial):
+    def setInitialConditions(self):
         self.createEmptyArrays()
-        self.fluid = fluid
         self.z[0] = 0.
-        self.T_f[0] = T_f_initial       #C
-        self.T_f_avg[0] = self.T_f[0]   #C
-        self.T_e[0] = T_e_initial       #C
-        self.T_w[0] = self.T_f[0]       #C
-        self.P[0] = P_f_initial         #Pa
+        self.T_f[0] = self.T_f_initial      # C
+        self.T_f_avg[0] = self.T_f[0]       # C
+        self.T_e[0] = self.T_e_initial      # C
+        self.T_w[0] = self.T_f[0]           # C
+        self.P[0] = self.P_f_initial        # Pa
         self.h[0] = PropsSI('HMASS', 'P', self.P[0], 'T', self.T_f[0]+273.15, self.fluid)
         self.rho_fluid[0] = PropsSI('DMASS', 'P', self.P[0], 'T', self.T_f[0]+273.15, self.fluid)
 
+    # OUTPUT functions
     def getState(self):
         return (self.z, self.P / 1.e6, self.T_f, self.T_e)
 
@@ -65,7 +70,11 @@ class SemiAnalyticalWell(object):
     def getHeat(self):
         return -1. * np.sum(self.q)
 
+    # COMPUTE functions
     def computeSolution(self, epsilon, time_seconds, m_dot, dT_dz, useWellboreHeatLoss = True):
+
+        # setup initial conditions
+        self.setInitialConditions()
 
         # Calculate the Friction Factor
         # Use limit of Colebrook-white equation for large Re
@@ -104,7 +113,7 @@ class SemiAnalyticalWell(object):
             if self.fluid == 'Water':
                 P_sat = PropsSI('P', 'T', self.T_f[i-1] + 273.15, 'Q', 0, self.fluid)
                 if self.P[i] < P_sat:
-                    raise ValueError('SemiAnalytic:BelowSaturationPressure - ',\
+                    raise ValueError('SemiAnalyticalWell:BelowSaturationPressure - ',\
                     'Below saturation pressure of water at %s m !' %(self.z[i]))
 
             h_noHX = self.h[i-1] - self.params.g * self.dz
@@ -128,146 +137,3 @@ class SemiAnalyticalWell(object):
                     self.T_f[i] = (y * T_noHX + x *self. T_e[i]) / (x + y)
                 self.q[i] = y * (T_noHX - self.T_f[i])
                 self.h[i] = PropsSI('HMASS', 'P', self.P[i], 'T', self.T_f[i] + 273.15, self.fluid)
-
-
-if __name__ == '__main__':
-
-    from utils.globalProperties import *
-
-    def check_num_error(eps, val, ref):
-        return ((val - ref) / ref) < eps
-
-    def assert_Messages(fluid, max_error, pressure, temperature, enthalpy):
-        print('Production_%s_Pressure: %.6e Pa instead of %.4e Pa'%(fluid, *pressure))
-        print('Production_%s_Temp:     %.6e C  instead of %.6e C'%(fluid, *temperature))
-        print('Production_%s_Enthalpy: %.6e J  instead of %.6e J'%(fluid, *enthalpy))
-
-        assert check_num_error(max_error, *pressure),\
-            'Production_%s_Pressure %.4e Pa instead of %.4e Pa'%(fluid, *pressure)
-        assert check_num_error(max_error, *temperature),\
-            'Production_%s_Temp %.4e C instead of %.4e C'%(fluid, *temperature)
-        assert check_num_error(max_error, *enthalpy),\
-            'Production_%s_Enthalpy %.4e J instead of %.4e J'%(fluid, *enthalpy)
-
-    # relative error of the computed values compared to reference values provided by badams
-    accepted_num_error = 1e-4
-
-    ###
-    #  Testing the function for vertical production well settings
-    ###
-    # Water
-    gpp = GlobalPhysicalProperties()
-    well = SemiAnalyticalWell(gpp)
-    well.initializeWellDims(N_dx = 100, \
-                            dz_total = 2500., \
-                            dr_total = 0., \
-                            wellRadius = 0.205)
-    well.initializeStates(fluid = 'water', \
-                          P_f_initial = 25.e6, \
-                          T_f_initial = 97., \
-                          T_e_initial = 102.5)
-    well.computeSolution(epsilon = 55 * 1e-6, \
-                         time_seconds = 10. * (3600. * 24. * 365.), \
-                         m_dot = 136., \
-                         dT_dz = -0.035)
-
-    assert_Messages(well.fluid,\
-                    accepted_num_error,\
-                    (well.getEndPressure(), 1.2459e6),\
-                    (well.getEndTemperature(), 96.075),\
-                    (well.getEndEnthalpy(), 4.0350e5))
-
-    # CO2
-    well.initializeStates(fluid = 'CO2', \
-                          P_f_initial = 25.e6, \
-                          T_f_initial = 97., \
-                          T_e_initial = 102.5)
-    well.computeSolution(epsilon = 55 * 1e-6, \
-                         time_seconds = 10. * (3600. * 24. * 365.), \
-                         m_dot = 136., \
-                         dT_dz = -0.035)
-
-    assert_Messages(well.fluid,\
-                    accepted_num_error,\
-                    (well.getEndPressure(), 1.1763e7),\
-                    (well.getEndTemperature(), 57.26),\
-                    (well.getEndEnthalpy(), 3.767e5))
-
-    ###
-    #  Testing the function for vertical and horizontal injection well settings
-    ###
-    # Vertical well segment and water
-    well = SemiAnalyticalWell(gpp)
-    well.initializeWellDims(N_dx = 100, \
-                            dz_total = -3500., \
-                            dr_total = 0., \
-                            wellRadius = 0.279)
-    well.initializeStates(fluid = 'water', \
-                          P_f_initial = 1.e6, \
-                          T_f_initial = 25., \
-                          T_e_initial = 15.)
-    well.computeSolution(epsilon = 55 * 1e-6, \
-                         time_seconds = 10. * (3600. * 24. * 365.), \
-                         m_dot = 5., \
-                         dT_dz = 0.06)
-
-    assert_Messages(well.fluid,\
-                    accepted_num_error,\
-                    (well.getEndPressure(), 3.533e7),\
-                    (well.getEndTemperature(), 67.03),\
-                    (well.getEndEnthalpy(), 3.0963e5))
-
-    # Vertical well segment and CO2
-    well.initializeStates(fluid = 'CO2', \
-                          P_f_initial = 1.e6, \
-                          T_f_initial = 25., \
-                          T_e_initial = 15.)
-    well.computeSolution(epsilon = 55 * 1e-6, \
-                         time_seconds = 10. * (3600. * 24. * 365.), \
-                         m_dot = 5., \
-                         dT_dz = 0.06)
-
-    assert_Messages(well.fluid,\
-                    accepted_num_error,\
-                    (well.getEndPressure(), 1.7245e6),\
-                    (well.getEndTemperature(), 156.08),\
-                    (well.getEndEnthalpy(), 6.1802e5))
-
-    # Horizontal well segment and water
-    dT_dz = 0.06                        # to compute T_e_initial for horizontal well
-    dr_total = 3000.                    # to compute T_e_initial for horizontal well
-    well = SemiAnalyticalWell(gpp)
-    well.initializeWellDims(N_dx = 100, \
-                            dz_total = 0., \
-                            dr_total = dr_total, \
-                            wellRadius = 0.279)
-    well.initializeStates(fluid = 'water', \
-                          P_f_initial = 1.e6, \
-                          T_f_initial = 25., \
-                          T_e_initial = 15. + dT_dz * abs(dr_total))
-    well.computeSolution(epsilon = 55 * 1e-6, \
-                         time_seconds = 10. * (3600. * 24. * 365.), \
-                         m_dot = 5., \
-                         dT_dz = dT_dz)
-
-    assert_Messages(well.fluid,\
-                    accepted_num_error,\
-                    (well.getEndPressure(), 3.533e7),\
-                    (well.getEndTemperature(), 121.99),\
-                    (well.getEndEnthalpy(), 5.3712e5))
-
-    # Horizontal well segment and CO2
-    well.initializeStates(fluid = 'CO2', \
-                          P_f_initial = 1.e6, \
-                          T_f_initial = 25., \
-                          T_e_initial = 15. + dT_dz * abs(dr_total))
-    well.computeSolution(epsilon = 55 * 1e-6, \
-                         time_seconds = 10. * (3600. * 24. * 365.), \
-                         m_dot = 5., \
-                         dT_dz = dT_dz)
-
-    assert_Messages(well.fluid,\
-                    accepted_num_error,\
-                    (well.getEndPressure(), 1.7238e6),\
-                    (well.getEndTemperature(), 212.746),\
-                    (well.getEndEnthalpy(), 6.755e5))

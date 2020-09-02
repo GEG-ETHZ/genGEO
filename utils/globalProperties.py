@@ -1,5 +1,5 @@
-
-
+# global parameters
+secPerYear = 3600. * 24. * 365.25
 
 class GlobalPhysicalProperties(object):
     """GlobalPhysicalProperties provides physical properties of the system."""
