@@ -12,11 +12,13 @@ class SemiAnalyticalWell(object):
         self.alpha_rock = self.params.k_rock/self.params.density_rock/self.params.C_rock  #D rock
 
     # INPUT functions
-    def initializeWellDims(self, N_dx, dz_total, dr_total, wellRadius):
+    def initializeWellDims(self, dz_total, dr_total, wellRadius, N_dx = 100):
         self.wellRadius = wellRadius
         self.N_dx = N_dx
-        self.dz = dz_total/self.N_dx                # m
-        self.dr = dr_total/self.N_dx                # m
+        self.dz_total = dz_total
+        self.dr_total = dr_total
+        self.dz = self.dz_total/self.N_dx           # m
+        self.dr = self.dr_total/self.N_dx           # m
         self.dL = (self.dz**2 + self.dr**2)**0.5    # m
         self.A_c = np.pi * self.wellRadius**2       # m**2
         self.P_c = np.pi * 2 * self.wellRadius      # m
@@ -27,32 +29,12 @@ class SemiAnalyticalWell(object):
         self.T_e_initial = T_e_initial
         self.P_f_initial = P_f_initial
 
-    def createEmptyArrays(self):
-        # create zero arrays of the size of N_dz+1 to iterate through all n+1 well segments.
-        self.z              = np.zeros(self.N_dx+1)
-        self.T_f            = np.zeros(self.N_dx+1)
-        self.T_f_avg        = np.zeros(self.N_dx+1)
-        self.T_w            = np.zeros(self.N_dx+1)
-        self.T_e            = np.zeros(self.N_dx+1)
-        self.P              = np.zeros(self.N_dx+1)
-        self.h              = np.zeros(self.N_dx+1)
-        self.rho_fluid      = np.zeros(self.N_dx+1)
-        self.q              = np.zeros(self.N_dx+1)
-        self.Cp_fluid       = np.zeros(self.N_dx+1)
-        self.h_fluid        = np.zeros(self.N_dx+1)
-        self.v              = np.zeros(self.N_dx+1)
-        self.delta_P_loss   = np.zeros(self.N_dx+1)
-
-    def setInitialConditions(self):
-        self.createEmptyArrays()
-        self.z[0] = 0.
-        self.T_f[0] = self.T_f_initial      # C
-        self.T_f_avg[0] = self.T_f[0]       # C
-        self.T_e[0] = self.T_e_initial      # C
-        self.T_w[0] = self.T_f[0]           # C
-        self.P[0] = self.P_f_initial        # Pa
-        self.h[0] = PropsSI('HMASS', 'P', self.P[0], 'T', self.T_f[0]+273.15, self.fluid)
-        self.rho_fluid[0] = PropsSI('DMASS', 'P', self.P[0], 'T', self.T_f[0]+273.15, self.fluid)
+    def initializeModel(self, epsilon, time_seconds, m_dot, dT_dz, useWellboreHeatLoss = True):
+        self.epsilon = epsilon
+        self.time_seconds = time_seconds
+        self.m_dot = m_dot
+        self.dT_dz = dT_dz
+        self.useWellboreHeatLoss =  useWellboreHeatLoss
 
     # OUTPUT functions
     def getState(self):
@@ -70,17 +52,38 @@ class SemiAnalyticalWell(object):
     def getHeat(self):
         return -1. * np.sum(self.q)
 
+    def createEmptyArrays(self):
+        # create zero arrays of the size of N_dz+1 to iterate through all n+1 well segments.
+        self.z              = np.zeros(self.N_dx+1)
+        self.T_f            = np.zeros(self.N_dx+1)
+        self.T_e            = np.zeros(self.N_dx+1)
+        self.P              = np.zeros(self.N_dx+1)
+        self.h              = np.zeros(self.N_dx+1)
+        self.rho_fluid      = np.zeros(self.N_dx+1)
+        self.q              = np.zeros(self.N_dx+1)
+        self.Cp_fluid       = np.zeros(self.N_dx+1)
+        self.v              = np.zeros(self.N_dx+1)
+        self.delta_P_loss   = np.zeros(self.N_dx+1)
+
+    def setInitialConditions(self):
+        self.createEmptyArrays()
+        self.T_f[0] = self.T_f_initial      # C
+        self.T_e[0] = self.T_e_initial      # C
+        self.P[0] = self.P_f_initial        # Pa
+        self.h[0] = PropsSI('HMASS', 'P', self.P[0], 'T', self.T_f[0]+273.15, self.fluid)
+        self.rho_fluid[0] = PropsSI('DMASS', 'P', self.P[0], 'T', self.T_f[0]+273.15, self.fluid)
+
     # COMPUTE functions
-    def computeSolution(self, epsilon, time_seconds, m_dot, dT_dz, useWellboreHeatLoss = True):
+    def computeSolution(self):
 
         # setup initial conditions
         self.setInitialConditions()
 
         # Calculate the Friction Factor
         # Use limit of Colebrook-white equation for large Re
-        ff = 0.25 * (1/np.log10(epsilon/(self.wellRadius * 2)/3.7))**2
+        ff = 0.25 * (1/np.log10(self.epsilon/(self.wellRadius * 2)/3.7))**2
 
-        t_d = self.alpha_rock*time_seconds/(self.wellRadius**2)  #dim
+        t_d = self.alpha_rock*self.time_seconds/(self.wellRadius**2)  #dim
         if t_d < 2.8:
             beta = ((np.pi*t_d)**-0.5 + 0.5 - 0.25*(t_d/np.pi)**0.5 + 0.125*t_d)
         else:
@@ -91,9 +94,9 @@ class SemiAnalyticalWell(object):
             self.z[i] = self.z[i-1] + self.dz
 
             # far-field rock temp
-            self.T_e[i] = self.T_e[0] - self.z[i]*dT_dz
+            self.T_e[i] = self.T_e[0] - self.z[i]*self.dT_dz
             # fluid velocity
-            self.v[i] = m_dot / self.A_c / self.rho_fluid[i-1]  #m/s
+            self.v[i] = self.m_dot / self.A_c / self.rho_fluid[i-1]  #m/s
 
             # Calculate Pressure
             self.delta_P_loss[i] =  ff * self.dL / ( 2 * self.wellRadius) * \
@@ -121,7 +124,7 @@ class SemiAnalyticalWell(object):
             self.Cp_fluid[i] = PropsSI('CPMASS', 'P', self.P[i], 'HMASS', h_noHX, self.fluid)
 
             #Find Fluid Temp
-            if not useWellboreHeatLoss:
+            if not self.useWellboreHeatLoss:
                 self.T_f[i] = T_noHX
                 self.h[i] = h_noHX
                 self.q[i] = 0.
@@ -130,7 +133,7 @@ class SemiAnalyticalWell(object):
                 # approach for modeling heat exchange between a wellbore and
                 # surrounding formation. Geothermics 40, 261-266.
                 x = self.dL * self.P_c * self.params.k_rock * beta / self.wellRadius
-                y = m_dot * self.Cp_fluid[i]
+                y = self.m_dot * self.Cp_fluid[i]
                 if math.isinf(x):
                     self.T_f[i] = self.T_e[i]
                 else:
