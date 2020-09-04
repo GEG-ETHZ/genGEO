@@ -1,5 +1,6 @@
 import unittest
 import numpy as np
+from copy import deepcopy
 
 from src.semiAnalyticalWell import SemiAnalyticalWell
 from utils.globalProperties import *
@@ -23,20 +24,19 @@ class semiAnalyticalWellTest(unittest.TestCase):
         # relative error of the computed values compared to reference values provided by badams
         accepted_num_error = 1e-4
         # Water
-        well = SemiAnalyticalWell(gpp)
-        well.initializeWellDims(dz_total = 2500., \
+        well = SemiAnalyticalWell(params = gpp,
+                                dz_total = 2500., \
                                 dr_total = 0., \
-                                wellRadius = 0.205)
-        well.initializeStates(fluid = 'water', \
-                              P_f_initial = 25.e6, \
-                              T_f_initial = 97., \
-                              T_e_initial = 102.5)
-        well.initializeModel(epsilon = 55 * 1e-6, \
-                             time_seconds = 10. * secPerYear, \
-                             m_dot = 136., \
-                             dT_dz = -0.035)
-
-        well.computeSolution()
+                                wellRadius = 0.205,
+                                fluid = 'water', \
+                                P_f_initial = 25.e6, \
+                                T_f_initial = 97., \
+                                T_e_initial = 102.5,
+                                epsilon = 55 * 1e-6, \
+                                time_seconds = 10. * secPerYear, \
+                                m_dot = 136., \
+                                dT_dz = -0.035)
+        well.solve()
 
         self.assertMessages(well.fluid,\
                         accepted_num_error,\
@@ -46,7 +46,7 @@ class semiAnalyticalWellTest(unittest.TestCase):
 
         # CO2
         well.fluid = 'CO2'
-        well.computeSolution()
+        well.solve()
 
         self.assertMessages(well.fluid,\
                         accepted_num_error,\
@@ -63,19 +63,19 @@ class semiAnalyticalWellTest(unittest.TestCase):
         # relative error of the computed values compared to reference values provided by badams
         accepted_num_error = 1e-4
 
-        vertical_well = SemiAnalyticalWell(gpp)
-        vertical_well.initializeWellDims(dz_total = -3500., \
-                                         dr_total = 0., \
-                                         wellRadius = 0.279)
-        vertical_well.initializeStates(fluid = 'water', \
+        vertical_well = SemiAnalyticalWell(params = gpp,
+                                        dz_total = -3500., \
+                                        dr_total = 0., \
+                                        wellRadius = 0.279,
+                                        fluid = 'water', \
                                         P_f_initial = 1.e6, \
                                         T_f_initial = 25., \
-                                        T_e_initial = 15.)
-        vertical_well.initializeModel(epsilon = 55 * 1e-6, \
+                                        T_e_initial = 15.,
+                                        epsilon = 55 * 1e-6, \
                                         time_seconds = 10. * secPerYear, \
                                         m_dot = 5., \
                                         dT_dz = 0.06)
-        vertical_well.computeSolution()
+        vertical_well.solve()
 
         self.assertMessages(vertical_well.fluid,\
                         accepted_num_error,\
@@ -83,20 +83,14 @@ class semiAnalyticalWellTest(unittest.TestCase):
                         (vertical_well.getEndTemperature(), 67.03),\
                         (vertical_well.getEndEnthalpy(), 3.0963e5))
 
+        horizontal_well = deepcopy(vertical_well)
+        horizontal_well.dz_total = 0.
+        horizontal_well.dr_total = 3000.
+        horizontal_well.P_f_initial = vertical_well.getEndPressure()
+        horizontal_well.T_f_initial = vertical_well.getEndTemperature()
+        horizontal_well.T_e_initial = 15. + vertical_well.dT_dz * abs(vertical_well.dz_total)
 
-        horizontal_well = SemiAnalyticalWell(gpp)
-        horizontal_well.initializeWellDims(dz_total = 0., \
-                                            dr_total = 3000., \
-                                            wellRadius = vertical_well.wellRadius)
-        horizontal_well.initializeStates(fluid = 'water', \
-                                        P_f_initial = vertical_well.getEndPressure(), \
-                                        T_f_initial = vertical_well.getEndTemperature(), \
-                                        T_e_initial = 15. + vertical_well.dT_dz * abs(vertical_well.dz_total))
-        horizontal_well.initializeModel(epsilon = vertical_well.epsilon, \
-                                        time_seconds = vertical_well.time_seconds, \
-                                        m_dot = vertical_well.m_dot, \
-                                        dT_dz = vertical_well.dT_dz)
-        horizontal_well.computeSolution()
+        horizontal_well.solve()
 
         self.assertMessages(horizontal_well.fluid,\
                         accepted_num_error,\
@@ -113,19 +107,19 @@ class semiAnalyticalWellTest(unittest.TestCase):
         # relative error of the computed values compared to reference values provided by badams
         accepted_num_error = 1e-4
 
-        vertical_well = SemiAnalyticalWell(gpp)
-        vertical_well.initializeWellDims(dz_total = -3500., \
+        vertical_well = SemiAnalyticalWell(params = gpp,
+                                            dz_total = -3500., \
                                             dr_total = 0., \
-                                            wellRadius = 0.279)
-        vertical_well.initializeStates(fluid = 'CO2', \
-                                        P_f_initial = 1.e6, \
-                                        T_f_initial = 25., \
-                                        T_e_initial = 15.)
-        vertical_well.initializeModel(epsilon = 55 * 1e-6, \
-                                        time_seconds = 10. * secPerYear, \
-                                        m_dot = 5., \
-                                        dT_dz = 0.06)
-        vertical_well.computeSolution()
+                                            wellRadius = 0.279,
+                                            fluid = 'CO2', \
+                                            P_f_initial = 1.e6, \
+                                            T_f_initial = 25., \
+                                            T_e_initial = 15.,
+                                            epsilon = 55 * 1e-6, \
+                                            time_seconds = 10. * secPerYear, \
+                                            m_dot = 5., \
+                                            dT_dz = 0.06)
+        vertical_well.solve()
 
         self.assertMessages(vertical_well.fluid,\
                         accepted_num_error,\
@@ -133,20 +127,14 @@ class semiAnalyticalWellTest(unittest.TestCase):
                         (vertical_well.getEndTemperature(), 156.08),\
                         (vertical_well.getEndEnthalpy(), 6.1802e5))
 
+        horizontal_well = deepcopy(vertical_well)
+        horizontal_well.dz_total = 0.
+        horizontal_well.dr_total = 3000.
+        horizontal_well.P_f_initial = vertical_well.getEndPressure()
+        horizontal_well.T_f_initial = vertical_well.getEndTemperature()
+        horizontal_well.T_e_initial = 15. + vertical_well.dT_dz * abs(vertical_well.dz_total)
 
-        horizontal_well = SemiAnalyticalWell(gpp)
-        horizontal_well.initializeWellDims(dz_total = 0., \
-                                            dr_total = 3000., \
-                                            wellRadius = vertical_well.wellRadius)
-        horizontal_well.initializeStates(fluid = 'CO2', \
-                                        P_f_initial = vertical_well.getEndPressure(), \
-                                        T_f_initial = vertical_well.getEndTemperature(), \
-                                        T_e_initial = 15. + vertical_well.dT_dz * abs(vertical_well.dz_total))
-        horizontal_well.initializeModel(epsilon = vertical_well.epsilon, \
-                                        time_seconds = vertical_well.time_seconds, \
-                                        m_dot = vertical_well.m_dot, \
-                                        dT_dz = vertical_well.dT_dz)
-        horizontal_well.computeSolution()
+        horizontal_well.solve()
 
         self.assertMessages(horizontal_well.fluid,\
                         accepted_num_error,\

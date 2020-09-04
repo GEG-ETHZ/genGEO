@@ -7,29 +7,21 @@ class SemiAnalyticalWell(object):
     """SemiAnalyticalWell to compute heat transport with fluid flow in a well
         and analytical conduction in the surrounding rock."""
 
-    def __init__(self, params):
+    def __init__(self, params, dz_total, dr_total, wellRadius, \
+                fluid, P_f_initial, T_f_initial, T_e_initial, epsilon, \
+                time_seconds, m_dot, dT_dz, N_dx = 100, useWellboreHeatLoss = True):
         self.params = params
-        self.alpha_rock = self.params.k_rock/self.params.density_rock/self.params.C_rock  #D rock
-
-    # INPUT functions
-    def initializeWellDims(self, dz_total, dr_total, wellRadius, N_dx = 100):
+        # dimensions
         self.wellRadius = wellRadius
         self.N_dx = N_dx
         self.dz_total = dz_total
         self.dr_total = dr_total
-        self.dz = self.dz_total/self.N_dx           # m
-        self.dr = self.dr_total/self.N_dx           # m
-        self.dL = (self.dz**2 + self.dr**2)**0.5    # m
-        self.A_c = np.pi * self.wellRadius**2       # m**2
-        self.P_c = np.pi * 2 * self.wellRadius      # m
-
-    def initializeStates(self, fluid, P_f_initial, T_f_initial, T_e_initial):
+        # states
         self.fluid = fluid
         self.T_f_initial = T_f_initial
         self.T_e_initial = T_e_initial
         self.P_f_initial = P_f_initial
-
-    def initializeModel(self, epsilon, time_seconds, m_dot, dT_dz, useWellboreHeatLoss = True):
+        # model
         self.epsilon = epsilon
         self.time_seconds = time_seconds
         self.m_dot = m_dot
@@ -52,7 +44,7 @@ class SemiAnalyticalWell(object):
     def getHeat(self):
         return -1. * np.sum(self.q)
 
-    def createEmptyArrays(self):
+    def solve(self):
         # create zero arrays of the size of N_dz+1 to iterate through all n+1 well segments.
         self.z              = np.zeros(self.N_dx+1)
         self.T_f            = np.zeros(self.N_dx+1)
@@ -65,25 +57,26 @@ class SemiAnalyticalWell(object):
         self.v              = np.zeros(self.N_dx+1)
         self.delta_P_loss   = np.zeros(self.N_dx+1)
 
-    def setInitialConditions(self):
-        self.createEmptyArrays()
+        # set geometry
+        self.dz = self.dz_total/self.N_dx           # m
+        self.dr = self.dr_total/self.N_dx           # m
+        self.dL = (self.dz**2 + self.dr**2)**0.5    # m
+        self.A_c = np.pi * self.wellRadius**2       # m**2
+        self.P_c = np.pi * 2 * self.wellRadius      # m
+
+        # set states
         self.T_f[0] = self.T_f_initial      # C
         self.T_e[0] = self.T_e_initial      # C
         self.P[0] = self.P_f_initial        # Pa
         self.h[0] = PropsSI('HMASS', 'P', self.P[0], 'T', self.T_f[0]+273.15, self.fluid)
         self.rho_fluid[0] = PropsSI('DMASS', 'P', self.P[0], 'T', self.T_f[0]+273.15, self.fluid)
 
-    # COMPUTE functions
-    def computeSolution(self):
-
-        # setup initial conditions
-        self.setInitialConditions()
-
         # Calculate the Friction Factor
         # Use limit of Colebrook-white equation for large Re
         ff = 0.25 * (1/np.log10(self.epsilon/(self.wellRadius * 2)/3.7))**2
 
-        t_d = self.alpha_rock*self.time_seconds/(self.wellRadius**2)  #dim
+        alpha_rock = self.params.k_rock/self.params.density_rock/self.params.C_rock  #D rock
+        t_d = alpha_rock*self.time_seconds/(self.wellRadius**2)  #dim
         if t_d < 2.8:
             beta = ((np.pi*t_d)**-0.5 + 0.5 - 0.25*(t_d/np.pi)**0.5 + 0.125*t_d)
         else:
