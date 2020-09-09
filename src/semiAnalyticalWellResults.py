@@ -1,4 +1,5 @@
 import numpy as np
+from utils.fluidStates import FluidState
 
 class SemiAnalyticalWellResults(object):
     """docstring for SemiAnalyticalWellResults."""
@@ -16,6 +17,9 @@ class SemiAnalyticalWellResults(object):
         self.rho_kgm3       = np.zeros(N_dx+1)
         self.cp_JK          = np.zeros(N_dx+1)
 
+    def finalState(self):
+        return FluidState.getStateFromPT(self.P_Pa[-1], self.T_C_f[-1], self.fluid)
+
     def end_P_Pa(self):
         return self.P_Pa[-1]
 
@@ -25,8 +29,10 @@ class SemiAnalyticalWellResults(object):
     def end_h_Jkg(self):
         return self.h_Jkg[-1]
 
+    # # TODO: get units and change name. do we need this?
     def getHeat(self):
         return -1. * np.sum(self.q)
 
+    # # TODO: get units and change name. do we need this?
     def getPressure(self):
         return self.P_Pa / 1.e6

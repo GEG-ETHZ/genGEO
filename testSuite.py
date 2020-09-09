@@ -1,7 +1,7 @@
 import unittest
 
 from tests.semiAnalyticalWellTest import semiAnalyticalWellTest
-
+from tests.reservoirDepletionTest import reservoirDepletionTest
 
 # # TODO: this is not considered right now. Use runner = unittest.TextTestRunner() to use it
 # # TODO: if runner = unittest.TextTestRunner() is used no test report is written

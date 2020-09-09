@@ -41,7 +41,7 @@ class SemiAnalyticalWell(object):
         # Use limit of Colebrook-white equation for large Re
         ff = 0.25 * (1/np.log10(self.epsilon/(self.wellRadius * 2)/3.7))**2
 
-        alpha_rock = self.params.k_rock/self.params.density_rock/self.params.C_rock  #D rock
+        alpha_rock = self.params.k_rock/self.params.rho_rock/self.params.C_rock  #D rock
         t_d = alpha_rock*time_seconds/(self.wellRadius**2)  #dim
         if t_d < 2.8:
             beta = ((np.pi*t_d)**-0.5 + 0.5 - 0.25*(t_d/np.pi)**0.5 + 0.125*t_d)
