@@ -2,9 +2,10 @@ import unittest
 
 from tests.semiAnalyticalWellTest import semiAnalyticalWellTest
 from tests.reservoirDepletionTest import reservoirDepletionTest
+from tests.oRCCycleTboilTest import oRCCycleTboilTest
 
 # # TODO: this is not considered right now. Use runner = unittest.TextTestRunner() to use it
-# # TODO: if runner = unittest.TextTestRunner() is used no test report is written
+# # TODO: if runner = unittest.TextTestRunner(verbosity=2) is used no test report is written
 # def testSuite():
 #     suite = unittest.TestSuite()
 #     suite.addTest(semiAnalyticalWellTest('testProductionWell'))

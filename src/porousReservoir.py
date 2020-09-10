@@ -28,6 +28,7 @@ class PorousReservoir(object):
         self.modelTemperatureDepletion = modelTemperatureDepletion
 
     def solve(self, initialState, m_dot, time_years):
+        results = PorousReservoirResults(self.fluid, self.well_spacing)
 
         self.m_dot =  m_dot
         self.time_years = time_years
@@ -40,17 +41,15 @@ class PorousReservoir(object):
         self.dT_dz = abs(self.dT_dz)
         self.depth = abs(self.depth)
 
-        T_reservoir = self.depth * self.dT_dz + self.T_surface_rock
+        results.reservoirT = self.depth * self.dT_dz + self.T_surface_rock
         P_reservoir = self.depth * 1000. * self.params.g
 
         # from output properties
-        prod_State = FluidState.getStateFromPT(P_reservoir, T_reservoir, self.fluid)
-        # # TODO: why initial here?
-        cp_prod_fluid = FluidState.getCpFromPT(initialState.P_Pa, initialState.T_C, self.fluid)
+        prod_State = FluidState.getStateFromPT(P_reservoir, results.reservoirT, self.fluid)
 
         mu_fluid = (initialState.v_Pas + prod_State.v_Pas)/2
         rho_fluid = (initialState.rho_kgm3 + prod_State.rho_kgm3)/2
-        cp_fluid = (initialState.cp_JK + cp_prod_fluid)/2
+        cp_fluid = (initialState.cp_JK + prod_State.cp_JK)/2
 
 
         # reservoir impedance
@@ -68,7 +67,7 @@ class PorousReservoir(object):
                 'Unknown Reservoir Configuration')
 
         # Calculate heat extracted
-        dT_initial = T_reservoir - initialState.T_C
+        dT_initial = results.reservoirT - initialState.T_C
         res_energy = A_reservoir * self.thickness * self.params.rho_rock * self.params.c_rock * dT_initial
 
         # Model pressure transient (Figure 4.2, Adams (2015)), only for CO2 drying out
@@ -117,27 +116,23 @@ class PorousReservoir(object):
             gamma = 1
             for i in range(int(increments)):
                 res_energy_extracted = self.m_dot * cp_fluid * gamma * dT_initial * dt + res_energy_extracted
-                Psi = res_energy_extracted / res_energy
-                gamma = depletionCurve(Psi, p1, p2, p3)
+                results.psi = res_energy_extracted / res_energy
+                gamma = depletionCurve(results.psi, p1, p2, p3)
                 # last gamma is res temp
         else:
             # gamma of 1 is undepleted reservoir
             gamma = 1
             res_energy_extracted = self.m_dot * cp_fluid * gamma * dT_initial * time_seconds
             if res_energy == 0:
-                Psi = 0
+                results.psi = 0
             else:
-                Psi = res_energy_extracted / res_energy
+                results.psi = res_energy_extracted / res_energy
 
         # Calculate final values
-        results = PorousReservoirResults(self.fluid, self.well_spacing)
         results.dP = self.m_dot * RI
         results.end_P_Pa = initialState.P_Pa - results.dP
         results.end_T_C = gamma * dT_initial + initialState.T_C
         results.end_h_Jkg = FluidState.getHFromPT(results.end_P_Pa, results.end_T_C, self.fluid)
-        starth = initialState.h_Jkg
-        results.heat = self.m_dot * (results.end_h_Jkg - starth)
-        results.reservoirT = T_reservoir
-        results.psi = Psi
+        results.heat = self.m_dot * (results.end_h_Jkg - initialState.h_Jkg)
 
         return results

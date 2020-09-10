@@ -53,7 +53,7 @@ class reservoirDepletionTest(unittest.TestCase):
         self.assertTrue(*testAssert(results.end_P_Pa, 2.0351e7, 'test2_pressure'))
         self.assertTrue(*testAssert(results.end_T_C, 102.5, 'test2_temp'))
         self.assertTrue(*testAssert(results.end_h_Jkg, 4.30e5, 'test2_enthalpy'))
-        self.assertTrue(*testAssert(results.psi, 1.232, 'test2_Psi'))
+        self.assertTrue(*testAssert(results.psi, 1.2713, 'test2_Psi'))
 
     def testTransientPNoT(self):
         reservoir.modelPressureTransient = False
@@ -64,9 +64,9 @@ class reservoirDepletionTest(unittest.TestCase):
                         time_years = 30)
 
         self.assertTrue(*testAssert(results.end_P_Pa, 2.0351e7, 'test3_pressure'))
-        self.assertTrue(*testAssert(results.end_T_C, 70.78, 'test3_temp'))
-        self.assertTrue(*testAssert(results.end_h_Jkg, 3.5084e5, 'test3_enthalpy'))
-        self.assertTrue(*testAssert(results.psi, 0.9082, 'test3_Psi'))
+        self.assertTrue(*testAssert(results.end_T_C, 70.678, 'test3_temp'))
+        self.assertTrue(*testAssert(results.end_h_Jkg, 3.5056e5, 'test3_enthalpy'))
+        self.assertTrue(*testAssert(results.psi, 0.92775, 'test3_Psi'))
 
     def testTransientPT(self):
         reservoir.modelPressureTransient = True
@@ -77,9 +77,9 @@ class reservoirDepletionTest(unittest.TestCase):
                         time_years = 30)
 
         self.assertTrue(*testAssert(results.end_P_Pa, 1.9325e7, 'test4_pressure'))
-        self.assertTrue(*testAssert(results.end_T_C, 70.78, 'test4_temp'))
-        self.assertTrue(*testAssert(results.end_h_Jkg, 3.5480e5, 'test4_enthalpy'))
-        self.assertTrue(*testAssert(results.psi, 0.9082, 'test4_Psi'))
+        self.assertTrue(*testAssert(results.end_T_C, 70.678, 'test4_temp'))
+        self.assertTrue(*testAssert(results.end_h_Jkg, 3.5452e5, 'test4_enthalpy'))
+        self.assertTrue(*testAssert(results.psi, 0.92775, 'test4_Psi'))
 
     def testTransientTNoP(self):
         reservoir.modelPressureTransient = False
@@ -90,6 +90,6 @@ class reservoirDepletionTest(unittest.TestCase):
                         time_years = 30)
 
         self.assertTrue(*testAssert(results.end_P_Pa, 1.5702e7, 'test5_pressure'))
-        self.assertTrue(*testAssert(results.end_T_C, 53.66, 'test5_temp'))
-        self.assertTrue(*testAssert(results.end_h_Jkg, 3.2196e5, 'test5_enthalpy'))
-        self.assertTrue(*testAssert(results.psi, 1.3701, 'test5_Psi'))
+        self.assertTrue(*testAssert(results.end_T_C, 53.352, 'test5_temp'))
+        self.assertTrue(*testAssert(results.end_h_Jkg, 3.2103e5, 'test5_enthalpy'))
+        self.assertTrue(*testAssert(results.psi, 1.3877, 'test5_Psi'))
