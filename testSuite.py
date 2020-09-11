@@ -4,6 +4,7 @@ from tests.semiAnalyticalWellTest import semiAnalyticalWellTest
 from tests.reservoirDepletionTest import reservoirDepletionTest
 from tests.oRCCycleTboilTest import oRCCycleTboilTest
 from tests.oRCCycleSupercritPboilTest import oRCCycleSupercritPboilTest
+from tests.oRCCycleSupercritPboilTest import heatExchangerTest
 
 # # TODO: this is not considered right now. Use runner = unittest.TextTestRunner() to use it
 # # TODO: if runner = unittest.TextTestRunner(verbosity=2) is used no test report is written
