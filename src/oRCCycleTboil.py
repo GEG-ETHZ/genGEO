@@ -7,6 +7,10 @@ from utils.fluidStates import FluidState
 from src.parasiticPowerFractionCoolingTower import parasiticPowerFractionCoolingTower
 from src.oRCCycleResults import ORCCycleResults
 
+class ORCCycleTboilOutput(object):
+    """ORCCycleTboilOutput."""
+    pass
+
 class ORCCycleTboil(object):
     """ ORCCycleTboil.
     Heat/power is output as specific heat and specific work. To find the
@@ -21,7 +25,7 @@ class ORCCycleTboil(object):
         self.eta_turbine = eta_turbine
         self.coolingMode = coolingMode
         self.orcFluid = orcFluid
-        self.filepath = os.path.join(getProjectRoot(), 'data', 'ORC_Tboil_optimum_%s.csv'%orcFluid)
+        self.filepath = getTboilOptimum(orcFluid)
 
     def solve(self, T_in_C, T_boil_C = False):
 
@@ -132,3 +136,7 @@ class ORCCycleTboil(object):
         results.end_T_C = T_C_13
 
         return results
+
+    def gatherOutput(self):
+        output = ORCCycleTboilOutput()
+        return output

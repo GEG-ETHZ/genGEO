@@ -7,6 +7,9 @@ def getProjectRoot() -> Path:
 def getWellCost():
     return os.path.join(getProjectRoot(), 'data', 'PPI_Table.xlsx')
 
+def getTboilOptimum(orcFluid):
+    return os.path.join(getProjectRoot(), 'data', 'ORC_Tboil_optimum_%s.csv'%orcFluid)
+
 class globalConstants(object):
     """globalConstants carries global constants to convert units."""
 
