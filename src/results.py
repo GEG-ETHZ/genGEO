@@ -4,6 +4,3 @@ class Results(object):
     def __init__(self, fluid):
         self.end_T_C = None
         self.fluid =  fluid
-
-    def finalState(self):
-        return FluidState.getStateFromTQ(self.end_T_C, 0, self.fluid)

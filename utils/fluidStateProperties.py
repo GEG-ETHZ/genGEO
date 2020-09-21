@@ -5,7 +5,7 @@ class FluidStateProperties(FluidState):
     """FluidStateProperties."""
 
     def __init__(self, arg):
-        super(FluidState, self).__init__()
+        super(FluidState, self)
 
     def rho_kgm3(self):
         return self.getRhoFromPh(self.P_Pa(), self.h_Jkg(), self.fluid)

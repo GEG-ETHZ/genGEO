@@ -5,16 +5,16 @@ class FluidStateFromPh(FluidStateProperties):
     """FluidStateFromPh."""
 
     def __init__(self, P_Pa, h_Jkg, fluid):
-        super(FluidStateProperties, self).__init__()
-        self.P_Pa_init = P_Pa
-        self.h_Jkg_init = h_Jkg
+        super(FluidStateProperties, self)
+        self.P_Pa_in = P_Pa
+        self.h_Jkg_in = h_Jkg
         self.fluid = fluid
 
     def P_Pa(self):
-        return self.P_Pa_init
+        return self.P_Pa_in
 
     def h_Jkg(self):
-        return self.h_Jkg_init
+        return self.h_Jkg_in
 
 
 if __name__ == '__main__':

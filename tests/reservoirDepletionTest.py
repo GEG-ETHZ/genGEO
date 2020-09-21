@@ -6,7 +6,7 @@ from utils.depletionCurve import depletionCurve
 from utils.globalProperties import GlobalSimulationProperties
 from utils.globalConstants import globalConstants
 from tests.testAssertion import testAssert
-from utils.fluidStates import FluidState
+from utils.fluidStateFromPT import FluidStateFromPT
 
 
 # define global methods to be used in the tests
@@ -29,7 +29,7 @@ reservoir = PorousReservoir(
             modelPressureTransient = False,
             modelTemperatureDepletion = False)
 
-initialState = FluidState.getStateFromPT(25.e6, 40., reservoir.fluid)
+initialState = FluidStateFromPT(25.e6, 40., reservoir.fluid)
 
 class reservoirDepletionTest(unittest.TestCase):
 
@@ -111,7 +111,7 @@ class reservoirDepletionTest(unittest.TestCase):
     #                 fluid = 'Water',
     #                 modelPressureTransient = False,
     #                 modelTemperatureDepletion = False)
-    #     initialState = FluidState.getStateFromPT(25.e6, 15., reservoir.fluid)
+    #     initialState = FluidStateFromPT(25.e6, 15., reservoir.fluid)
     #     reservoir.solve(
     #                     initialState = initialState,
     #                     m_dot = 100,

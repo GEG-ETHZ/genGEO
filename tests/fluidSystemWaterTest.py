@@ -5,10 +5,13 @@ from src.semiAnalyticalWell import SemiAnalyticalWell
 from src.porousReservoir import PorousReservoir
 from src.fluidSystemWater import FluidSystemWater
 from src.surfacePlantComponents import DownHolePump
+from src.oRCCycleTboil import ORCCycleTboil
+
 from utils.globalProperties import GlobalSimulationProperties
 from utils.globalConstants import globalConstants
+from utils.fluidStateFromPT import FluidStateFromPT
+
 from tests.testAssertion import testAssert
-from utils.fluidStates import FluidState
 
 
 # define global methods to be used in this tests
@@ -60,6 +63,14 @@ pump = DownHolePump(well = prod_well2,
                     pump_depth = 500,
                     max_pump_dP = 10e6)
 
+cycle = ORCCycleTboil(T_ambient_C = 15.,
+                        dT_approach = 7.,
+                        dT_pinch = 5.,
+                        eta_pump = 0.9,
+                        eta_turbine = 0.8,
+                        coolingMode = 'Wet',
+                        orcFluid = 'R245fa')
+
 class FluidSystemWaterTest(unittest.TestCase):
 
     def testFluidSystemWater(self):
@@ -69,24 +80,25 @@ class FluidSystemWaterTest(unittest.TestCase):
         fluid_system.reservoir = reservoir
         fluid_system.production_well1 = prod_well1
         fluid_system.pump = pump
-        fluid_system.production_well2 = prod_well2
+        fluid_system.oRC = cycle
 
-        initialState = FluidState.getStateFromPT(1.e6, 15., fluid_system.fluid)
-        fluid_system.solve(initial_state = initialState,
+        initialState = FluidStateFromPT(1.e6, 15., fluid_system.fluid)
+        results = fluid_system.solve(initial_state = initialState,
                         m_dot = 100,
                         time_years = 10)
 
-        results = fluid_system.gatherOutput()
+        output = fluid_system.gatherOutput()
 
+        # print(results)
 
-        # print(results.injection_well.end_P_Pa())
-        # print(results.injection_well.end_T_C())
-        # print(results.injection_well.end_h_Jkg())
+        # print(output.injection_well.end_P_Pa())
+        # print(output.injection_well.end_T_C())
+        # print(output.injection_well.end_h_Jkg())
         #
-        # fs = results.reservoir.finalState()
-        # fp = results.reservoir.getPressure()
-        # print(fs.S_JK, fp, results.reservoir.heat)
+        # fs = output.reservoir.finalState()
+        # fp = output.reservoir.getPressure()
+        # print(fs.S_JK, fp, output.reservoir.heat)
         #
-        # print(results.production_well1.end_P_Pa())
-        # print(results.production_well1.end_T_C())
-        # print(results.production_well1.end_h_Jkg())
+        # print(output.production_well1.end_P_Pa())
+        # print(output.production_well1.end_T_C())
+        # print(output.production_well1.end_h_Jkg())

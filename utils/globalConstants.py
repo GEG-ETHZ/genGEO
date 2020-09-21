@@ -7,6 +7,9 @@ def getProjectRoot() -> Path:
 def getWellCost():
     return os.path.join(getProjectRoot(), 'data', 'PPI_Table.xlsx')
 
+def getPboilOptimum():
+    return os.path.join(getProjectRoot(), 'data', 'ORC_Pboil_optimum.csv')
+
 def getTboilOptimum(orcFluid):
     return os.path.join(getProjectRoot(), 'data', 'ORC_Tboil_optimum_%s.csv'%orcFluid)
 

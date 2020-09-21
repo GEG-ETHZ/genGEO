@@ -4,7 +4,7 @@ import numpy as np
 from src.semiAnalyticalWell import SemiAnalyticalWell
 from utils.globalProperties import GlobalSimulationProperties
 from utils.globalConstants import globalConstants
-from utils.fluidStates import FluidState
+from utils.fluidStateFromPT import FluidStateFromPT
 from tests.testAssertion import testAssert
 
 class semiAnalyticalWellTest(unittest.TestCase):
@@ -30,7 +30,7 @@ class semiAnalyticalWellTest(unittest.TestCase):
                                 T_e_initial = 102.5)
 
         # initial state
-        initial_state = FluidState.getStateFromPT(25.e6, 97., well.fluid)
+        initial_state = FluidStateFromPT(25.e6, 97., well.fluid)
 
         well.solve(initial_state = initial_state,
                                 m_dot = 136.,
@@ -45,7 +45,7 @@ class semiAnalyticalWellTest(unittest.TestCase):
         # CO2
         well.fluid = 'CO2'
         # initial state
-        initial_state = FluidState.getStateFromPT(25.e6, 97., well.fluid)
+        initial_state = FluidStateFromPT(25.e6, 97., well.fluid)
         well.solve(initial_state = initial_state,
                     time_years = 10.,
                     m_dot = 136.)
@@ -72,7 +72,7 @@ class semiAnalyticalWellTest(unittest.TestCase):
                                         T_e_initial = 15.)
 
         # initial state
-        initial_state = FluidState.getStateFromPT(1.e6, 25., vertical_well.fluid)
+        initial_state = FluidStateFromPT(1.e6, 25., vertical_well.fluid)
         vertical_well.solve(initial_state = initial_state,
                                                     m_dot = 5.,
                                                     time_years = 10.)
@@ -92,7 +92,7 @@ class semiAnalyticalWellTest(unittest.TestCase):
                                         T_e_initial = 15.+ 0.06 * abs(vertical_well.dz_total))
 
         # initial state
-        initial_state = FluidState.getStateFromPT(vertical_well_results.end_P_Pa(), vertical_well_results.end_T_C(), vertical_well_results.fluid)
+        initial_state = FluidStateFromPT(vertical_well_results.end_P_Pa(), vertical_well_results.end_T_C(), vertical_well_results.fluid)
         horizontal_well.solve(initial_state = initial_state,
                             m_dot = 5.,
                             time_years = 10.)
@@ -119,7 +119,7 @@ class semiAnalyticalWellTest(unittest.TestCase):
                                             T_e_initial = 15.)
 
         # initial state
-        initial_state = FluidState.getStateFromPT(1.e6, 25., vertical_well.fluid)
+        initial_state = FluidStateFromPT(1.e6, 25., vertical_well.fluid)
         vertical_well.solve(initial_state = initial_state,
                                                     m_dot = 5.,
                                                     time_years = 10.)
@@ -139,7 +139,7 @@ class semiAnalyticalWellTest(unittest.TestCase):
                                             T_e_initial = 15. + 0.06 * abs(vertical_well.dz_total))
 
         # initial state
-        initial_state = FluidState.getStateFromPT(vertical_well_results.end_P_Pa(), vertical_well_results.end_T_C(), vertical_well.fluid)
+        initial_state = FluidStateFromPT(vertical_well_results.end_P_Pa(), vertical_well_results.end_T_C(), vertical_well.fluid)
         horizontal_well.solve(initial_state = initial_state,
                             m_dot = 5.,
                             time_years = 10.)

@@ -1,5 +1,5 @@
 
-from utils.fluidStates import FluidState
+from utils.fluidStateFromPT import FluidStateFromPT
 
 class DownHolePumpOutput(object):
     """DownHolePumpOutput."""
@@ -25,29 +25,27 @@ class DownHolePump(object):
                 if dP_pump > self.max_pump_dP:
                     dP_pump = self.max_pump_dP
 
-                P_prod_pump_out = initial_state.P_Pa + dP_pump
-                T_prod_pump_out = initial_state.T_C
+                P_prod_pump_out = initial_state.P_Pa() + dP_pump
+                T_prod_pump_out = initial_state.T_C()
                 temp_at_pump_depth = self.well.T_e_initial + self.well.dT_dz * self.pump_depth
 
-                state = FluidState.getStateFromPT(P_prod_pump_out, T_prod_pump_out, self.well.fluid)
+                state = FluidStateFromPT(P_prod_pump_out, T_prod_pump_out, self.well.fluid)
                 state = self.well.solve(state, m_dot, time_years)
 
-                dP_surface = (state.P_Pa - P_inj_surface)
+                dP_surface = (state.P_Pa() - P_inj_surface)
                 if dP_pump == self.max_pump_dP:
                     break
 
                 if dP_surface < 0:
                     d_dP_pump = -1 * dP_surface
                     dP_pump = dP_pump + d_dP_pump
-            except:
-                # print(val)
-                # 1/0
-                raise ValueError('asd')
-               #  # Only catch problems of flashing fluid
-               # if (strcmp(ME.identifier,'SemiAnalytic:BelowSaturationPressure'))
-               #      dP_pump = dP_pump + d_dP_pump
-               # else:
-               #      rethrow(ME)
+
+            except ValueError as error:
+                # Only catch problems of flashing fluid
+                if str(error).find('SemiAnalyticalWell:BelowSaturationPressure') > -1:
+                    dP_pump = dP_pump + d_dP_pump
+                else:
+                   raise error
 
         return state
 

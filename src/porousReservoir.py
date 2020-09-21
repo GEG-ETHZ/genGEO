@@ -2,6 +2,7 @@ import math
 import numpy as np
 
 from utils.fluidStates import FluidState
+from utils.fluidStateFromPT import FluidStateFromPT
 from utils.depletionCurve import depletionCurve
 from utils.globalConstants import globalConstants
 from src.porousReservoirResults import PorousReservoirResults
@@ -44,11 +45,11 @@ class PorousReservoir(object):
         self.depth = abs(self.depth)
 
         # from output properties
-        prod_State = FluidState.getStateFromPT(self.P_reservoir, self.reservoirT, self.fluid)
+        prod_State = FluidStateFromPT(self.P_reservoir, self.reservoirT, self.fluid)
 
-        mu_fluid = (self.initialState.v_Pas + prod_State.v_Pas)/2
-        rho_fluid = (self.initialState.rho_kgm3 + prod_State.rho_kgm3)/2
-        cp_fluid = (self.initialState.cp_JK + prod_State.cp_JK)/2
+        mu_fluid = (self.initialState.v_Pas() + prod_State.v_Pas())/2
+        rho_fluid = (self.initialState.rho_kgm3() + prod_State.rho_kgm3())/2
+        cp_fluid = (self.initialState.cp_JK() + prod_State.cp_JK())/2
 
 
         # reservoir impedance
@@ -66,13 +67,13 @@ class PorousReservoir(object):
                 'Unknown Reservoir Configuration')
 
         # Calculate heat extracted
-        dT_initial = self.reservoirT - self.initialState.T_C
+        dT_initial = self.reservoirT - self.initialState.T_C()
         res_energy = A_reservoir * self.thickness * self.params.rho_rock * self.params.c_rock * dT_initial
 
         # Model pressure transient (Figure 4.2, Adams (2015)), only for CO2 drying out
         if self.modelPressureTransient == True and self.fluid=='CO2':
             R = self.well_spacing
-            nu_inj_fluid = self.initialState.v_Pas / self.initialState.rho_kgm3
+            nu_inj_fluid = self.initialState.v_Pas() / self.initialState.rho_kgm3()
             # fit doesn't work before 2 years
             if self.time_years < 2.:
                 tau = (globalConstants.secPerYear * 2.) * nu_inj_fluid / R**2.
@@ -92,7 +93,7 @@ class PorousReservoir(object):
         # At time zero, output is the same as no temp depletion
         if self.modelTemperatureDepletion == True and self.time_years > 0.:
             # p1
-            coeff1 = self.thickness * self.params.k_rock * self.initialState.rho_kgm3 / self.m_dot / self.params.rho_rock / self.params.c_rock
+            coeff1 = self.thickness * self.params.k_rock * self.initialState.rho_kgm3() / self.m_dot / self.params.rho_rock / self.params.c_rock
             p1 = -890.97*coeff1 - 1.30
             # limit to regression
             p1 = np.minimum(p1, -1.3)
@@ -100,7 +101,7 @@ class PorousReservoir(object):
             p2 = 0.4095*np.exp(-0.7815 * p1)
             # p3
             R = self.well_spacing
-            coeff2 = self.params.k_rock * R * self.initialState.rho_kgm3 / self.params.rho_rock / self.initialState.cp_JK / self.m_dot
+            coeff2 = self.params.k_rock * R * self.initialState.rho_kgm3() / self.params.rho_rock / self.initialState.cp_JK() / self.m_dot
             # A more realistic, exponential relation is found by fitting the same data
             # with an exponential, instead of linear, curve.
             p3 = 1 - (1.4646 * np.exp(-377.3*coeff2))
@@ -127,18 +128,18 @@ class PorousReservoir(object):
             else:
                 self.psi = res_energy_extracted / res_energy
 
-        self.end_P_Pa = self.initialState.P_Pa - (self.m_dot * self.RI)
-        self.end_T_C = gamma * dT_initial + self.initialState.T_C
-        return FluidState.getStateFromPT(self.end_P_Pa, self.end_T_C, self.fluid)
+        self.end_P_Pa = self.initialState.P_Pa() - (self.m_dot * self.RI)
+        self.end_T_C = gamma * dT_initial + self.initialState.T_C()
+        return FluidStateFromPT(self.end_P_Pa, self.end_T_C, self.fluid)
 
     def gatherOutput(self):
         output = PorousReservoirResults(self.fluid, self.well_spacing)
         # Calculate final values
         output.dP = self.m_dot * self.RI
-        output.end_P_Pa = self.initialState.P_Pa - output.dP
+        output.end_P_Pa = self.initialState.P_Pa() - output.dP
         output.end_T_C = self.end_T_C
         output.end_h_Jkg = FluidState.getHFromPT(self.end_P_Pa, self.end_T_C, self.fluid)
-        output.heat = self.m_dot * (output.end_h_Jkg - self.initialState.h_Jkg)
+        output.heat = self.m_dot * (output.end_h_Jkg - self.initialState.h_Jkg())
         output.psi =  self.psi
         output.reservoirT = self.reservoirT
         return output

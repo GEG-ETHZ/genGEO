@@ -1,4 +1,3 @@
-from utils.fluidStates import FluidState
 
 class ORCCycleResults(object):
     """ORCCycleResults."""
@@ -17,6 +16,3 @@ class ORCCycleResults(object):
         self.dT_LMTD_boiler = None
         self.end_T_C = None
         self.fluid =  'Water'
-
-    def finalState(self):
-        return FluidState.getStateFromTQ(self.end_T_C, 0, self.fluid)

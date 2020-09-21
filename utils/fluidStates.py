@@ -86,57 +86,57 @@ class FluidState(object):
     def getPcrit(fluid):
         return PropsSI('PCRIT', "", 0, "", 0, fluid)
 
-    @staticmethod
-    def getStateFromTQ(T_C, Q, fluid):
-        st = FluidState()
-        st.T_C = T_C
-        st.fluid = fluid
-        st.P_Pa = st.getPFromTQ(T_C, Q, fluid)
-        st.h_Jkg = st.getHFromTQ(T_C, Q, fluid)
-        st.S_JK = st.getSFromTQ(T_C, Q, fluid)
-        st.rho_kgm3 = st.getRhoFromPh(st.P_Pa, st.h_Jkg, fluid)
-        st.cp_JK = st.getCpFromPh(st.P_Pa, st.h_Jkg, fluid)
-        st.v_Pas = st.getVFromPh(st.P_Pa, st.h_Jkg, fluid)
-        return st
+    # @staticmethod
+    # def getStateFromTQ(T_C, Q, fluid):
+    #     st = FluidState()
+    #     st.T_C = T_C
+    #     st.fluid = fluid
+    #     st.P_Pa = st.getPFromTQ(T_C, Q, fluid)
+    #     st.h_Jkg = st.getHFromTQ(T_C, Q, fluid)
+    #     st.S_JK = st.getSFromTQ(T_C, Q, fluid)
+    #     st.rho_kgm3 = st.getRhoFromPh(st.P_Pa, st.h_Jkg, fluid)
+    #     st.cp_JK = st.getCpFromPh(st.P_Pa, st.h_Jkg, fluid)
+    #     st.v_Pas = st.getVFromPh(st.P_Pa, st.h_Jkg, fluid)
+    #     return st
+    #
+    # @staticmethod
+    # def getStateFromPT(P_Pa, T_C, fluid):
+    #     st = FluidState()
+    #     st.P_Pa = P_Pa
+    #     st.T_C = T_C
+    #     st.fluid = fluid
+    #     st.h_Jkg = st.getHFromPT(P_Pa, T_C, fluid)
+    #     st.rho_kgm3 = st.getRhoFromPT(P_Pa, T_C, fluid)
+    #     st.cp_JK = st.getCpFromPT(P_Pa, T_C, fluid)
+    #     st.v_Pas = st.getVFromPT(P_Pa, T_C, fluid)
+    #     st.S_JK = st.getSFromPT(P_Pa, T_C, fluid)
+    #     return st
+    #
+    # @staticmethod
+    # def getStateFromPh(P_Pa, h_Jkg, fluid):
+    #     st = FluidState()
+    #     st.P_Pa = P_Pa
+    #     st.h_Jkg = h_Jkg
+    #     st.fluid = fluid
+    #     st.T_C = st.getTFromPh(P_Pa, h_Jkg, fluid)
+    #     st.rho_kgm3 = st.getRhoFromPh(P_Pa, h_Jkg, fluid)
+    #     st.cp_JK = st.getCpFromPh(P_Pa, h_Jkg, fluid)
+    #     st.v_Pas = st.getVFromPh(P_Pa, h_Jkg, fluid)
+    #     st.S_JK = st.getSFromPh(P_Pa, h_Jkg, fluid)
+    #     return st
 
-    @staticmethod
-    def getStateFromPT(P_Pa, T_C, fluid):
-        st = FluidState()
-        st.P_Pa = P_Pa
-        st.T_C = T_C
-        st.fluid = fluid
-        st.h_Jkg = st.getHFromPT(P_Pa, T_C, fluid)
-        st.rho_kgm3 = st.getRhoFromPT(P_Pa, T_C, fluid)
-        st.cp_JK = st.getCpFromPT(P_Pa, T_C, fluid)
-        st.v_Pas = st.getVFromPT(P_Pa, T_C, fluid)
-        st.S_JK = st.getSFromPT(P_Pa, T_C, fluid)
-        return st
-
-    @staticmethod
-    def getStateFromPh(P_Pa, h_Jkg, fluid):
-        st = FluidState()
-        st.P_Pa = P_Pa
-        st.h_Jkg = h_Jkg
-        st.fluid = fluid
-        st.T_C = st.getTFromPh(P_Pa, h_Jkg, fluid)
-        st.rho_kgm3 = st.getRhoFromPh(P_Pa, h_Jkg, fluid)
-        st.cp_JK = st.getCpFromPh(P_Pa, h_Jkg, fluid)
-        st.v_Pas = st.getVFromPh(P_Pa, h_Jkg, fluid)
-        st.S_JK = st.getSFromPh(P_Pa, h_Jkg, fluid)
-        return st
-
-if __name__ == '__main__':
-    import numpy as np
-    P = np.array([1.e6, 1.e7])
-    T = np.array([50., 60.])
-    state = FluidState.getStateFromPT(P, T, 'water')
-    print(state.h_Jkg)
-    print(state.rho_kgm3)
-    print(state.cp_JK)
-    print(state.S_JK)
-    state = FluidState.getStateFromPh(P, state.h_Jkg, 'water')
-    print(state.T_C)
-    print(state.rho_kgm3)
-    print(state.cp_JK)
-    print(state.S_JK)
-    print(FluidState.getPFromTQ(T, 0, 'water'))
+# if __name__ == '__main__':
+#     import numpy as np
+#     P = np.array([1.e6, 1.e7])
+#     T = np.array([50., 60.])
+#     state = FluidState.getStateFromPT(P, T, 'water')
+#     print(state.h_Jkg)
+#     print(state.rho_kgm3)
+#     print(state.cp_JK)
+#     print(state.S_JK)
+#     state = FluidState.getStateFromPh(P, state.h_Jkg, 'water')
+#     print(state.T_C)
+#     print(state.rho_kgm3)
+#     print(state.cp_JK)
+#     print(state.S_JK)
+#     print(FluidState.getPFromTQ(T, 0, 'water'))

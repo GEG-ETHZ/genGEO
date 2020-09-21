@@ -1,5 +1,6 @@
 import numpy as np
-from utils.fluidStates import FluidState
+
+from utils.fluidStateFromPT import FluidStateFromPT
 
 class SemiAnalyticalWellResults(object):
     """docstring for SemiAnalyticalWellResults."""
@@ -18,7 +19,7 @@ class SemiAnalyticalWellResults(object):
         self.cp_JK          = np.zeros(N_dx+1)
 
     def finalState(self):
-        return FluidState.getStateFromPT(self.P_Pa[-1], self.T_C_f[-1], self.fluid)
+        return FluidStateFromPT(self.P_Pa[-1], self.T_C_f[-1], self.fluid)
 
     def end_P_Pa(self):
         return self.P_Pa[-1]

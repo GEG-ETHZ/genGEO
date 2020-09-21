@@ -1,6 +1,5 @@
 import numpy as np
 
-from utils.fluidStates import FluidState
 from src.heatExchanger import heatExchanger
 
 def heatExchangerOptMdot(T_1_in, P_1, fluid_1, T_2_in, P_2, fluid_2, dT_pinch, T_1_out_min, maximizeHeatFromStream = '2'):

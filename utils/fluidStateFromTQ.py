@@ -5,19 +5,19 @@ class FluidStateFromTQ(FluidStateProperties):
     """FluidStateFromTQ."""
 
     def __init__(self, T_C, Q, fluid):
-        super(FluidStateProperties, self).__init__()
-        self.Q_init = Q
-        self.T_C_init = T_C
+        super(FluidStateProperties, self)
+        self.Q_in = Q
+        self.T_C_in = T_C
         self.fluid = fluid
 
     def P_Pa(self):
-        return self.getPFromTQ(self.T_C(), self.Q_init, self.fluid)
+        return self.getPFromTQ(self.T_C(), self.Q_in, self.fluid)
 
     def h_Jkg(self):
-        return self.getHFromTQ(self.T_C(), self.Q_init, self.fluid)
+        return self.getHFromTQ(self.T_C(), self.Q_in, self.fluid)
 
     def T_C(self):
-        return self.T_C_init
+        return self.T_C_in
 
 if __name__ == '__main__':
     import numpy as np

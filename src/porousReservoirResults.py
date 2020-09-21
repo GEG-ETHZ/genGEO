@@ -1,5 +1,6 @@
 import numpy as np
-from utils.fluidStates import FluidState
+
+from utils.fluidStateFromPT import FluidStateFromPT
 
 class PorousReservoirResults(object):
     """PorousReservoirResults."""
@@ -15,7 +16,7 @@ class PorousReservoirResults(object):
         self.end_h_Jkg = None
 
     def finalState(self):
-        return FluidState.getStateFromPT(self.end_P_Pa, self.end_T_C, self.fluid)
+        return FluidStateFromPT(self.end_P_Pa, self.end_T_C, self.fluid)
 
     # # TODO: do we need this?
     def getPressure(self):

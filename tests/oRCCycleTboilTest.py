@@ -3,7 +3,7 @@ import unittest
 from src.oRCCycleTboil import ORCCycleTboil
 from src.parasiticPowerFractionCoolingTower import parasiticPowerFractionCoolingTower
 from tests.testAssertion import testAssert
-from utils.fluidStates import FluidState
+from utils.fluidStateFromPT import FluidStateFromPT
 
 
 class oRCCycleTboilTest(unittest.TestCase):
@@ -30,14 +30,16 @@ class oRCCycleTboilTest(unittest.TestCase):
                                 coolingMode = 'Wet',
                                 orcFluid = 'R245fa')
 
-        results = cycle.solve(T_in_C = 150., T_boil_C = 100.)
+        initialState = FluidStateFromPT(1.e6, 150., 'water')
+        results = cycle.solve(initialState, T_boil_C = 100.)
         self.assertTrue(*testAssert(results.end_T_C, 68.36, 'test1_temp'))
         self.assertTrue(*testAssert(results.w_net, 3.8559e4, 'test1_w_net'))
         self.assertTrue(*testAssert(results.w_turbine, 4.7773e4, 'test1_w_turbine'))
         self.assertTrue(*testAssert(results.q_preheater, 1.5778e5, 'test1_q_preheater'))
         self.assertTrue(*testAssert(results.q_boiler, 1.9380e5, 'test1_q_boiler'))
 
-        results = cycle.solve(T_in_C = 15., T_boil_C = 100.)
+        initialState = FluidStateFromPT(1.e6, 15., 'water')
+        results = cycle.solve(initialState, T_boil_C = 100.)
         self.assertTrue(*testAssert(results.end_T_C, 178.2724, 'test2_temp'))
         self.assertTrue(*testAssert(results.w_net, -7.5000e4, 'test2_w_net'))
         self.assertTrue(*testAssert(results.w_turbine, -9.2921e4, 'test2_w_turbine'))

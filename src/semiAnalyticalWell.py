@@ -2,6 +2,7 @@ import math
 import numpy as np
 
 from utils.fluidStates import FluidState
+from utils.fluidStateFromPT import FluidStateFromPT
 from utils.globalConstants import globalConstants
 from src.semiAnalyticalWellResults import SemiAnalyticalWellResults
 
@@ -26,8 +27,8 @@ class SemiAnalyticalWell(object):
 
     def solve(self, initial_state, m_dot, time_years):
 
-        P_f_initial = initial_state.P_Pa
-        T_f_initial = initial_state.T_C
+        P_f_initial = initial_state.P_Pa()
+        T_f_initial = initial_state.T_C()
         time_seconds = time_years * globalConstants.secPerYear
 
         # set geometry
@@ -82,7 +83,7 @@ class SemiAnalyticalWell(object):
             if self.fluid == 'Water':
                 P_sat = FluidState.getPFromTQ(self.results.T_C_f[i-1], 0, self.fluid)
                 if self.results.P_Pa[i] < P_sat:
-                    raise ValueError('SemiAnalyticalWell:BelowSaturationPressure - ',\
+                    raise ValueError('SemiAnalyticalWell:BelowSaturationPressure - ' \
                     'Below saturation pressure of water at %s m !' %(self.results.z_m[i]))
 
             h_noHX = self.results.h_Jkg[i-1] - self.params.g * dz
@@ -106,7 +107,7 @@ class SemiAnalyticalWell(object):
                     self.results.T_C_f[i] = (y * T_noHX + x *self.results. T_C_e[i]) / (x + y)
                 self.results.q[i] = y * (T_noHX - self.results.T_C_f[i])
                 self.results.h_Jkg[i] = FluidState.getHFromPT(self.results.P_Pa[i], self.results.T_C_f[i], self.fluid)
-        return FluidState.getStateFromPT(self.results.P_Pa[i], self.results.T_C_f[i], self.fluid)
+        return FluidStateFromPT(self.results.P_Pa[i], self.results.T_C_f[i], self.fluid)
 
     def gatherOutput(self):
         return self.results
