@@ -1,4 +1,5 @@
 from CoolProp.CoolProp import PropsSI
+
 from utils.globalConstants import globalConstants
 
 class FluidState(object):
@@ -77,11 +78,6 @@ class FluidState(object):
     def getTFromPS(P_Pa, S_JK, fluid):
         return PropsSI('T', 'P', P_Pa, 'SMASS', S_JK, fluid) - globalConstants.kelvin2celsius
 
-    # @staticmethod
-    # def getGenericState(out, in1, in1v, in2, in2v, fluid):
-    #     print(out, in1, in1v, in2, in2v, fluid)
-    #     PropsSI(out, in1, in1v, in2, in2v, fluid)
-
     @staticmethod
     def getTcrit(fluid):
         return PropsSI('TCRIT', "", 0, "", 0, fluid) - globalConstants.kelvin2celsius
@@ -128,19 +124,6 @@ class FluidState(object):
         st.v_Pas = st.getVFromPh(P_Pa, h_Jkg, fluid)
         st.S_JK = st.getSFromPh(P_Pa, h_Jkg, fluid)
         return st
-
-    # @staticmethod
-    # def getState():
-    #     st = FluidState()
-    #     st.P_Pa = None
-    #     st.h_Jkg = None
-    #     st.fluid = None
-    #     st.T_C = None
-    #     st.rho_kgm3 = None
-    #     st.cp_JK = None
-    #     st.v_Pas = None
-    #     st.S_JK = None
-    #     return st
 
 if __name__ == '__main__':
     import numpy as np
