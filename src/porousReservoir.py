@@ -26,6 +26,7 @@ class PorousReservoir(object):
         self.fluid = fluid
         self.reservoirT = abs(self.depth) * abs(self.dT_dz) + self.T_surface_rock
         self.P_reservoir = self.depth * 1000. * self.params.g
+        self.P_reservoir_max = self.depth * 2500. * self.params.g
         self.reservoirConfiguration = reservoirConfiguration
         self.modelPressureTransient = modelPressureTransient
         self.modelTemperatureDepletion = modelTemperatureDepletion

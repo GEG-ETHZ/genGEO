@@ -35,5 +35,5 @@ class SemiAnalyticalWellResults(object):
         return -1. * np.sum(self.q)
 
     # # TODO: get units and change name. do we need this?
-    def getPressure(self):
+    def getPressureAlongWell(self):
         return self.P_Pa / 1.e6

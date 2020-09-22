@@ -139,7 +139,9 @@ class ORCCycleTboil(object):
 
         results.end_T_C = T_C_13
 
-        return results
+        # return results
+        initialState.T_C_in = T_C_13
+        return initialState
 
     def gatherOutput(self):
         output = ORCCycleTboilOutput()

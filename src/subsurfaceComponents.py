@@ -29,8 +29,8 @@ class DownHolePump(object):
                 T_prod_pump_out = initial_state.T_C()
                 temp_at_pump_depth = self.well.T_e_initial + self.well.dT_dz * self.pump_depth
 
-                state = FluidStateFromPT(P_prod_pump_out, T_prod_pump_out, self.well.fluid)
-                state = self.well.solve(state, m_dot, time_years)
+                state_in = FluidStateFromPT(P_prod_pump_out, T_prod_pump_out, self.well.fluid)
+                state = self.well.solve(state_in, m_dot, time_years)
 
                 dP_surface = (state.P_Pa() - P_inj_surface)
                 if dP_pump == self.max_pump_dP:
@@ -46,7 +46,10 @@ class DownHolePump(object):
                     dP_pump = dP_pump + d_dP_pump
                 else:
                    raise error
-
+        # if pump pressure greater than allowable, throw error
+        if dP_pump >= self.max_pump_dP:
+            raise ValueError('TotalAnalyticSystemWater:ExceedsMaxProductionPumpPressure',
+            'Exceeds Max Pump Pressure of %.3f MPa!' %(self.max_pump_dP/1e6))
         return state
 
     def gatherOutput(self):
