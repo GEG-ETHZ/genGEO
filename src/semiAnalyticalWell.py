@@ -1,10 +1,11 @@
 import math
 import numpy as np
 
+from src.semiAnalyticalWellResults import SemiAnalyticalWellResults
+
+from utils.globalConstants import globalConstants
 from utils.fluidStates import FluidState
 from utils.fluidStateFromPT import FluidStateFromPT
-from utils.globalConstants import globalConstants
-from src.semiAnalyticalWellResults import SemiAnalyticalWellResults
 
 class SemiAnalyticalWell(object):
     """SemiAnalyticalWell to compute heat transport with fluid flow in a well

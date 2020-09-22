@@ -7,8 +7,8 @@ from utils.fluidStateFromPT import FluidStateFromPT
 class FluidSystemWaterSolver(object):
     """FluidSystemWaterSolver provides a solver to determine water injection temperature."""
 
-    def __init__(self):
-        self.fluid_system = None
+    def __init__(self, system):
+        self.fluid_system = system
 
     def minimizeFunction(self, initialT):
         initial_state = FluidStateFromPT(1.e6, initialT, self.fluid_system.fluid)

@@ -2,9 +2,9 @@ import unittest
 
 from src.semiAnalyticalWell import SemiAnalyticalWell
 from src.porousReservoir import PorousReservoir
-from src.fluidSystemWater import FluidSystemWater
 from src.subsurfaceComponents import DownHolePump
 from src.oRCCycleTboil import ORCCycleTboil
+from src.fluidSystemWater import FluidSystemWater
 from src.fluidSystemWaterSolver import FluidSystemWaterSolver
 
 from utils.globalProperties import GlobalSimulationProperties
@@ -31,19 +31,18 @@ inj_well = SemiAnalyticalWell(params = gsp,
                                     dT_dz = 0.035,
                                     T_e_initial = 15.)
 
-reservoir = PorousReservoir(
-            params = gsp2,
-            well_spacing = 707.,
-            thickness = 100,
-            permeability = 1.0e-15 * 15000 / 100., # permeability = transmissivity / thickness
-            T_surface_rock = 15,
-            depth = 2500,
-            dT_dz = 0.035,
-            wellRadius = 0.205,
-            reservoirConfiguration = '5spot',
-            fluid = 'Water',
-            modelPressureTransient = False,
-            modelTemperatureDepletion = True)
+reservoir = PorousReservoir(params = gsp2,
+                                well_spacing = 707.,
+                                thickness = 100,
+                                permeability = 1.0e-15 * 15000 / 100., # permeability = transmissivity / thickness
+                                T_surface_rock = 15,
+                                depth = 2500,
+                                dT_dz = 0.035,
+                                wellRadius = 0.205,
+                                reservoirConfiguration = '5spot',
+                                fluid = 'Water',
+                                modelPressureTransient = False,
+                                modelTemperatureDepletion = True)
 
 prod_well1 = SemiAnalyticalWell(params = gsp,
                                     dz_total = 2000.,
@@ -65,7 +64,8 @@ prod_well2 = SemiAnalyticalWell(params = gsp,
 
 pump = DownHolePump(well = prod_well2,
                     pump_depth = 500.,
-                    max_pump_dP = 10.e6)
+                    max_pump_dP = 10.e6,
+                    eta_pump = 0.75)
 
 cycle = ORCCycleTboil(T_ambient_C = 15.,
                         dT_approach = 7.,
@@ -95,15 +95,14 @@ class FluidSystemWaterTest(unittest.TestCase):
         self.assertTrue(*testAssert(fluid_system_results.T_C(), 54.038702389379260, 'test_subsurface1_temp'))
 
     def testFluidSystemWaterSolverMdot1(self):
-        solver = FluidSystemWaterSolver()
-        solver.fluid_system = fluid_system
+        solver = FluidSystemWaterSolver(fluid_system)
         solver.solve(m_dot = 1, time_years = 1)
 
-        out = solver.fluid_system.pump.well.gatherOutput()
-        wellout = out.finalState()
+        output = solver.fluid_system.gatherOutput()
 
-        self.assertTrue(*testAssert(wellout.P_Pa(), 1.400500841642725e+06, 'test_subsurface_solver1_pressure'))
-        self.assertTrue(*testAssert(wellout.T_C(), 81.255435963675800, 'test_subsurface_solver1_temp'))
+        self.assertTrue(*testAssert(output.production_well2.end_P_Pa(), 1.400500841642725e+06, 'test_subsurface_solver1_pressure'))
+        self.assertTrue(*testAssert(output.production_well2.end_T_C(), 81.255435963675800, 'test_subsurface_solver1_temp'))
+        self.assertTrue(*testAssert(output.orc.w_net, 5.3517e3, 'test_subsurface_solver1_w_net'))
 
     def testFluidSystemWaterMdot40(self):
         fluid_system_results = fluid_system.solve(initial_state = initialState,
@@ -114,12 +113,11 @@ class FluidSystemWaterTest(unittest.TestCase):
         self.assertTrue(*testAssert(fluid_system_results.T_C(), 58.834943596593840, 'test_subsurface2_temp'))
 
     def testFluidSystemWaterSolverMdot40(self):
-        solver = FluidSystemWaterSolver()
-        solver.fluid_system = fluid_system
+        solver = FluidSystemWaterSolver(fluid_system)
         solver.solve(m_dot = 40, time_years = 1)
 
-        out = solver.fluid_system.pump.well.gatherOutput()
-        wellout = out.finalState()
+        output = solver.fluid_system.gatherOutput()
 
-        print(*testAssert(wellout.P_Pa(), 8.144555268219999e+06, 'test_subsurface_solver2_pressure'))
-        self.assertTrue(*testAssert(wellout.T_C(), 100.3126791060898, 'test_subsurface_solver2_temp'))
+        print(*testAssert(output.production_well2.end_P_Pa(), 8.144555268219999e+06, 'test_subsurface_solver2_pressure'))
+        self.assertTrue(*testAssert(output.production_well2.end_T_C(), 100.3126791060898, 'test_subsurface_solver2_temp'))
+        print(*testAssert(output.orc.w_net * 40., 1.5416e5, 'test_subsurface_solver2_w_net'))
