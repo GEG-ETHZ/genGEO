@@ -98,7 +98,7 @@ class FluidSystemWaterTest(unittest.TestCase):
         solver = FluidSystemWaterSolver(fluid_system)
         solver.solve(m_dot = 1, time_years = 1)
 
-        output = solver.fluid_system.gatherOutput()
+        output = solver.gatherOutput()
 
         self.assertTrue(*testAssert(output.production_well2.end_P_Pa(), 1.400500841642725e+06, 'test_subsurface_solver1_pressure'))
         self.assertTrue(*testAssert(output.production_well2.end_T_C(), 81.255435963675800, 'test_subsurface_solver1_temp'))
@@ -116,8 +116,18 @@ class FluidSystemWaterTest(unittest.TestCase):
         solver = FluidSystemWaterSolver(fluid_system)
         solver.solve(m_dot = 40, time_years = 1)
 
-        output = solver.fluid_system.gatherOutput()
+        output = solver.gatherOutput()
 
-        print(*testAssert(output.production_well2.end_P_Pa(), 8.144555268219999e+06, 'test_subsurface_solver2_pressure'))
+        self.assertTrue(*testAssert(output.production_well2.end_P_Pa(), 8.144555268219999e+06, 'test_subsurface_solver2_pressure'))
         self.assertTrue(*testAssert(output.production_well2.end_T_C(), 100.3126791060898, 'test_subsurface_solver2_temp'))
         print(*testAssert(output.orc.w_net * 40., 1.5416e5, 'test_subsurface_solver2_w_net'))
+        Q_preheater_IP = 40. * output.orc.q_preheater
+        Q_boiler_IP = 40. * output.orc.q_boiler
+        W_turbine_IP = 40. * output.orc.w_turbine
+        Q_recuperator_IP = 40. * output.orc.q_recuperator
+        Q_desuperheater_IP = 40. * output.orc.q_desuperheater
+        Q_condenser_IP = 40. * output.orc.q_condenser
+        W_pump_orc_IP = 40. * output.orc.w_pump
+        W_cooler_orc_IP = 40. * output.orc.w_cooler
+        W_condenser_orc_IP = 40. * output.orc.w_condenser
+        print(W_turbine_IP + W_pump_orc_IP + W_cooler_orc_IP + W_condenser_orc_IP + output.pump.w_pump * 40.)

@@ -37,7 +37,6 @@ class FluidSystemWater(object):
         production_well1_state  = self.production_well1.solve(reservoir_state, m_dot, time_years)
         production_well2_state  = self.pump.solve(production_well1_state, m_dot, time_years, injection_state.P_Pa())
         orc_state               = self.orc.solve(production_well2_state, m_dot, time_years)
-
         return orc_state
 
     def gatherOutput(self):

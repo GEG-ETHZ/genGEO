@@ -1,18 +1,20 @@
 
+import numpy as np
+
 class ORCCycleOutput(object):
     """ORCCycleOutput."""
-    q_preheater = None
-    q_recuperator = None
-    q_boiler = None
-    q_desuperheater = None
-    q_condenser = None
-    w_turbine = None
-    w_pump = None
-    w_cooler = None
-    w_condenser = None
-    w_net = None
-    dT_range_CT = None
-    dT_LMTD_preheater = None
-    dT_LMTD_recuperator = None
-    dT_LMTD_boiler = None
-    state_out = None
+    q_preheater = np.nan
+    q_recuperator = np.nan
+    q_boiler = np.nan
+    q_desuperheater = np.nan
+    q_condenser = np.nan
+    w_turbine = np.nan
+    w_pump = np.nan
+    w_cooler = np.nan
+    w_condenser = np.nan
+    w_net = np.nan
+    dT_range_CT = np.nan
+    dT_LMTD_preheater = np.nan
+    dT_LMTD_recuperator = np.nan
+    dT_LMTD_boiler = np.nan
+    state_out = np.nan

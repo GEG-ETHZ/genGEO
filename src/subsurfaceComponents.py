@@ -17,6 +17,7 @@ class DownHolePump(object):
     def solve(self, initial_state, m_dot, time_years, P_inj_surface):
 
         self.initial_state = initial_state
+        self.P_inj_surface = P_inj_surface
 
         # Now pumping and second well
         dP_pump = 0
@@ -35,7 +36,7 @@ class DownHolePump(object):
                 state_in = FluidStateFromPT(P_prod_pump_out, T_prod_pump_out, self.well.fluid)
                 state = self.well.solve(state_in, m_dot, time_years)
 
-                dP_surface = (state.P_Pa() - P_inj_surface)
+                dP_surface = (state.P_Pa() - self.P_inj_surface)
                 if dP_pump == self.max_pump_dP:
                     break
 
