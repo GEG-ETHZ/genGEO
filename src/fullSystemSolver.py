@@ -18,7 +18,7 @@ class FullSystemSolver(object):
 
     def minimizeLCOEBrownfield(self, time_years):
 
-        initial_m_dot = 1.
+        initial_m_dot = 10.
         self.time_years = time_years
 
         sol = minimize(self.minimizeFunctionBrownfield, (initial_m_dot), method='Nelder-Mead', tol=1e-3)
@@ -35,7 +35,7 @@ class FullSystemSolver(object):
 
     def minimizeLCOEGreenfield(self, time_years):
 
-        initial_m_dot = 1.
+        initial_m_dot = 10.
         self.time_years = time_years
 
         sol = minimize(self.minimizeFunctionGreenfield, (initial_m_dot), method='Nelder-Mead', tol=1e-3)
@@ -52,7 +52,7 @@ class FullSystemSolver(object):
 
     def maximizePower(self, time_years):
 
-        initial_m_dot = 1.
+        initial_m_dot = 10.
         self.time_years = time_years
 
         sol = minimize(self.maximizeFunctionPower, (initial_m_dot), method='Nelder-Mead', tol=1e-3)

@@ -29,11 +29,11 @@ class CapitalCostSurfacePlantORC(object):
         W_pump_orc = energy_results.W_pump_orc_total
         W_pump_prod = energy_results.W_pump_prod_total
 
-        orc_system = fluid_system.orc
-        T_ambient_C = fluid_system.orc.T_ambient_C
-        dT_approach_CT = fluid_system.orc.dT_approach
+        orc_system = fluid_system.pp
+        T_ambient_C = fluid_system.pp.T_ambient_C
+        dT_approach_CT = fluid_system.pp.dT_approach
 
-        orc_results = fluid_system.orc.gatherOutput()
+        orc_results = fluid_system.pp.gatherOutput()
         dT_range_CT = orc_results.dT_range_CT
         dT_LMTD_preheater = orc_results.dT_LMTD_preheater
         dT_LMTD_boiler = orc_results.dT_LMTD_boiler

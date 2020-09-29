@@ -4,7 +4,7 @@ import numpy as np
 from src.parasiticPowerFractionCoolingTower import parasiticPowerFractionCoolingTower
 from src.heatExchanger import heatExchanger
 from src.heatExchangerOptMdot import heatExchangerOptMdot
-from src.oRCCycleOutput import ORCCycleOutput
+from src.powerPlantOutput import PowerPlantOutput
 
 from utils.globalConstants import getPboilOptimum
 from utils.fluidStates import FluidState
@@ -121,7 +121,7 @@ class ORCCycleSupercritPboil(object):
 
     def gatherOutput(self):
 
-        output = ORCCycleOutput()
+        output = PowerPlantOutput()
 
         output.state_out = self.state_out
 

@@ -6,8 +6,9 @@ from src.subsurfaceComponents import DownHolePump
 from src.oRCCycleTboil import ORCCycleTboil
 from src.fluidSystemWater import FluidSystemWater
 from src.fluidSystemWaterSolver import FluidSystemWaterSolver
-from src.capitalCostSystemWater import CapitalCostSystemWater
-from src.fullSystem import FullSystem
+from src.capitalCostSystem import CapitalCostSystem
+
+from src.fullSystem import FullSystemORC
 from src.lCOESimple import LCOESimple
 from src.capitalCostSurfacePipes import CapitalCostSurfacePipes
 from src.capitalCostWell import CapitalCostWell
@@ -77,7 +78,7 @@ fluid_system.pump = DownHolePump(well = prod_well2,
                     max_pump_dP = 10.e6,
                     eta_pump = 0.75)
 
-fluid_system.orc = ORCCycleTboil(T_ambient_C = 15.,
+fluid_system.pp = ORCCycleTboil(T_ambient_C = 15.,
                         dT_approach = 7.,
                         dT_pinch = 5.,
                         eta_pump = 0.9,
@@ -85,8 +86,8 @@ fluid_system.orc = ORCCycleTboil(T_ambient_C = 15.,
                         coolingMode = 'Wet',
                         orcFluid = 'R245fa')
 
-capital_cost_system = CapitalCostSystemWater(2019)
-capital_cost_system.CapitalCost_SurfacePlant_ORC = CapitalCostSurfacePlantORC(2019)
+capital_cost_system = CapitalCostSystem(2019)
+capital_cost_system.CapitalCost_SurfacePlant = CapitalCostSurfacePlantORC(2019)
 capital_cost_system.CapitalCost_SurfacePipe = CapitalCostSurfacePipes(N = 0)
 capital_cost_system.CapitalCost_Production_Well = CapitalCostWell.waterBaseline(well_length = 2500,
                                                                     well_diameter = 0.205 * 2,
@@ -121,7 +122,7 @@ class FluidSystemWaterTest(unittest.TestCase):
     def testFluidSystemWaterSolverMdot1(self):
         solver = FluidSystemWaterSolver(fluid_system)
 
-        full_system = FullSystem(solver, capital_cost_system)
+        full_system = FullSystemORC(solver, capital_cost_system)
         full_system.solve(m_dot = 1, time_years = 1)
 
         output = full_system.gatherOutput()
@@ -136,7 +137,7 @@ class FluidSystemWaterTest(unittest.TestCase):
     def testFluidSystemWaterSolverOptMdot(self):
         solver = FluidSystemWaterSolver(fluid_system)
 
-        full_system = FullSystem(solver, capital_cost_system)
+        full_system = FullSystemORC(solver, capital_cost_system)
 
         full_system_solver = FullSystemSolver(full_system)
 
@@ -158,7 +159,7 @@ class FluidSystemWaterTest(unittest.TestCase):
     def testFluidSystemWaterSolverMdot40(self):
         solver = FluidSystemWaterSolver(fluid_system)
 
-        full_system = FullSystem(solver, capital_cost_system)
+        full_system = FullSystemORC(solver, capital_cost_system)
         full_system.solve(m_dot = 40, time_years = 1)
 
         output = full_system.gatherOutput()

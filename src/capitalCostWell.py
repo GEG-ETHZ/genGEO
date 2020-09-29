@@ -40,5 +40,5 @@ def well(well_length, well_diameter, well_type, success_rate, cost_year, dC_well
 
 def wellCO2(well_length, well_diameter, well_type, success_rate, cost_year):
     PPI_O_G = readCostTable(cost_year, 'PPI_O&G')
-    dC_well = X_IC_well * X_PC_well * PPI_O_G * (26.5 * well_diameter * well_length + 133. * well_length)
+    dC_well = X_IC_well * X_PC_well * PPI_O_G * (265. * well_diameter * well_length + 133. * well_length)
     return well(well_length, well_diameter, well_type, success_rate, cost_year, dC_well)

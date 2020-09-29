@@ -15,7 +15,7 @@ class FluidSystemWater(object):
         self.reservoir = None
         self.production_well1 = None
         self.pump = None
-        self.orc = None
+        self.pp = None
 
     def solve(self, initial_state, m_dot, time_years):
         injection_state = initial_state
@@ -31,13 +31,13 @@ class FluidSystemWater(object):
                 injection_state.P_Pa_in = injection_state.P_Pa() + dP_downhole
 
         if reservoir_state.P_Pa() >= self.reservoir.P_reservoir_max:
-            raise ValueError('TotalAnalyticSystemWater:ExceedsMaxReservoirPressure - '
+            raise ValueError('FluidSystemWater:ExceedsMaxReservoirPressure - '
                         'Exceeds Max Reservoir Pressure of %.3f MPa!'%(self.reservoir.P_reservoir_max/1e6))
 
         production_well1_state  = self.production_well1.solve(reservoir_state, m_dot, time_years)
         production_well2_state  = self.pump.solve(production_well1_state, m_dot, time_years, injection_state.P_Pa())
-        orc_state               = self.orc.solve(production_well2_state, m_dot, time_years)
-        return orc_state
+        pp_state               = self.pp.solve(production_well2_state, m_dot, time_years)
+        return pp_state
 
     def gatherOutput(self):
         output = FluidSystemWaterOutput()
@@ -46,5 +46,5 @@ class FluidSystemWater(object):
         output.production_well1     = self.production_well1.gatherOutput()
         output.pump                 = self.pump.gatherOutput()
         output.production_well2     = self.pump.well.gatherOutput()
-        output.orc                  = self.orc.gatherOutput()
+        output.pp                  = self.pp.gatherOutput()
         return output

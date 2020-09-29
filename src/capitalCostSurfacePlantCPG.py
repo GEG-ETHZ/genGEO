@@ -1,5 +1,6 @@
 import numpy as np
 
+from src.capitalCostCoolingTower import CapitalCostCoolingTower
 
 from utils.readXlsxData import readCostTable
 
@@ -16,8 +17,16 @@ class CapitalCostSurfacePlantCPG(object):
         self.ppi_T_G = readCostTable(cost_year, 'PPI_T-G')
         self.ppi_pump = readCostTable(cost_year, 'PPI_Pump')
 
-    def solve(W_turbine, Q_desuperheater, Q_condenser, W_pump_inj, T_ambient_C,
-                dT_approach_CT, dT_range_CT):
+    def solve(self, energy_results, fluid_system):
+
+        dT_range_CT =  0.
+        T_ambient_C = fluid_system.T_ambient_C
+        dT_approach_CT = fluid_system.dT_approach
+
+        Q_condenser = energy_results.Q_condenser_total
+        Q_desuperheater = energy_results.Q_desuperheater_total
+        W_pump_inj = energy_results.W_pump_total
+        W_turbine = energy_results.W_turbine_total
 
         # # TODO: Do some checks if temp is correct
 
@@ -28,12 +37,12 @@ class CapitalCostSurfacePlantCPG(object):
         # C_T_G
         # Regular fluid
         S_T_fluid = 1.20 #CO2
-        results.C_T_G = 0.67 * PPI_T_G * (S_T_fluid*2830*(W_turbine/1e3)**0.745 + 3680*(W_turbine/1e3)**0.617)
+        results.C_T_G = 0.67 * self.ppi_T_G * (S_T_fluid*2830*(W_turbine/1e3)**0.745 + 3680*(W_turbine/1e3)**0.617)
 
         # C_pump_inj
         C_pump_surface_inj = 1750 * (1.34*-1*(W_pump_inj/1e3))**0.7
         S_pump_inj = 2.09 #CO2
-        results.C_pump_inj = PPI_pump * S_pump_inj * C_pump_surface_inj
+        results.C_pump_inj = self.ppi_pump * S_pump_inj * C_pump_surface_inj
 
         # C_coolingTowers
         TDC = 1.2

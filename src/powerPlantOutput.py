@@ -2,8 +2,8 @@
 import numpy as np
 
 
-class ORCCycleEnergyOutput(object):
-    """ORCCycleOutput."""
+class PowerPlantEnergyOutput(object):
+    """PowerPlantEnergyOutput."""
     q_preheater = np.nan
     q_recuperator = np.nan
     q_boiler = np.nan
@@ -16,8 +16,8 @@ class ORCCycleEnergyOutput(object):
     w_net = np.nan
 
 
-class ORCCycleOutput(ORCCycleEnergyOutput):
-    """ORCCycleOutput."""
+class PowerPlantOutput(PowerPlantEnergyOutput):
+    """PowerPlantOutput."""
     dT_range_CT = np.nan
     dT_LMTD_preheater = np.nan
     dT_LMTD_recuperator = np.nan
