@@ -5,7 +5,7 @@ from utils.readXlsxData import readCostTable
 
 class CapitalCostSurfacePlantCPGResults(object):
     """CapitalCostSurfacePlantCPGResults."""
-    def __init__(self):
+    pass
 
 
 class CapitalCostSurfacePlantCPG(object):
@@ -64,3 +64,5 @@ class CapitalCostSurfacePlantCPG(object):
         results.f_T_G = results.C_T_G / C_primaryEquipment
         results.f_pump_inj = results.C_pump_inj / C_primaryEquipment
         results.f_coolingTowers = results.C_coolingTowers / C_primaryEquipment
+
+        return results

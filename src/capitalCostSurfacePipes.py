@@ -3,8 +3,11 @@ from utils.readXlsxData import readCostTable
 
 class CapitalCostSurfacePipes(object):
     """CapitalCostSurfacePipes."""
-    @staticmethod
-    def cost(N, cost_year):
+
+    def __init__(self, N):
+        self.N = N
+
+    def solve(self, cost_year):
         X_PCs = 1.15
         X_ICs = 1.12
 
@@ -35,5 +38,5 @@ class CapitalCostSurfacePipes(object):
                         9: 1.09,
                         10: 1.13
                         }
-        c_surfacePipe = 2205. * D_surfacePipe[N]**2 + 134.
-        return X_PCs * X_ICs * readCostTable(cost_year, 'PPI_Pipe') * c_surfacePipe * L_surfacePipe[N]
+        c_surfacePipe = 2205. * D_surfacePipe[self.N]**2 + 134.
+        return X_PCs * X_ICs * readCostTable(cost_year, 'PPI_Pipe') * c_surfacePipe * L_surfacePipe[self.N]

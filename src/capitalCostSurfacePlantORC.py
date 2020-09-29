@@ -1,9 +1,12 @@
+import numpy as np
+
+from src.capitalCostCoolingTower import CapitalCostCoolingTower
 
 from utils.readXlsxData import readCostTable
 
 class CapitalCostSurfacePlantORCResults(object):
     """CapitalCostSurfacePlantORCResults."""
-    def __init__(self):
+    pass
 
 
 class CapitalCostSurfacePlantORC(object):
@@ -15,10 +18,27 @@ class CapitalCostSurfacePlantORC(object):
         self.ppi_pump = readCostTable(cost_year, 'PPI_Pump')
         self.ppi_HX = readCostTable(cost_year, 'PPI_HX')
 
-    def solve(Q_preheater, Q_boiler, W_turbine, Q_recuperator, Q_desuperheater, Q_condenser,
-                W_pump_orc, W_pump_prod, T_ambient_C,
-                dT_approach_CT, dT_range_CT, dT_LMTD_preheater, dT_LMTD_boiler, dT_LMTD_recuperator):
-                
+    def solve(self, energy_results, fluid_system):
+
+        Q_preheater = energy_results.Q_preheater_total
+        Q_boiler = energy_results.Q_boiler_total
+        Q_recuperator = energy_results.Q_recuperator_total
+        Q_desuperheater = energy_results.Q_desuperheater_total
+        Q_condenser = energy_results.Q_condenser_total
+        W_turbine = energy_results.W_turbine_total
+        W_pump_orc = energy_results.W_pump_orc_total
+        W_pump_prod = energy_results.W_pump_prod_total
+
+        orc_system = fluid_system.orc
+        T_ambient_C = fluid_system.orc.T_ambient_C
+        dT_approach_CT = fluid_system.orc.dT_approach
+
+        orc_results = fluid_system.orc.gatherOutput()
+        dT_range_CT = orc_results.dT_range_CT
+        dT_LMTD_preheater = orc_results.dT_LMTD_preheater
+        dT_LMTD_boiler = orc_results.dT_LMTD_boiler
+        dT_LMTD_recuperator = orc_results.dT_LMTD_recuperator
+
         # # TODO: Do some checks if temp is correct
 
         results = CapitalCostSurfacePlantORCResults()
@@ -42,21 +62,21 @@ class CapitalCostSurfacePlantORC(object):
         #dT_LMTD_HX
         #U = 500/1000 #kW/m**2-K
         U = 500 #W/m**2-K
-        if (isnan(dT_LMTD_preheater) || dT_LMTD_preheater == 0)
+        if np.isnan(dT_LMTD_preheater) or dT_LMTD_preheater == 0:
             A_preheater = 0
-        else
+        else:
             A_preheater = Q_preheater / U / dT_LMTD_preheater
-        end
+
         A_boiler = Q_boiler / U / dT_LMTD_boiler
         A_HX = A_preheater + A_boiler
         results.C_heatExchanger = self.ppi_HX * (239*A_HX + 13400)
 
         # C_recuperator
-        if (isnan(dT_LMTD_recuperator) || dT_LMTD_recuperator == 0)
+        if np.isnan(dT_LMTD_recuperator) or dT_LMTD_recuperator == 0:
             A_recuperator = 0
-        else
+        else:
             A_recuperator = Q_recuperator / U / dT_LMTD_recuperator
-        end
+
         results.C_recuperator = self.ppi_HX * (239*A_recuperator + 13400)
 
         # C_productionPump
