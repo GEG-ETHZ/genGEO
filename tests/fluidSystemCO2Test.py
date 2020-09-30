@@ -138,6 +138,14 @@ class FluidSystemCO2Test(unittest.TestCase):
         self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 7.5351e7, 'test_C_greenfield_N'))
         self.assertTrue(np.isnan(output.capital_cost_model.LCOE_brownfield.LCOE), 'test_LCOE_brownfield')
 
+    def testFluidSystemCO2Mdot57_4(self):
+        full_system = FullSystemCPG(fluid_system, capital_cost_system)
+        full_system.solve(m_dot = 57.400, time_years = 1)
+
+        output = full_system.gatherOutput()
+
+        self.assertTrue(*testAssert(output.energy_results.W_net, 4.6519e5, 'test_W_net'))
+        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.6144e-4, 'test_LCOE_brownfield'))
 
     def testFluidSystemCO2SolverOptMdot(self):
         full_system = FullSystemCPG(fluid_system, capital_cost_system)

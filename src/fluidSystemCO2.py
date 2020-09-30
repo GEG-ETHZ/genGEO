@@ -42,9 +42,8 @@ class FluidSystemCO2(object):
             P_pump_inlet = P_condensation
             P_pump_outlet = P_pump_inlet + dP_pump
             if P_pump_outlet < 7.38e6 and P_pump_outlet > 7.37e6:
-                print('Total_analytic_system_co2:Manually adjusting pressure from ',
-                        num2str(P_pump_outlet/1e6),
-                        ' MPa to 7.37 MPa to avoid CoolProp CO2 critical point convergence issues.')
+                print('Total_analytic_system_co2:Manually adjusting pressure from %s'%(P_pump_outlet[0]/1e6),
+                        'MPa to 7.37 MPa to avoid CoolProp CO2 critical point convergence issues.')
                 P_pump_outlet = 7.37e6
             T_pump_inlet = T_condensation
             pump_inlet_state = FluidStateFromPT(P_pump_inlet, T_pump_inlet, self.fluid)

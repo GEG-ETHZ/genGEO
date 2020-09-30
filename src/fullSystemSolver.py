@@ -14,6 +14,8 @@ class FullSystemSolver(object):
 
         output = self.full_system.gatherOutput()
 
+        print(initial_m_dot)
+
         return output.capital_cost_model.LCOE_brownfield.LCOE
 
     def minimizeLCOEBrownfield(self, time_years):
@@ -21,7 +23,7 @@ class FullSystemSolver(object):
         initial_m_dot = 10.
         self.time_years = time_years
 
-        sol = minimize(self.minimizeFunctionBrownfield, (initial_m_dot), method='Nelder-Mead', tol=1e-3)
+        sol = minimize(self.minimizeFunctionBrownfield, (initial_m_dot), method='Nelder-Mead', tol=1e-2)
 
         return sol.x[0]
 
@@ -38,7 +40,7 @@ class FullSystemSolver(object):
         initial_m_dot = 10.
         self.time_years = time_years
 
-        sol = minimize(self.minimizeFunctionGreenfield, (initial_m_dot), method='Nelder-Mead', tol=1e-3)
+        sol = minimize(self.minimizeFunctionGreenfield, (initial_m_dot), method='Nelder-Mead', tol=1e-2)
 
         return sol.x[0]
 
@@ -55,7 +57,7 @@ class FullSystemSolver(object):
         initial_m_dot = 10.
         self.time_years = time_years
 
-        sol = minimize(self.maximizeFunctionPower, (initial_m_dot), method='Nelder-Mead', tol=1e-3)
+        sol = minimize(self.maximizeFunctionPower, (initial_m_dot), method='Nelder-Mead', tol=1e-2)
 
         return sol.x[0]
 
