@@ -5,7 +5,7 @@ class EnergyConversionORC(object):
 
     @staticmethod
     def gatherOutput(m_dot, input):
-        N_IP_multiplier = input.fluid_system.injection_well.wellMultiplier
+        N_IP_multiplier = input.injection_well.wellMultiplier
         input = input.gatherOutput()
         ec = EnergyConversionORC()
         ec.Q_preheater = m_dot * input.pp.q_preheater

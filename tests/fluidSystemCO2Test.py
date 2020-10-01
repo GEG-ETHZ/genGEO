@@ -96,10 +96,11 @@ capital_cost_system.lcoe_model = LCOESimple(F_OM = 0.045,
                                             Lifetime = 25,
                                             CapacityFactor = 0.9)
 
+full_system = FullSystemCPG(fluid_system, capital_cost_system)
+
 class FluidSystemCO2Test(unittest.TestCase):
 
     def testFluidSystemCO2Mdot10(self):
-        full_system = FullSystemCPG(fluid_system, capital_cost_system)
         full_system.solve(m_dot = 10, time_years = 1)
 
         output = full_system.gatherOutput()
@@ -113,7 +114,6 @@ class FluidSystemCO2Test(unittest.TestCase):
 
 
     def testFluidSystemCO2Mdot80(self):
-        full_system = FullSystemCPG(fluid_system, capital_cost_system)
         full_system.solve(m_dot = 80, time_years = 1)
 
         output = full_system.gatherOutput()
@@ -126,7 +126,6 @@ class FluidSystemCO2Test(unittest.TestCase):
         self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.8562e-4, 'test_LCOE_brownfield'))
 
     def testFluidSystemCO2Mdot200(self):
-        full_system = FullSystemCPG(fluid_system, capital_cost_system)
         full_system.solve(m_dot = 200, time_years = 1)
 
         output = full_system.gatherOutput()
@@ -139,7 +138,6 @@ class FluidSystemCO2Test(unittest.TestCase):
         self.assertTrue(np.isnan(output.capital_cost_model.LCOE_brownfield.LCOE), 'test_LCOE_brownfield')
 
     def testFluidSystemCO2Mdot57_4(self):
-        full_system = FullSystemCPG(fluid_system, capital_cost_system)
         full_system.solve(m_dot = 57.400, time_years = 1)
 
         output = full_system.gatherOutput()
@@ -148,7 +146,6 @@ class FluidSystemCO2Test(unittest.TestCase):
         self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.6144e-4, 'test_LCOE_brownfield'))
 
     def testFluidSystemCO2SolverOptMdot(self):
-        full_system = FullSystemCPG(fluid_system, capital_cost_system)
 
         full_system_solver = FullSystemSolver(full_system)
 

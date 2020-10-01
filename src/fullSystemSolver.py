@@ -14,7 +14,7 @@ class FullSystemSolver(object):
 
         output = self.full_system.gatherOutput()
 
-        print(initial_m_dot)
+        # print(initial_m_dot)
 
         return output.capital_cost_model.LCOE_brownfield.LCOE
 

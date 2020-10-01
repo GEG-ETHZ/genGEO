@@ -1,4 +1,3 @@
 #! /bin/bash
 
-
-python testSuite.py -v
+python testSuite.py -v $1

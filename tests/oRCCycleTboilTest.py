@@ -8,7 +8,7 @@ from utils.fluidStateFromPT import FluidStateFromPT
 from tests.testAssertion import testAssert
 
 
-class oRCCycleTboilTest(unittest.TestCase):
+class ORCCycleTboilTest(unittest.TestCase):
 
     def testParasiticPowerFraction(self):
         parasiticPowerFraction = parasiticPowerFractionCoolingTower(15. , 7. , 25., 'Wet')

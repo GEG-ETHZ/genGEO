@@ -31,7 +31,7 @@ reservoir = PorousReservoir(
 
 initialState = FluidStateFromPT(25.e6, 40., reservoir.fluid)
 
-class reservoirDepletionTest(unittest.TestCase):
+class ReservoirDepletionTest(unittest.TestCase):
 
     def testDepletionCurve(self):
         Psi_1 = 2.

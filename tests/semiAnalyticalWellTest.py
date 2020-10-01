@@ -7,7 +7,7 @@ from utils.globalConstants import globalConstants
 from utils.fluidStateFromPT import FluidStateFromPT
 from tests.testAssertion import testAssert
 
-class semiAnalyticalWellTest(unittest.TestCase):
+class SemiAnalyticalWellTest(unittest.TestCase):
 
     def assertMessages(self, fluid, pressure, temperature, enthalpy):
         self.assertTrue(*testAssert(*(*pressure, '%s_Pressure'%fluid)))
