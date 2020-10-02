@@ -38,8 +38,8 @@ class SemiAnalyticalWellTest(unittest.TestCase):
 
         wellresult = well.gatherOutput()
         self.assertMessages(well.fluid,
-                        (wellresult.end_P_Pa(), 1.2459e6),
-                        (wellresult.end_T_C(), 96.075),
+                        (wellresult.end_P_Pa(), 1.2432e6),
+                        (wellresult.end_T_C(), 96.076),
                         (wellresult.end_h_Jkg(), 4.0350e5))
 
         # CO2
@@ -52,9 +52,9 @@ class SemiAnalyticalWellTest(unittest.TestCase):
 
         wellresult = well.gatherOutput()
         self.assertMessages(well.fluid,
-                        (wellresult.end_P_Pa(), 1.1763e7),
-                        (wellresult.end_T_C(), 57.26),
-                        (wellresult.end_h_Jkg(), 3.767e5))
+                        (wellresult.end_P_Pa(), 1.1762e7),
+                        (wellresult.end_T_C(), 57.257),
+                        (wellresult.end_h_Jkg(), 3.7672e5))
 
     def testInjectionWellWater(self):
         ###
@@ -146,6 +146,60 @@ class SemiAnalyticalWellTest(unittest.TestCase):
 
         horizontal_well_results = horizontal_well.gatherOutput()
         self.assertMessages(horizontal_well.fluid,
-                        (horizontal_well_results.end_P_Pa(), 1.7238e6),
+                        (horizontal_well_results.end_P_Pa(), 1.7235e6),
                         (horizontal_well_results.end_T_C(), 212.746),
                         (horizontal_well_results.end_h_Jkg(), 6.755e5))
+
+    def testInjectionWellCO2HighQ(self):
+        ###
+        #  Testing SemiAnalyticalWell for horizontal injection well settings
+        ###
+        # load global physical properties
+        gpp = GlobalSimulationProperties()
+
+        vertical_well = SemiAnalyticalWell(params = gpp,
+                                            dz_total = -3500.,
+                                            wellRadius = 0.279,
+                                            fluid = 'CO2',
+                                            epsilon = 55 * 1e-6,
+                                            dT_dz = 0.06,
+                                            T_e_initial = 15.)
+
+        # initial state
+        initial_state = FluidStateFromPT(1.e6, 25., vertical_well.fluid)
+        vertical_well.solve(initial_state = initial_state,
+                                                    m_dot = 150.,
+                                                    time_years = 10.)
+
+        vertical_well_results = vertical_well.gatherOutput()
+        self.assertMessages(vertical_well.fluid,
+                        (vertical_well_results.end_P_Pa(), 5.1170e5),
+                        (vertical_well_results.end_T_C(), 63.9786),
+                        (vertical_well_results.end_h_Jkg(), 5.3677e5))
+
+    def testInjectionWellCO2SmallWellR(self):
+        ###
+        #  Testing SemiAnalyticalWell for horizontal injection well settings
+        ###
+        # load global physical properties
+        gpp = GlobalSimulationProperties()
+
+        vertical_well = SemiAnalyticalWell(params = gpp,
+                                            dz_total = -3500.,
+                                            wellRadius = 0.02,
+                                            fluid = 'CO2',
+                                            epsilon = 55 * 1e-6,
+                                            dT_dz = 0.06,
+                                            T_e_initial = 15.)
+
+        # initial state
+        initial_state = FluidStateFromPT(1.e6, 25., vertical_well.fluid)
+        vertical_well.solve(initial_state = initial_state,
+                                                    m_dot = 0.1,
+                                                    time_years = 10.)
+
+        vertical_well_results = vertical_well.gatherOutput()
+        self.assertMessages(vertical_well.fluid,
+                        (vertical_well_results.end_P_Pa(), 1.1431e6),
+                        (vertical_well_results.end_T_C(), 222.2246),
+                        (vertical_well_results.end_h_Jkg(), 6.8717e5))

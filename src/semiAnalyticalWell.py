@@ -48,10 +48,20 @@ class SemiAnalyticalWell(object):
         self.results.P_Pa[0] = P_f_initial        # Pa
         self.results.h_Jkg[0] = FluidState.getHFromPT(self.results.P_Pa[0], self.results.T_C_f[0], self.fluid)
         self.results.rho_kgm3[0] = FluidState.getRhoFromPT(self.results.P_Pa[0], self.results.T_C_f[0], self.fluid)
+        self.results.v_ms[0] = m_dot / A_c / self.results.rho_kgm3[0]  #m/s
+        mu_0 = FluidState.getMuFromPT(self.results.P_Pa[0], self.results.T_C_f[0], self.fluid)
 
         # Calculate the Friction Factor
-        # Use limit of Colebrook-white equation for large Re
-        ff = 0.25 * (1/np.log10(self.epsilon/(self.wellRadius * 2)/3.7))**2
+        # Use Colebrook-white equation for wellbore friction loss.
+        # Calculate for first element and assume constant in remainder
+
+        # Relative Roughness
+        rr = self.epsilon/(2*self.wellRadius)
+        # Reynolds Number
+        Re = self.results.rho_kgm3[0] * self.results.v_ms[0] * (2*self.wellRadius) / mu_0
+        # Use Haaland (1983) Approximation
+        c1 = -1.8 * np.log10((6.9/Re) + (rr/3.7)**1.11)
+        ff = (1/c1)**2
 
         alpha_rock = self.params.k_rock/self.params.rho_rock/self.params.c_rock  #D rock
         t_d = alpha_rock*time_seconds/(self.wellRadius**2)  #dim

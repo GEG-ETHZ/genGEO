@@ -13,8 +13,8 @@ class FluidStateProperties(FluidState):
     def cp_JK(self):
         return self.getCpFromPh(self.P_Pa(), self.h_Jkg(), self.fluid)
 
-    def v_Pas(self):
-        return self.getVFromPh(self.P_Pa(), self.h_Jkg(), self.fluid)
+    def mu_Pas(self):
+        return self.getMuFromPh(self.P_Pa(), self.h_Jkg(), self.fluid)
 
     def S_JK(self):
         return self.getSFromPh(self.P_Pa(), self.h_Jkg(), self.fluid)

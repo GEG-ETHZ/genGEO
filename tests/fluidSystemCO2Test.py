@@ -118,32 +118,24 @@ class FluidSystemCO2Test(unittest.TestCase):
 
         output = full_system.gatherOutput()
 
-        self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.6620e6, 'test_dP_surface'))
-        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.end_T_C(), 59.0938, 'test_T_prod_surface_C'))
-        self.assertTrue(*testAssert(output.energy_results.W_net, 5.0289e5, 'test_W_net'))
-        self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 2.9840e7, 'test_C_brownfield_N'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.65949586e6, 'test_dP_surface'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.end_T_C(), 59.0826, 'test_T_prod_surface_C'))
+        self.assertTrue(*testAssert(output.energy_results.W_net, 5.02286e+05, 'test_W_net'))
+        self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 2.98408178e+07, 'test_C_brownfield_N'))
         self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 5.2470e7, 'test_C_greenfield_N'))
-        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.8562e-4, 'test_LCOE_brownfield'))
+        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.8596677e-04, 'test_LCOE_brownfield'))
 
     def testFluidSystemCO2Mdot200(self):
         full_system.solve(m_dot = 200, time_years = 1)
 
         output = full_system.gatherOutput()
 
-        self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 3.5431e6, 'test_dP_surface'))
-        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.end_T_C(), 47.6612, 'test_T_prod_surface_C'))
-        self.assertTrue(*testAssert(output.energy_results.W_net, -1.3528e6, 'test_W_net'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 3.53347e+06, 'test_dP_surface'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.end_T_C(), 47.603999, 'test_T_prod_surface_C'))
+        self.assertTrue(*testAssert(output.energy_results.W_net, -1.3588e6, 'test_W_net'))
         self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 5.2721e7, 'test_C_brownfield_N'))
         self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 7.5351e7, 'test_C_greenfield_N'))
         self.assertTrue(np.isnan(output.capital_cost_model.LCOE_brownfield.LCOE), 'test_LCOE_brownfield')
-
-    def testFluidSystemCO2Mdot57_4(self):
-        full_system.solve(m_dot = 57.400, time_years = 1)
-
-        output = full_system.gatherOutput()
-
-        self.assertTrue(*testAssert(output.energy_results.W_net, 4.6519e5, 'test_W_net'))
-        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.6144e-4, 'test_LCOE_brownfield'))
 
     def testFluidSystemCO2SolverOptMdot(self):
 
@@ -152,6 +144,6 @@ class FluidSystemCO2Test(unittest.TestCase):
         optMdot = full_system_solver.minimizeLCOEBrownfield(time_years = 1)
 
         output = full_system.gatherOutput()
-        print(*testAssert(optMdot, 57.400, 'test_optMdot_solver_optMdot'))
-        print(*testAssert(output.energy_results.W_net, 4.6519e5, 'test_optMdot_solver_w_net'))
-        print(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.6144e-4, 'test_optMdot_solver_brownfield'))
+        print(*testAssert(optMdot, 55.56, 'test_optMdot_solver_optMdot'))
+        print(*testAssert(output.energy_results.W_net, 4.5795e5, 'test_optMdot_solver_w_net'))
+        print(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.6158e-4, 'test_optMdot_solver_LCOE_brownfield'))

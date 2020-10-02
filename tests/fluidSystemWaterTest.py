@@ -135,6 +135,29 @@ class FluidSystemWaterTest(unittest.TestCase):
         self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 2.4579e7, 'test_solver1_C_greenfield_N'))
         self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 0.010314, 'test_solver1_LCOE_brownfield'))
 
+    def testFluidSystemWaterMdot40(self):
+        fluid_system_results = fluid_system.solve(initial_state = initialState,
+                        m_dot = 40,
+                        time_years = 1)
+
+        self.assertTrue(*testAssert(fluid_system_results.P_Pa(), 8.149344891612666e+06, 'test_subsurface2_pressure'))
+        self.assertTrue(*testAssert(fluid_system_results.T_C(), 58.835063067362940, 'test_subsurface2_temp'))
+
+    def testFluidSystemWaterSolverMdot40(self):
+        solver = FluidSystemWaterSolver(fluid_system)
+
+        full_system = FullSystemORC(solver, capital_cost_system)
+        full_system.solve(m_dot = 40, time_years = 1)
+
+        output = full_system.gatherOutput()
+
+        self.assertTrue(*testAssert(output.fluid_system_solver.production_well2.end_P_Pa(), 8.1493e+06, 'test_subsurface_solver2_pressure'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.production_well2.end_T_C(), 100.3127, 'test_subsurface_solver2_temp'))
+        self.assertTrue(*testAssert(output.energy_results.W_net, 1.53849e5, 'test_subsurface_solver2_w_net'))
+        self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 2.6733e7, 'test_solver2_C_brownfield_N'))
+        self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 3.9845e7, 'test_solver2_C_greenfield_N'))
+        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 8.36432e-04, 'test_solver2_LCOE_brownfield'))
+
     def testFluidSystemWaterSolverOptMdot(self):
         solver = FluidSystemWaterSolver(fluid_system)
 
@@ -145,29 +168,6 @@ class FluidSystemWaterTest(unittest.TestCase):
         optMdot = full_system_solver.minimizeLCOEBrownfield(time_years = 1)
 
         output = full_system.gatherOutput()
-        print(*testAssert(optMdot, 22.8667, 'test_optMdot_solver_optMdot'))
-        self.assertTrue(*testAssert(output.energy_results.W_net, 1.6306e5, 'test_optMdot_solver_w_net'))
-        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 6.0598e-4, 'test_optMdot_solver_brownfield'))
-
-    def testFluidSystemWaterMdot40(self):
-        fluid_system_results = fluid_system.solve(initial_state = initialState,
-                        m_dot = 40,
-                        time_years = 1)
-
-        self.assertTrue(*testAssert(fluid_system_results.P_Pa(), 8.144555604792739e+06, 'test_subsurface2_pressure'))
-        self.assertTrue(*testAssert(fluid_system_results.T_C(), 58.834943596593840, 'test_subsurface2_temp'))
-
-    def testFluidSystemWaterSolverMdot40(self):
-        solver = FluidSystemWaterSolver(fluid_system)
-
-        full_system = FullSystemORC(solver, capital_cost_system)
-        full_system.solve(m_dot = 40, time_years = 1)
-
-        output = full_system.gatherOutput()
-
-        self.assertTrue(*testAssert(output.fluid_system_solver.production_well2.end_P_Pa(), 8.144555268219999e+06, 'test_subsurface_solver2_pressure'))
-        self.assertTrue(*testAssert(output.fluid_system_solver.production_well2.end_T_C(), 100.3126791060898, 'test_subsurface_solver2_temp'))
-        self.assertTrue(*testAssert(output.energy_results.W_net, 1.5416e5, 'test_subsurface_solver2_w_net'))
-        self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 2.6733e7, 'test_solver2_C_brownfield_N'))
-        self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 3.9845e7, 'test_solver2_C_greenfield_N'))
-        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 8.3469e-4, 'test_solver2_LCOE_brownfield'))
+        print(*testAssert(optMdot, 22.85, 'test_optMdot_solver_optMdot'))
+        self.assertTrue(*testAssert(output.energy_results.W_net, 1.6292e5, 'test_optMdot_solver_w_net'))
+        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 6.0634e-4, 'test_optMdot_solver_brownfield'))

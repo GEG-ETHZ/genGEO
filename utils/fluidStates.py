@@ -31,7 +31,7 @@ class FluidState(object):
         return PropsSI('SMASS', 'P', P_Pa, 'T', T_C + globalConstants.kelvin2celsius, fluid)
 
     @staticmethod
-    def getVFromPT(P_Pa, T_C, fluid):
+    def getMuFromPT(P_Pa, T_C, fluid):
         return PropsSI('V', 'P', P_Pa, 'T', T_C + globalConstants.kelvin2celsius, fluid)
 
     @staticmethod
@@ -51,7 +51,7 @@ class FluidState(object):
         return PropsSI('SMASS', 'P', P_Pa, 'HMASS', h_Jkg, fluid)
 
     @staticmethod
-    def getVFromPh(P_Pa, h_Jkg, fluid):
+    def getMuFromPh(P_Pa, h_Jkg, fluid):
         return PropsSI('V', 'P', P_Pa, 'HMASS', h_Jkg, fluid)
 
     @staticmethod
@@ -101,7 +101,7 @@ class FluidState(object):
     #     st.S_JK = st.getSFromTQ(T_C, Q, fluid)
     #     st.rho_kgm3 = st.getRhoFromPh(st.P_Pa, st.h_Jkg, fluid)
     #     st.cp_JK = st.getCpFromPh(st.P_Pa, st.h_Jkg, fluid)
-    #     st.v_Pas = st.getVFromPh(st.P_Pa, st.h_Jkg, fluid)
+    #     st.mu_Pas = st.getMuFromPh(st.P_Pa, st.h_Jkg, fluid)
     #     return st
     #
     # @staticmethod
@@ -113,7 +113,7 @@ class FluidState(object):
     #     st.h_Jkg = st.getHFromPT(P_Pa, T_C, fluid)
     #     st.rho_kgm3 = st.getRhoFromPT(P_Pa, T_C, fluid)
     #     st.cp_JK = st.getCpFromPT(P_Pa, T_C, fluid)
-    #     st.v_Pas = st.getVFromPT(P_Pa, T_C, fluid)
+    #     st.mu_Pas = st.getMuFromPT(P_Pa, T_C, fluid)
     #     st.S_JK = st.getSFromPT(P_Pa, T_C, fluid)
     #     return st
     #
@@ -126,7 +126,7 @@ class FluidState(object):
     #     st.T_C = st.getTFromPh(P_Pa, h_Jkg, fluid)
     #     st.rho_kgm3 = st.getRhoFromPh(P_Pa, h_Jkg, fluid)
     #     st.cp_JK = st.getCpFromPh(P_Pa, h_Jkg, fluid)
-    #     st.v_Pas = st.getVFromPh(P_Pa, h_Jkg, fluid)
+    #     st.mu_Pas = st.getMuFromPh(P_Pa, h_Jkg, fluid)
     #     st.S_JK = st.getSFromPh(P_Pa, h_Jkg, fluid)
     #     return st
 

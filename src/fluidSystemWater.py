@@ -36,7 +36,7 @@ class FluidSystemWater(object):
 
         production_well1_state  = self.production_well1.solve(reservoir_state, m_dot, time_years)
         production_well2_state  = self.pump.solve(production_well1_state, m_dot, time_years, injection_state.P_Pa())
-        pp_state               = self.pp.solve(production_well2_state, m_dot, time_years)
+        pp_state                = self.pp.solve(production_well2_state, m_dot, time_years)
         return pp_state
 
     def gatherOutput(self):
@@ -46,5 +46,5 @@ class FluidSystemWater(object):
         output.production_well1     = self.production_well1.gatherOutput()
         output.pump                 = self.pump.gatherOutput()
         output.production_well2     = self.pump.well.gatherOutput()
-        output.pp                  = self.pp.gatherOutput()
+        output.pp                   = self.pp.gatherOutput()
         return output
