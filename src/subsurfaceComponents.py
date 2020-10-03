@@ -52,7 +52,7 @@ class DownHolePump(object):
                    raise error
         # if pump pressure greater than allowable, throw error
         if dP_pump >= self.max_pump_dP:
-            raise ValueError('TotalAnalyticSystemWater:ExceedsMaxProductionPumpPressure',
+            raise ValueError('TotalAnalyticSystemWater:ExceedsMaxProductionPumpPressure ' \
             'Exceeds Max Pump Pressure of %.3f MPa!' %(self.max_pump_dP/1e6))
         self.state_pump = state_in
         return state

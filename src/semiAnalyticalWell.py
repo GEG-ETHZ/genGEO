@@ -94,7 +94,7 @@ class SemiAnalyticalWell(object):
                 self.results.P_Pa[i] = 7.37e6
 
             # Throw exception if below saturation pressure of water at previous temperature
-            if self.fluid == 'Water':
+            if self.fluid.lower() == 'Water'.lower():
                 P_sat = FluidState.getPFromTQ(self.results.T_C_f[i-1], 0, self.fluid)
                 if self.results.P_Pa[i] < P_sat:
                     raise ValueError('SemiAnalyticalWell:BelowSaturationPressure - ' \
