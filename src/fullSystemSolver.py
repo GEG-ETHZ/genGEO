@@ -21,30 +21,45 @@ class FullSystemSolver(object):
         else:
             self.m_dots.append(initial_m_dot)
 
-        print(initial_m_dot)
+        print('main val', initial_m_dot)
 
         try:
             system = self.full_system.solve(initial_m_dot, self.time_years)
             output = self.full_system.gatherOutput()
             output_val = output.capital_cost_model.LCOE_brownfield.LCOE
 
-            self.test.append(np.array([initial_m_dot[0], output_val]))
-            print(self.test)
+            if not np.isnan(output_val):
+                self.test = np.array([initial_m_dot[0], output_val[0]])
+
         except ValueError as error:
             # regex = re.compile('Saturation pressure \[([+-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)) Pa\] corresponding to T \[([+-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)) K\] is within 1e-4 % of given p')
             # string = """Saturation pressure [7.2315e+06 Pa] corresponding to T [303.258 K] is within 1e-4 % of given p [7.2315e+06 Pa] : PropsSI("HMASS","P",7231504.074,"T",303.257922,"CO2")"""
             # re.match(regex, string)
             if str(error).find('TotalAnalyticSystemWater:ExceedsMaxProductionPumpPressure') > -1:
-                print(str(error))
+                # print(str(error))
                 self.max_m_dot = initial_m_dot
                 output_val = np.nan
-                print('NaN')
+                # print('NaN')
             elif str(error).find('FluidSystemCO2:TurbinePowerNegative') > -1 \
             or str(error).find('Saturation pressure ') > -1: # # TODO: fix this to regular expression error triggered in semiAnalyticalWell.py line: 123
-                print(str(error))
-                output_val = np.nan
-                # output_val = np.interp(initial_m_dot, self.m_dots_test, self.lcoe_test)
-                print('NaN')
+                # print(str(error))
+                n = 2
+                while n <= 3:
+                    try:
+                        diff = initial_m_dot[0] - self.test[0]
+                        tmp_m_dot = self.test[0] + n * diff
+                        # print(tmp_m_dot)
+                        system = self.full_system.solve(tmp_m_dot, self.time_years)
+                        output = self.full_system.gatherOutput()
+                        output_val_tmp = output.capital_cost_model.LCOE_brownfield.LCOE
+                        output_val = np.interp(initial_m_dot, [self.test[0], tmp_m_dot], [self.test[1], output_val_tmp])[0]
+                        print('tmp val ', output_val_tmp)
+                        # print(output_val)
+                        n = 11
+                    except:
+                        n += 1
+                        output_val = np.nan
+                        print('NaN')
             else:
                 raise(error)
 
@@ -63,13 +78,9 @@ class FullSystemSolver(object):
         # return sol.x[0]
 
         while True:
-            # print('start')
-            self.test = []
             sol = minimize(self.minimizeFunctionBrownfield, (self.initial_m_dot), method='Nelder-Mead',
             tol=1e-3)#, options={'maxfev': 50})#, 'maxiter': 15})
-            print('out')
-            # print(np.interp(1.57 * self.initial_m_dot, self.m_dots_test, self.lcoe_test))
-            print(self.test)
+
 
             # sol = minimize(self.minimizeFunctionBrownfield, initial_m_dot, method='Powell', tol=1e-3)
 

@@ -6,8 +6,8 @@ from src.totalSystemCO2 import TotalSystemCO2
 class Dummy(object):
     pass
 
-
-# m_dot = 1.157795
+#
+# m_dot = 1.55
 # # system = TotalSystemWater(depth = 1000, permeability = 1e-13 / 100., orc_fluid = 'R245fa')
 # # system = TotalSystemWater(depth = 1000, permeability = 1e-13 / 100.)
 # system = TotalSystemCO2(depth = 1000, permeability = 1e-12 / 100.)
@@ -22,8 +22,8 @@ logTrans = np.arange(2., 8., 1.)
 permeabilities = 1e-15 * 10. ** logTrans
 depths = np.arange(1000, 8000, 1000)
 
-permeabilities = [1e-12]
-depths = [1000]
+permeabilities = [1e-12, 1e-11]
+depths = [2000]
 file = open('data_tmp.csv', 'w')
 
 # file = open('data_Water_R600a.csv', 'w')
