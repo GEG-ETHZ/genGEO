@@ -1,33 +1,43 @@
 import numpy as np
 
 from src.totalSystemWater import TotalSystemWater
+from src.totalSystemCO2 import TotalSystemCO2
 
 class Dummy(object):
     pass
 
 
-# m_dot = 0.768538599999999
-# system = TotalSystemWater(depth = 5000, permeability = 1e-13 / 100.)
-system = TotalSystemWater(depth = 7000, permeability = 1e-11 / 100.)
-results = system.minimizeLCOEBrownfield(time_years = 1.)
+# m_dot = 1.157795
+# # system = TotalSystemWater(depth = 1000, permeability = 1e-13 / 100., orc_fluid = 'R245fa')
+# # system = TotalSystemWater(depth = 1000, permeability = 1e-13 / 100.)
+# system = TotalSystemCO2(depth = 1000, permeability = 1e-12 / 100.)
+# # results = system.minimizeLCOEBrownfield(time_years = 1.)
 # results = system.solve(m_dot = m_dot, time_years = 1.)
 # results.optMdot = m_dot
-print(results.optMdot)
-print(results.capital_cost_model.LCOE_brownfield.LCOE * 1e6)
-1/0
+# print(results.optMdot)
+# print(results.capital_cost_model.LCOE_brownfield.LCOE * 1e6)
+# 1/0
 
 logTrans = np.arange(2., 8., 1.)
 permeabilities = 1e-15 * 10. ** logTrans
 depths = np.arange(1000, 8000, 1000)
 
-file = open('test_out.csv', 'w')
+permeabilities = [1e-12]
+depths = [1000]
+file = open('data_tmp.csv', 'w')
+
+# file = open('data_Water_R600a.csv', 'w')
+# file = open('data_Water_R245fa.csv', 'w')
+# file = open('data_CO2.csv', 'w')
 
 for depth in depths:
     for permeability in permeabilities:
         print('######### new case ########')
         print(depth)
         print(permeability)
-        system = TotalSystemWater(depth = depth, permeability = permeability / 100.)
+        # system = TotalSystemWater(depth = depth, permeability = permeability / 100., orc_fluid = 'R600a')
+        # system = TotalSystemWater(depth = depth, permeability = permeability / 100., orc_fluid = 'R245fa')
+        system = TotalSystemCO2(depth = depth, permeability = permeability / 100.)
         try:
             results = system.minimizeLCOEBrownfield(time_years = 1.)
             error_str =  'No error'

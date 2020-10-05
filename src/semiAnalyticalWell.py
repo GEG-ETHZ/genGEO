@@ -87,14 +87,14 @@ class SemiAnalyticalWell(object):
                                     - self.results.delta_P_loss[i]
             # If pressure is very near and below the critical point of 7.377 MPa (for CO2),
             # there will be a coolprop convergence error
-            if self.fluid == 'CO2' and self.results.P_Pa[i] < 7.38e6 and self.results.P_Pa[i] > 7.37e6:
+            if self.fluid.lower() == 'co2' and self.results.P_Pa[i] < 7.38e6 and self.results.P_Pa[i] > 7.37e6:
                 print('Semi_analytic_well: Manually adjusting pressure from %s' \
                         ' MPa to 7.37 MPa to avoid CoolProp CO2 critical point' \
                         ' convergence issues.'%(self.results.P_Pa[i]/1e6))
                 self.results.P_Pa[i] = 7.37e6
 
             # Throw exception if below saturation pressure of water at previous temperature
-            if self.fluid.lower() == 'Water'.lower():
+            if self.fluid.lower() == 'water':
                 P_sat = FluidState.getPFromTQ(self.results.T_C_f[i-1], 0, self.fluid)
                 if self.results.P_Pa[i] < P_sat:
                     raise ValueError('SemiAnalyticalWell:BelowSaturationPressure - ' \
