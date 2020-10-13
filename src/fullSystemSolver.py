@@ -14,9 +14,11 @@ class FullSystemSolver(object):
     def minimizeFunctionBrownfield(self, initial_m_dot):
 
         if len(self.m_dots) > 10 and initial_m_dot >= (self.max_m_dot - 1e-8):
+            print('NaN')
             return np.nan
 
         if len(self.m_dots) > 6 and np.isclose([np.mean(self.m_dots)], [self.initial_m_dot], rtol = 1e-2):
+            print('STOP')
             return False
         else:
             self.m_dots.append(initial_m_dot)
@@ -31,7 +33,8 @@ class FullSystemSolver(object):
             if not np.isnan(output_val):
                 self.test = np.array([initial_m_dot[0], output_val[0]])
 
-        except ValueError as error:
+        except Exception as error:
+            print(str(error))
             # regex = re.compile('Saturation pressure \[([+-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)) Pa\] corresponding to T \[([+-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)) K\] is within 1e-4 % of given p')
             # string = """Saturation pressure [7.2315e+06 Pa] corresponding to T [303.258 K] is within 1e-4 % of given p [7.2315e+06 Pa] : PropsSI("HMASS","P",7231504.074,"T",303.257922,"CO2")"""
             # re.match(regex, string)
@@ -39,7 +42,7 @@ class FullSystemSolver(object):
                 # print(str(error))
                 self.max_m_dot = initial_m_dot
                 output_val = np.nan
-                # print('NaN')
+                print('NaN')
             elif str(error).find('FluidSystemCO2:TurbinePowerNegative') > -1 \
             or str(error).find('Saturation pressure ') > -1: # # TODO: fix this to regular expression error triggered in semiAnalyticalWell.py line: 123
                 # print(str(error))
@@ -63,11 +66,12 @@ class FullSystemSolver(object):
             else:
                 raise(error)
 
+        # print(output_val)
         return output_val
 
     def minimizeLCOEBrownfield(self, time_years):
 
-        self.initial_m_dot = 10.
+        self.initial_m_dot = 20.
         self.m_dots = []
         self.max_m_dot = 1e4
         self.time_years = time_years
@@ -78,9 +82,14 @@ class FullSystemSolver(object):
         # return sol.x[0]
 
         while True:
-            sol = minimize(self.minimizeFunctionBrownfield, (self.initial_m_dot), method='Nelder-Mead',
-            tol=1e-3)#, options={'maxfev': 50})#, 'maxiter': 15})
+            # sol = minimize(self.minimizeFunctionBrownfield, (self.initial_m_dot), method='TNC',
+            # tol=1e-3, options={'eps': 1e0, 'scale': None, 'offset': None, 'mesg_num': None,
+            # 'maxCGit': - 1, 'maxiter': None, 'eta': - 1, 'stepmx': 0, 'accuracy': 0,
+            # 'minfev': 0, 'ftol': - 1, 'xtol': - 1, 'gtol': - 1, 'rescale': - 1, 'disp': False,
+            # 'finite_diff_rel_step': None, 'maxfun': None})
 
+            sol = minimize(self.minimizeFunctionBrownfield, (self.initial_m_dot),
+            method='Nelder-Mead', tol=1e-3)#, options={'maxfev': 50})#, 'maxiter': 15})
 
             # sol = minimize(self.minimizeFunctionBrownfield, initial_m_dot, method='Powell', tol=1e-3)
 
@@ -91,8 +100,9 @@ class FullSystemSolver(object):
                 self.initial_m_dot = self.initial_m_dot * 0.1
                 self.m_dots = []
                 # print('reduce mDot')
-            elif self.initial_m_dot < 1e-3:
-                return False
+                if self.initial_m_dot < 1e-3:
+                    # print('STOP')
+                    return False
             else:
                 return sol.x[0]
 
