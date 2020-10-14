@@ -31,8 +31,8 @@ class FluidSystemWaterSolver(object):
 
         dT_inj = initialT
         hist = []
-        while abs(dT_inj) > 1e-3:
-            print('find T', initialT)
+        while abs(dT_inj) > 0.5:# 1e-3:
+            # print('find T', initialT)
             initial_state = FluidStateFromPT(self.initial_P, initialT, self.fluid_system.fluid)
             system_state = self.fluid_system.solve(initial_state, m_dot, time_years)
             self.initial_P =  self.fluid_system.pump.P_inj_surface
@@ -55,7 +55,7 @@ class FluidSystemWaterSolver(object):
                 x_zero = T_prod_surface_C
 
             initialT = x_zero
-        print('final T opt ', system_state.T_C())
+        # print('final T opt ', system_state.T_C())
 
     def solve(self, m_dot, time_years):
 

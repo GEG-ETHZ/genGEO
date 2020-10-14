@@ -149,7 +149,7 @@ class TotalSystemWater(object):
             output.optMdot = optMdot
             return output
         else:
-            raise ValueError('No minimum found!')
+            raise Exception('No minimum found!')
 
 
     def minimizeLCOEGreenfield(self, time_years = 1.):
@@ -159,14 +159,18 @@ class TotalSystemWater(object):
             output.optMdot = optMdot
             return output
         else:
-            raise ValueError('No minimum found!')
+            raise Exception('No minimum found!')
 
 
     def maximizePower(self, time_years = 1.):
         optMdot = self.full_system_solver.maximizePower(time_years = time_years)
-        output = self.full_system.gatherOutput()
-        output.optMdot = optMdot
-        return output
+        if optMdot:
+            output = self.full_system.gatherOutput()
+            output.optMdot = optMdot
+            return output
+        else:
+            raise Exception('No maximum found!')
+
 
     def solve(self, m_dot, time_years):
         self.full_system.solve(m_dot = m_dot, time_years = time_years)

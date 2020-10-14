@@ -11,9 +11,10 @@ import time
 
 logTrans = np.arange(2., 8., 1.)
 permeabilities = 1e-15 * 10. ** logTrans
-depths = np.arange(4000, 6000, 1000)
+depths = np.arange(1000, 8000, 1000)
 
-
+# fluids = []
+# for fluid in fluids:
 # for depth in depths:
 #     for permeability in permeabilities:
 #         start = time.time()
@@ -52,20 +53,21 @@ depths = np.arange(4000, 6000, 1000)
 #         end = time.time()
 #         print('time', end - start)
 #
-#         1/0
 # 1/0
-#
+
+
+
 # logTrans = np.arange(2., 8., 1.)
 # permeabilities = 1e-15 * 10. ** logTrans
 # depths = np.arange(1000, 8000, 1000)
 
-# permeabilities = [1e-12, 1e-11]
-# depths = [2000]
+permeabilities = [1e-9]
+depths = [1000]
 file = open('data_tmp.csv', 'w')
 
-# file = open('data_Water_R600a.csv', 'w')
-# file = open('data_Water_R245fa.csv', 'w')
-# file = open('data_CO2.csv', 'w')
+# file = open('data_Water_R600a_orig.csv', 'w')
+# file = open('data_Water_R245fa_orig.csv', 'w')
+# file = open('data_CO2_orig.csv', 'w')
 
 for depth in depths:
     for permeability in permeabilities:
@@ -73,8 +75,8 @@ for depth in depths:
         print(depth)
         print(permeability)
         # system = TotalSystemWater(depth = depth, permeability = permeability / 100., orc_fluid = 'R600a')
-        system = TotalSystemWater(depth = depth, permeability = permeability / 100., orc_fluid = 'R245fa')
-        # system = TotalSystemCO2(depth = depth, permeability = permeability / 100.)
+        # system = TotalSystemWater(depth = depth, permeability = permeability / 100., orc_fluid = 'R245fa')
+        system = TotalSystemCO2(depth = depth, permeability = permeability / 100.)
         try:
             results = system.minimizeLCOEBrownfield(time_years = 1.)
             error_str =  'No error'
@@ -91,7 +93,7 @@ for depth in depths:
         if np.isnan(lcoe):
             lcoe = 0.
         else:
-            lcoe = lcoe[0]
+            lcoe = lcoe
         print(error_str)
         file.write(','.join([str(i) for i in [depth, permeability, results.optMdot, lcoe, """%s\n"""%error_str]]))
         # 1/0

@@ -71,6 +71,92 @@ class FullSystemSolver(object):
 
     def minimizeLCOEBrownfield(self, time_years):
 
+        LCOE_old = np.nan
+        LCOE = 0
+
+        bestLCOE = 1e12
+        bestLCOEMdot = np.nan
+
+        #Starting Massflow Guess (add 10)
+        m_dot_IP = 0
+
+        peaks = 0
+        d_m_dot = 10
+        d_power_d_m_dot = 0
+        d_m_dot_multiplier = 0.21 #0.25
+
+        while peaks < 5:
+            # if step is too big and crosses zero, make it smaller
+            if m_dot_IP + d_m_dot <= 0:
+                d_m_dot = -1 * d_m_dot * d_m_dot_multiplier
+                peaks = peaks + 1
+                print('mdot<=0; peak %s'%peaks)
+                # get it to go back
+                # W_net_IP_old = np.nan
+                LCOE_old = np.nan
+            m_dot_IP = m_dot_IP + d_m_dot
+            print('Trying a mass flowrate of %s'%m_dot_IP)
+            try:
+                system = self.full_system.solve(m_dot_IP, time_years)
+                output = self.full_system.gatherOutput()
+                LCOE_brownfield = output.capital_cost_model.LCOE_brownfield.LCOE
+                print('Done')
+                # # should never be zero
+                # if d_m_dot != 0 and not np.isnan(W_net_IP) and not np.isnan(W_net_IP_old):
+                #     d_power_d_m_dot = abs((W_net_IP - W_net_IP_old)*1e6 / d_m_dot)
+
+                print(LCOE_old)
+
+                # See if LCOE has inflected
+                # LCOE is NaN only at zero flowrate
+                if np.isnan(LCOE_brownfield):
+                    # If NaN LCOE, make sure it is trending towards mdot of
+                    # zero
+                    if d_m_dot > 0:
+                        d_m_dot = -1 * d_m_dot * d_m_dot_multiplier
+                        peaks = peaks + 1
+                        print('LCOE_brownfield=NaN; peak %s'%peaks)
+
+                elif not np.isnan(LCOE_old):
+                    # only make change if both LCOE and LCOE_old are not
+                    # nan
+                    if LCOE_old < LCOE_brownfield:
+                        d_m_dot = -1 * d_m_dot * d_m_dot_multiplier
+                        peaks = peaks + 1
+                        print('LCOE_old<LCOE_brownfield; peak %s'%peaks)
+
+                LCOE = LCOE_brownfield
+
+
+                # Save best values
+                if not np.isnan(LCOE_brownfield) and LCOE_brownfield < bestLCOE:
+                    bestLCOE = LCOE
+                    bestLCOEMdot = m_dot_IP
+
+                # Set current values to old values
+                LCOE_old = LCOE
+
+            except Exception as ex:
+                print(str(ex))
+                if d_m_dot > 0:
+                    d_m_dot = -1 * d_m_dot * d_m_dot_multiplier
+                    peaks = peaks + 1
+                    print('exception; peak %s'%peaks)
+                    LCOE_old = np.nan
+                    LCOE_brownfield = np.nan
+                    LCOE = np.nan
+            # # TODO: add raise exception
+
+        m_dot_IP = bestLCOEMdot
+        system = self.full_system.solve(m_dot_IP, time_years)
+        output = self.full_system.gatherOutput()
+        LCOE_brownfield = output.capital_cost_model.LCOE_brownfield.LCOE
+
+        print(m_dot_IP, LCOE_brownfield)
+        return m_dot_IP
+
+    def minimizeLCOEBrownfieldAuto(self, time_years):
+
         self.initial_m_dot = 20.
         self.m_dots = []
         self.max_m_dot = 1e4

@@ -41,9 +41,10 @@ class FluidSystemCO2(object):
             # Find Injection Conditions
             P_pump_inlet = P_condensation
             P_pump_outlet = P_pump_inlet + dP_pump
+
             if P_pump_outlet < 7.38e6 and P_pump_outlet > 7.37e6:
-                print('Total_analytic_system_co2:Manually adjusting pressure from %s'%(P_pump_outlet[0]/1e6),
-                        'MPa to 7.37 MPa to avoid CoolProp CO2 critical point convergence issues.')
+                print('Total_analytic_system_co2:Manually adjusting pressure from %s ',
+                        'MPa to 7.37 MPa to avoid CoolProp CO2 critical point convergence issues.'%(P_pump_outlet/1e6))
                 P_pump_outlet = 7.37e6
             T_pump_inlet = T_condensation
             pump_inlet_state = FluidStateFromPT(P_pump_inlet, T_pump_inlet, self.fluid)
@@ -66,7 +67,7 @@ class FluidSystemCO2(object):
                 dP_pump = dP_pump + 0.5 * dP_downhole
 
         if reservoir_state.P_Pa() >= self.reservoir.P_reservoir_max:
-            raise ValueError('FluidSystemCO2:ExceedsMaxReservoirPressure - '
+            raise Exception('FluidSystemCO2:ExceedsMaxReservoirPressure - '
                         'Exceeds Max Reservoir Pressure of %.3f MPa!'%(self.reservoir.P_reservoir_max/1e6))
 
         production_well_state  = self.production_well.solve(reservoir_state, m_dot, time_years)
@@ -77,7 +78,7 @@ class FluidSystemCO2(object):
 
         self.pp_output.w_turbine = production_well_state.h_Jkg() - h_turbine_out
         if self.pp_output.w_turbine < 0:
-            raise ValueError('FluidSystemCO2:TurbinePowerNegative','Turbine Power is Negative')
+            raise Exception('FluidSystemCO2:TurbinePowerNegative - Turbine Power is Negative')
 
         # heat rejection
         h_satVapor = FluidState.getHFromPQ(P_condensation, 1,  self.fluid)
