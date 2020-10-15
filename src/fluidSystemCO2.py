@@ -2,7 +2,6 @@
 from src.parasiticPowerFractionCoolingTower import parasiticPowerFractionCoolingTower
 from src.powerPlantOutput import PowerPlantEnergyOutput
 
-from utils.fluidStates import FluidState
 from utils.fluidStateFromPT import FluidStateFromPT
 from utils.fluidStateFromPh import FluidStateFromPh
 
@@ -31,7 +30,7 @@ class FluidSystemCO2(object):
 
         # Find condensation pressure
         T_condensation = self.T_ambient_C + self.dT_approach
-        P_condensation = FluidState.getPFromTQ(T_condensation, 0, self.fluid) + 50e3
+        P_condensation = FluidStateFromPT.getPFromTQ(T_condensation, 0, self.fluid) + 50e3
         dP_pump = 0
 
         dP_downhole_threshold = 1e4
@@ -42,13 +41,9 @@ class FluidSystemCO2(object):
             P_pump_inlet = P_condensation
             P_pump_outlet = P_pump_inlet + dP_pump
 
-            if P_pump_outlet < 7.38e6 and P_pump_outlet > 7.37e6:
-                print('Total_analytic_system_co2:Manually adjusting pressure from %s ',
-                        'MPa to 7.37 MPa to avoid CoolProp CO2 critical point convergence issues.'%(P_pump_outlet/1e6))
-                P_pump_outlet = 7.37e6
             T_pump_inlet = T_condensation
             pump_inlet_state = FluidStateFromPT(P_pump_inlet, T_pump_inlet, self.fluid)
-            h_pump_outletS = FluidState.getHFromPS(P_pump_outlet, pump_inlet_state.S_JK(), self.fluid)
+            h_pump_outletS = FluidStateFromPT.getHFromPS(P_pump_outlet, pump_inlet_state.S_JK(), self.fluid)
             h_pump_outlet = pump_inlet_state.h_Jkg() + (h_pump_outletS - pump_inlet_state.h_Jkg()) / self.eta_pump
 
             self.pp_output.w_pump = -1 * (h_pump_outlet - pump_inlet_state.h_Jkg())
@@ -73,7 +68,7 @@ class FluidSystemCO2(object):
         production_well_state  = self.production_well.solve(reservoir_state, m_dot, time_years)
 
         # Calculate Turbine Power
-        h_turbine_outS = FluidState.getHFromPS(P_condensation, production_well_state.S_JK(), self.fluid)
+        h_turbine_outS = FluidStateFromPT.getHFromPS(P_condensation, production_well_state.S_JK(), self.fluid)
         h_turbine_out = production_well_state.h_Jkg() - self.eta_turbine * (production_well_state.h_Jkg() - h_turbine_outS)
 
         self.pp_output.w_turbine = production_well_state.h_Jkg() - h_turbine_out
@@ -81,13 +76,13 @@ class FluidSystemCO2(object):
             raise Exception('FluidSystemCO2:TurbinePowerNegative - Turbine Power is Negative')
 
         # heat rejection
-        h_satVapor = FluidState.getHFromPQ(P_condensation, 1,  self.fluid)
-        h_condensed = FluidState.getHFromPQ(P_condensation, 0,  self.fluid)
+        h_satVapor = FluidStateFromPT.getHFromPQ(P_condensation, 1,  self.fluid)
+        h_condensed = FluidStateFromPT.getHFromPQ(P_condensation, 0,  self.fluid)
         if h_turbine_out > h_satVapor:
             # desuperheating needed
             self.pp_output.q_cooler = h_satVapor - h_turbine_out
             self.pp_output.q_condenser = h_condensed - h_satVapor
-            T_turbine_out = FluidState.getTFromPh(P_condensation, h_turbine_out, self.fluid)
+            T_turbine_out = FluidStateFromPT.getTFromPh(P_condensation, h_turbine_out, self.fluid)
             dT_range = T_turbine_out - T_condensation
         else:
             # no desuperheating

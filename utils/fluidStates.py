@@ -1,5 +1,4 @@
-from CoolProp.CoolProp import PropsSI
-
+from utils.coolPropInterface import coolProp
 from utils.globalConstants import globalConstants
 
 class FluidState(object):
@@ -16,80 +15,79 @@ class FluidState(object):
         """
     @staticmethod
     def getHFromPT(P_Pa, T_C, fluid):
-        return PropsSI('HMASS', 'P', P_Pa, 'T', T_C + globalConstants.kelvin2celsius, fluid)
+        return coolProp('HMASS', 'P', P_Pa, 'T', T_C + globalConstants.kelvin2celsius, fluid)
 
     @staticmethod
     def getRhoFromPT(P_Pa, T_C, fluid):
-        return PropsSI('DMASS', 'P', P_Pa, 'T', T_C + globalConstants.kelvin2celsius, fluid)
+        return coolProp('DMASS', 'P', P_Pa, 'T', T_C + globalConstants.kelvin2celsius, fluid)
 
     @staticmethod
     def getCpFromPT(P_Pa, T_C, fluid):
-        return PropsSI('CPMASS', 'P', P_Pa, 'T', T_C + globalConstants.kelvin2celsius, fluid)
+        return coolProp('CPMASS', 'P', P_Pa, 'T', T_C + globalConstants.kelvin2celsius, fluid)
 
     @staticmethod
     def getSFromPT(P_Pa, T_C, fluid):
-        return PropsSI('SMASS', 'P', P_Pa, 'T', T_C + globalConstants.kelvin2celsius, fluid)
+        return coolProp('SMASS', 'P', P_Pa, 'T', T_C + globalConstants.kelvin2celsius, fluid)
 
     @staticmethod
     def getMuFromPT(P_Pa, T_C, fluid):
-        return PropsSI('V', 'P', P_Pa, 'T', T_C + globalConstants.kelvin2celsius, fluid)
+        return coolProp('V', 'P', P_Pa, 'T', T_C + globalConstants.kelvin2celsius, fluid)
 
     @staticmethod
     def getTFromPh(P_Pa, h_Jkg, fluid):
-        return PropsSI('T', 'P', P_Pa, 'HMASS', h_Jkg, fluid) - globalConstants.kelvin2celsius
+        return coolProp('T', 'P', P_Pa, 'HMASS', h_Jkg, fluid) - globalConstants.kelvin2celsius
 
     @staticmethod
     def getRhoFromPh(P_Pa, h_Jkg, fluid):
-        return PropsSI('DMASS', 'P', P_Pa, 'HMASS', h_Jkg, fluid)
+        return coolProp('DMASS', 'P', P_Pa, 'HMASS', h_Jkg, fluid)
 
     @staticmethod
     def getCpFromPh(P_Pa, h_Jkg, fluid):
-        return PropsSI('CPMASS', 'P', P_Pa, 'HMASS', h_Jkg, fluid)
+        return coolProp('CPMASS', 'P', P_Pa, 'HMASS', h_Jkg, fluid)
 
     @staticmethod
     def getSFromPh(P_Pa, h_Jkg, fluid):
-        return PropsSI('SMASS', 'P', P_Pa, 'HMASS', h_Jkg, fluid)
+        return coolProp('SMASS', 'P', P_Pa, 'HMASS', h_Jkg, fluid)
 
     @staticmethod
     def getMuFromPh(P_Pa, h_Jkg, fluid):
-        return PropsSI('V', 'P', P_Pa, 'HMASS', h_Jkg, fluid)
+        return coolProp('V', 'P', P_Pa, 'HMASS', h_Jkg, fluid)
 
     @staticmethod
     def getPFromTQ(T_C, Q, fluid):
-        return PropsSI('P', 'T', T_C + globalConstants.kelvin2celsius, 'Q', Q, fluid)
+        return coolProp('P', 'T', T_C + globalConstants.kelvin2celsius, 'Q', Q, fluid)
 
     @staticmethod
     def getHFromTQ(T_C, Q, fluid):
-        return PropsSI('HMASS', 'T', T_C + globalConstants.kelvin2celsius, 'Q', Q, fluid)
+        return coolProp('HMASS', 'T', T_C + globalConstants.kelvin2celsius, 'Q', Q, fluid)
 
     @staticmethod
     def getSFromTQ(T_C, Q, fluid):
-        return PropsSI('SMASS', 'T', T_C + globalConstants.kelvin2celsius, 'Q', Q, fluid)
+        return coolProp('SMASS', 'T', T_C + globalConstants.kelvin2celsius, 'Q', Q, fluid)
 
     @staticmethod
     def getTFromPQ(P_Pa, Q, fluid):
-        return PropsSI('T', 'P', P_Pa , 'Q', Q, fluid) - globalConstants.kelvin2celsius
-
+        return coolProp('T', 'P', P_Pa , 'Q', Q, fluid) - globalConstants.kelvin2celsius
 
     @staticmethod
     def getHFromPQ(P_Pa, Q, fluid):
-        return PropsSI('HMASS', 'P', P_Pa, 'Q', Q, fluid)
+        return coolProp('HMASS', 'P', P_Pa, 'Q', Q, fluid)
 
     @staticmethod
     def getHFromPS(P_Pa, S_JK, fluid):
-        return PropsSI('HMASS', 'P', P_Pa, 'SMASS', S_JK, fluid)
+        return coolProp('HMASS', 'P', P_Pa, 'SMASS', S_JK, fluid)
 
     @staticmethod
     def getTFromPS(P_Pa, S_JK, fluid):
-        return PropsSI('T', 'P', P_Pa, 'SMASS', S_JK, fluid) - globalConstants.kelvin2celsius
+        return coolProp('T', 'P', P_Pa, 'SMASS', S_JK, fluid) - globalConstants.kelvin2celsius
 
     @staticmethod
     def getTcrit(fluid):
-        return PropsSI('TCRIT', "", 0, "", 0, fluid) - globalConstants.kelvin2celsius
+        return coolProp('TCRIT', "", 0, "", 0, fluid) - globalConstants.kelvin2celsius
 
     @staticmethod
     def getPcrit(fluid):
-        return PropsSI('PCRIT', "", 0, "", 0, fluid)
+        return coolProp('PCRIT', "", 0, "", 0, fluid)
 
     # @staticmethod
     # def getStateFromTQ(T_C, Q, fluid):
