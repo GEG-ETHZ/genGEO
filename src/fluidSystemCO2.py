@@ -1,9 +1,11 @@
+import numpy as np
 
 from src.parasiticPowerFractionCoolingTower import parasiticPowerFractionCoolingTower
 from src.powerPlantOutput import PowerPlantEnergyOutput
 
 from utils.fluidStateFromPT import FluidStateFromPT
 from utils.fluidStateFromPh import FluidStateFromPh
+from utils.solver import Solver
 
 class FluidSystemCO2Output(object):
     """FluidSystemCO2Output."""
@@ -33,9 +35,11 @@ class FluidSystemCO2(object):
         P_condensation = FluidStateFromPT.getPFromTQ(T_condensation, 0, self.fluid) + 50e3
         dP_pump = 0
 
-        dP_downhole_threshold = 1e4
-        dP_downhole = dP_downhole_threshold
-        while dP_downhole >= dP_downhole_threshold:
+        dP_downhole_threshold = 1e3
+        dP_downhole = np.nan
+        dP_loops = 1
+        dP_solver = Solver()
+        while np.isnan(dP_downhole) or dP_downhole >= dP_downhole_threshold:
 
             # Find Injection Conditions
             P_pump_inlet = P_condensation
@@ -43,8 +47,11 @@ class FluidSystemCO2(object):
 
             T_pump_inlet = T_condensation
             pump_inlet_state = FluidStateFromPT(P_pump_inlet, T_pump_inlet, self.fluid)
-            h_pump_outletS = FluidStateFromPT.getHFromPS(P_pump_outlet, pump_inlet_state.S_JK(), self.fluid)
-            h_pump_outlet = pump_inlet_state.h_Jkg() + (h_pump_outletS - pump_inlet_state.h_Jkg()) / self.eta_pump
+
+            h_pump_outlet = pump_inlet_state.h_Jkg()
+            if dP_pump > 0:
+                h_pump_outletS = FluidStateFromPT.getHFromPS(P_pump_outlet, pump_inlet_state.S_JK(), self.fluid)
+                h_pump_outlet = pump_inlet_state.h_Jkg() + (h_pump_outletS - pump_inlet_state.h_Jkg()) / self.eta_pump
 
             self.pp_output.w_pump = -1 * (h_pump_outlet - pump_inlet_state.h_Jkg())
 
@@ -57,9 +64,17 @@ class FluidSystemCO2(object):
             # find downhole pressure difference (negative means
             # overpressure
             dP_downhole = self.reservoir.P_reservoir - reservoir_state.P_Pa()
-            #adjust pump if not within threshold
-            if dP_downhole >= dP_downhole_threshold:
-                dP_pump = dP_pump + 0.5 * dP_downhole
+            dP_pump = dP_solver.addDataAndEstimate(dP_pump, dP_downhole)
+            if np.isnan(dP_pump):
+                dP_pump = 0.5 * dP_downhole
+
+            if dP_loops > 10:
+                print('Warning::FluidSystemCO2:dP_loops is large: %s'%dP_loops)
+            dP_loops += 1
+
+            # dP_pump can't be negative
+            if dP_pump < 0 and dP_downhole > 0:
+                dP_pump = 0
 
         if reservoir_state.P_Pa() >= self.reservoir.P_reservoir_max:
             raise Exception('FluidSystemCO2:ExceedsMaxReservoirPressure - '

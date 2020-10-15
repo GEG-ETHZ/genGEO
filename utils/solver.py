@@ -10,7 +10,7 @@ class Solver(object):
         self.allowExtrapolation = True
         self.showPlot = False
 
-    def AddDataAndEstimate(self, x, y):
+    def addDataAndEstimate(self, x, y):
         self.func1.append(np.array([x, y]))
         return self.convergeToZero()
 

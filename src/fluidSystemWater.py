@@ -37,7 +37,7 @@ class FluidSystemWater(object):
 
             # find downhole pressure difference (negative means overpressure)
             dP_downhole = self.reservoir.P_reservoir - reservoir_state.P_Pa()
-            injection_state.P_Pa_in = dP_solver.AddDataAndEstimate(injection_state.P_Pa(), dP_downhole)
+            injection_state.P_Pa_in = dP_solver.addDataAndEstimate(injection_state.P_Pa(), dP_downhole)
 
             if np.isnan(injection_state.P_Pa()):
                 injection_state.P_Pa_in = initial_state.P_Pa() + dP_downhole

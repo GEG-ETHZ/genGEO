@@ -38,7 +38,7 @@ class FluidSystemWaterSolver(object):
             self.initial_P =  self.fluid_system.pump.P_inj_surface
             dT_inj = initialT - system_state.T_C()
 
-            initialT = solv.AddDataAndEstimate(initialT, dT_inj)
+            initialT = solv.addDataAndEstimate(initialT, dT_inj)
 
             if np.isnan(initialT):
                 initialT = system_state.T_C()

@@ -48,7 +48,7 @@ class DownHolePump(object):
                 if dP_pump == 0 and dP_surface >= 0:
                     break
 
-                dP_pump = dP_Solver.AddDataAndEstimate(dP_pump, dP_surface)
+                dP_pump = dP_Solver.addDataAndEstimate(dP_pump, dP_surface)
                 if np.isnan(dP_pump):
                     dP_pump = -1 * dP_surface
 
