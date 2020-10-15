@@ -30,31 +30,28 @@ class FluidSystemWaterSolver(object):
     def minimizeFunctionOpt(self, initialT, m_dot, time_years):
 
         dT_inj = initialT
-        # hist = []
         solv = Solver()
         while abs(dT_inj) > 0.5:# 1e-3:
-            # print('find T', initialT)
+
             initial_state = FluidStateFromPT(self.initial_P, initialT, self.fluid_system.fluid)
             system_state = self.fluid_system.solve(initial_state, m_dot, time_years)
             self.initial_P =  self.fluid_system.pump.P_inj_surface
             dT_inj = initialT - system_state.T_C()
 
-            x_zero = solv.AddDataAndEstimate(initialT, dT_inj)
+            initialT = solv.AddDataAndEstimate(initialT, dT_inj)
 
-            if np.isnan(x_zero):
-                x_zero = initialT - dT_inj
+            if np.isnan(initialT):
+                initialT = system_state.T_C()
 
             # add bounds
-            if x_zero < 1:
-                x_zero = 1
+            if initialT < 1:
+                initialT = 1
 
             # add upper bounds that make sense
             T_prod_surface_C = self.fluid_system.pump.well.results.T_C_f[-1]
-            if x_zero > T_prod_surface_C and x_zero > 50:
-                x_zero = T_prod_surface_C
+            if initialT > T_prod_surface_C and initialT > 50:
+                initialT = T_prod_surface_C
 
-            initialT = x_zero
-        # print('final T opt ', system_state.T_C())
 
     def solve(self, m_dot, time_years):
 
