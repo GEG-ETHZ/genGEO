@@ -3,7 +3,7 @@ import numpy as np
 from scipy.optimize import root, minimize, newton, brentq
 
 from utils.fluidStateFromPT import FluidStateFromPT
-from utils.convergeToZero import convergeToZero
+from utils.solver import Solver
 
 
 class FluidSystemWaterSolver(object):
@@ -30,20 +30,19 @@ class FluidSystemWaterSolver(object):
     def minimizeFunctionOpt(self, initialT, m_dot, time_years):
 
         dT_inj = initialT
-        hist = []
+        # hist = []
+        solv = Solver()
         while abs(dT_inj) > 0.5:# 1e-3:
             # print('find T', initialT)
             initial_state = FluidStateFromPT(self.initial_P, initialT, self.fluid_system.fluid)
             system_state = self.fluid_system.solve(initial_state, m_dot, time_years)
             self.initial_P =  self.fluid_system.pump.P_inj_surface
             dT_inj = initialT - system_state.T_C()
-            hist.append(np.array([initialT, dT_inj]))
-            func1 = np.array(hist)
-            # print(func1)
 
-            x_zero = convergeToZero(func1, allowExtrapolation = True)
+            x_zero = solv.AddDataAndEstimate(initialT, dT_inj)
 
-            # print(x_zero)
+            if np.isnan(x_zero):
+                x_zero = initialT - dT_inj
 
             # add bounds
             if x_zero < 1:

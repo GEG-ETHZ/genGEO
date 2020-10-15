@@ -1,28 +1,5 @@
 import numpy as np
 
-def convergeToZero(func1, allowExtrapolation):
-
-    func1 = func1[np.argsort(func1[:, 0])]
-    func2 = np.array([np.array([0, 0]), np.array([1, 0])])
-
-    try:
-        x_zero, y_zero = getIntersection(func1, func2, allowExtrapolation)
-    except Exception as ex:
-        if str(ex).find('GetIntersection:NoIntersection') > -1:
-            # The lines appear divergent on either end.
-            # Old-school nudge it in the right direction.
-            x_zero = func1[-1, 0] - func1[-1, 1]
-            y_zero = 0
-            print('Converge to zero not working. Nudging x to %s' %x_zero)
-        elif str(ex).find('GetIntersection:NotEnoughRows') > -1:
-            # Only single values
-            # Guess last result
-            x_zero = func1[-1, 0] - func1[-1, 1]
-            y_zero = 0
-        else:
-            raise ex
-    return x_zero
-
 def getIntersection(func1, func2, allowExtrapolation):
 
     #Both functions have to have only two columns
