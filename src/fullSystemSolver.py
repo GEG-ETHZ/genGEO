@@ -13,6 +13,8 @@ class FullSystemSolver(object):
 
     def minimizeFunctionBrownfield(self, initial_m_dot):
 
+        initial_m_dot = initial_m_dot[0]
+
         if len(self.m_dots) > 10 and initial_m_dot >= (self.max_m_dot - 1e-8):
             print('NaN')
             return np.nan
@@ -23,7 +25,7 @@ class FullSystemSolver(object):
         else:
             self.m_dots.append(initial_m_dot)
 
-        print('main val', initial_m_dot)
+        print('Trying a mass flowrate of %s'%initial_m_dot)
 
         try:
             system = self.full_system.solve(initial_m_dot, self.time_years)
@@ -31,14 +33,14 @@ class FullSystemSolver(object):
             output_val = output.capital_cost_model.LCOE_brownfield.LCOE
 
             if not np.isnan(output_val):
-                self.test = np.array([initial_m_dot[0], output_val[0]])
+                self.test = np.array([initial_m_dot, output_val])
 
         except Exception as error:
             print(str(error))
             # regex = re.compile('Saturation pressure \[([+-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)) Pa\] corresponding to T \[([+-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)) K\] is within 1e-4 % of given p')
             # string = """Saturation pressure [7.2315e+06 Pa] corresponding to T [303.258 K] is within 1e-4 % of given p [7.2315e+06 Pa] : PropsSI("HMASS","P",7231504.074,"T",303.257922,"CO2")"""
             # re.match(regex, string)
-            if str(error).find('TotalAnalyticSystemWater:ExceedsMaxProductionPumpPressure') > -1:
+            if str(error).find(':ExceedsMaxProductionPumpPressure') > -1:
                 # print(str(error))
                 self.max_m_dot = initial_m_dot
                 output_val = np.nan
@@ -71,83 +73,92 @@ class FullSystemSolver(object):
 
     def minimizeLCOEBrownfield(self, time_years):
 
-        LCOE_old = np.nan
-        LCOE = 0
-
-        bestLCOE = 1e12
-        bestLCOEMdot = np.nan
+        old_var = np.nan
+        best_var = np.nan
+        best_m_dot = np.nan
 
         #Starting Massflow Guess (add 10)
-        m_dot_IP = 0
+        m_dot_IP = 10
 
         peaks = 0
         d_m_dot = 10
-        d_power_d_m_dot = 0
         d_m_dot_multiplier = 0.21 #0.25
 
+        point_towards_zero = False
+        change_m_dot_sign = False
+
+        # reversingFraction is the change past minimum to reverse
+        reversing_fraction = 3e-2
+
         while peaks < 5:
-            # if step is too big and crosses zero, make it smaller
-            if m_dot_IP + d_m_dot <= 0:
+            # Make sure mass flowrate is positive
+            if m_dot_IP <= 0:
                 d_m_dot = -1 * d_m_dot * d_m_dot_multiplier
                 peaks = peaks + 1
+                m_dot_IP = abs(d_m_dot)
                 print('mdot<=0; peak %s'%peaks)
-                # get it to go back
-                # W_net_IP_old = np.nan
-                LCOE_old = np.nan
-            m_dot_IP = m_dot_IP + d_m_dot
+
             print('Trying a mass flowrate of %s'%m_dot_IP)
             try:
                 system = self.full_system.solve(m_dot_IP, time_years)
                 output = self.full_system.gatherOutput()
-                LCOE_brownfield = output.capital_cost_model.LCOE_brownfield.LCOE
-                print('Done')
-                # # should never be zero
-                # if d_m_dot != 0 and not np.isnan(W_net_IP) and not np.isnan(W_net_IP_old):
-                #     d_power_d_m_dot = abs((W_net_IP - W_net_IP_old)*1e6 / d_m_dot)
+                var_out = output.capital_cost_model.LCOE_brownfield.LCOE
 
-                print(LCOE_old)
+                # See if this mass flowrate is better than previous values
 
-                # See if LCOE has inflected
-                # LCOE is NaN only at zero flowrate
-                if np.isnan(LCOE_brownfield):
-                    # If NaN LCOE, make sure it is trending towards mdot of
-                    # zero
-                    if d_m_dot > 0:
-                        d_m_dot = -1 * d_m_dot * d_m_dot_multiplier
-                        peaks = peaks + 1
-                        print('LCOE_brownfield=NaN; peak %s'%peaks)
+                if np.isnan(var_out):
+                    # make sure it is trending towards mdot of zero
+                    point_towards_zero = True
+                else:
+                    if var_out < best_var or np.isnan(best_var):
+                        best_var = var_out
+                        best_m_dot = m_dot_IP
 
-                elif not np.isnan(LCOE_old):
-                    # only make change if both LCOE and LCOE_old are not
-                    # nan
-                    if LCOE_old < LCOE_brownfield:
-                        d_m_dot = -1 * d_m_dot * d_m_dot_multiplier
-                        peaks = peaks + 1
-                        print('LCOE_old<LCOE_brownfield; peak %s'%peaks)
+                    if peaks == 0:
+                        # before first peak, exceed best val by
+                        # reversingfraction
+                        reversing_threshold = best_var * (1 + reversing_fraction)
+                        if var_out > reversing_threshold:
+                            change_m_dot_sign = True
+                            print('Minimize first crossing; peak %s'%peaks)
+                    else:
+                        if var_out > old_var:
+                            change_m_dot_sign = True
+                            print('Minimize crossing; peak %s'%peaks)
 
-                LCOE = LCOE_brownfield
+                # set residual
+                if np.isnan(var_out) or np.isnan(old_var) or d_m_dot == 0:
+                    residual = 0
+                else:
+                    residual = abs(var_out - old_var) / abs(d_m_dot)
 
-
-                # Save best values
-                if not np.isnan(LCOE_brownfield) and LCOE_brownfield < bestLCOE:
-                    bestLCOE = LCOE
-                    bestLCOEMdot = m_dot_IP
-
-                # Set current values to old values
-                LCOE_old = LCOE
+                # set current values as old value
+                old_var = var_out
 
             except Exception as ex:
+                raise ex
                 print(str(ex))
-                if d_m_dot > 0:
-                    d_m_dot = -1 * d_m_dot * d_m_dot_multiplier
-                    peaks = peaks + 1
-                    print('exception; peak %s'%peaks)
-                    LCOE_old = np.nan
-                    LCOE_brownfield = np.nan
-                    LCOE = np.nan
+                old_var = np.nan
+                residual = 0
+                point_towards_zero = True
+
             # # TODO: add raise exception
 
-        m_dot_IP = bestLCOEMdot
+            if point_towards_zero:
+                point_towards_zero = False
+                if d_m_dot > 0:
+                    change_m_dot_sign = True
+                    print('Pointing to zero.')
+
+            if change_m_dot_sign:
+                change_m_dot_sign = False
+                d_m_dot = -1 * d_m_dot * d_m_dot_multiplier
+                peaks += 1
+                print('Crossed peak %s, Changing direction.'%peaks)
+
+            m_dot_IP = m_dot_IP + d_m_dot
+
+
         system = self.full_system.solve(m_dot_IP, time_years)
         output = self.full_system.gatherOutput()
         LCOE_brownfield = output.capital_cost_model.LCOE_brownfield.LCOE
