@@ -14,7 +14,7 @@ from src.capitalCostWell import CapitalCostWell
 from src.capitalCostWellField import CapitalCostWellField
 from src.capitalCostExploration import CapitalCostExploration
 from src.capitalCostSurfacePlantCPG import CapitalCostSurfacePlantCPG
-from src.fullSystemSolver import FullSystemSolver
+from src.fullSystemSolver import FullSystemSolverMinLCOEBrownfield
 
 from utils.globalProperties import GlobalSimulationProperties
 # from utils.globalConstants import globalConstants
@@ -52,11 +52,6 @@ class TotalSystemCO2(object):
 
         # define global methods to be used in this tests
         gsp = GlobalSimulationProperties()
-        # alternative simulation properties for porous reservoir
-        gsp2 = GlobalSimulationProperties()
-        gsp2.k_rock = 2.1        #W/m/C
-        gsp2.rho_rock = 2300     #kg/m^3
-        gsp2.c_rock = 920.       #J/kg/C
 
         fluid_system = FluidSystemCO2(T_ambient_C = T_ambient_C,
                                 dT_approach = dT_approach,
@@ -73,7 +68,7 @@ class TotalSystemCO2(object):
                                             dT_dz = dT_dz,
                                             T_e_initial = T_e_initial)
 
-        fluid_system.reservoir = PorousReservoir(params = gsp2,
+        fluid_system.reservoir = PorousReservoir(params = gsp,
                                         well_spacing = well_spacing,
                                         thickness = reservoir_thickness,
                                         permeability = permeability,

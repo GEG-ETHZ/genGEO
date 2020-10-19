@@ -15,7 +15,9 @@ from src.capitalCostWell import CapitalCostWell
 from src.capitalCostWellField import CapitalCostWellField
 from src.capitalCostExploration import CapitalCostExploration
 from src.capitalCostSurfacePlantORC import CapitalCostSurfacePlantORC
-from src.fullSystemSolver import FullSystemSolver
+from src.fullSystemSolver import FullSystemSolverMinLCOEBrownfield
+from src.fullSystemSolver import FullSystemSolverMinLCOEGreenfield
+from src.fullSystemSolver import FullSystemSolverMaxPower
 
 from utils.globalProperties import GlobalSimulationProperties
 
@@ -55,11 +57,6 @@ class TotalSystemWater(object):
 
         # define global methods to be used in this tests
         gsp = GlobalSimulationProperties()
-        # alternative simulation properties for porous reservoir
-        gsp2 = GlobalSimulationProperties()
-        gsp2.k_rock = 2.1        #W/m/C
-        gsp2.rho_rock = 2300     #kg/m^3
-        gsp2.c_rock = 920.       #J/kg/C
 
         fluid_system = FluidSystemWater()
         fluid_system.injection_well = SemiAnalyticalWell(params = gsp,
@@ -71,7 +68,7 @@ class TotalSystemWater(object):
                                             dT_dz = dT_dz,
                                             T_e_initial = T_e_initial)
 
-        fluid_system.reservoir = PorousReservoir(params = gsp2,
+        fluid_system.reservoir = PorousReservoir(params = gsp,
                                         well_spacing = well_spacing,
                                         thickness = reservoir_thickness,
                                         permeability = permeability,
@@ -140,10 +137,9 @@ class TotalSystemWater(object):
 
         self.full_system = FullSystemORC(solver, capital_cost_system)
 
-        self.full_system_solver = FullSystemSolver(self.full_system)
-
     def minimizeLCOEBrownfield(self, time_years = 1.):
-        optMdot = self.full_system_solver.minimizeLCOEBrownfield(time_years = time_years)
+        self.full_system_solver = FullSystemSolverMinLCOEBrownfield(self.full_system)
+        optMdot = self.full_system_solver.solve(time_years = time_years)
         if optMdot:
             output = self.full_system.gatherOutput()
             output.optMdot = optMdot
@@ -153,7 +149,8 @@ class TotalSystemWater(object):
 
 
     def minimizeLCOEGreenfield(self, time_years = 1.):
-        optMdot = self.full_system_solver.minimizeLCOEGreenfield(time_years = time_years)
+        self.full_system_solver = FullSystemSolverMinLCOEGreenfield(self.full_system)
+        optMdot = self.full_system_solver.solve(time_years = time_years)
         if optMdot:
             output = self.full_system.gatherOutput()
             output.optMdot = optMdot
@@ -163,7 +160,8 @@ class TotalSystemWater(object):
 
 
     def maximizePower(self, time_years = 1.):
-        optMdot = self.full_system_solver.maximizePower(time_years = time_years)
+        self.full_system_solver = FullSystemSolverMaxPower(self.full_system)
+        optMdot = self.full_system_solver.solve(time_years = time_years)
         if optMdot:
             output = self.full_system.gatherOutput()
             output.optMdot = optMdot

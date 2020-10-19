@@ -62,7 +62,7 @@ depths = np.arange(1000, 8000, 1000)
 # depths = np.arange(1000, 8000, 1000)
 
 permeabilities = [1e-9]
-depths = [1000]
+depths = [5000]
 file = open('data_tmp.csv', 'w')
 
 # file = open('data_Water_R600a_orig.csv', 'w')
@@ -71,14 +71,15 @@ file = open('data_tmp.csv', 'w')
 
 for depth in depths:
     for permeability in permeabilities:
+        start = time.time()
         print('######### new case ########')
         print(depth)
         print(permeability)
         # system = TotalSystemWater(depth = depth, permeability = permeability / 100., orc_fluid = 'R600a')
-        # system = TotalSystemWater(depth = depth, permeability = permeability / 100., orc_fluid = 'R245fa')
-        system = TotalSystemCO2(depth = depth, permeability = permeability / 100.)
+        system = TotalSystemWater(depth = depth, permeability = permeability / 100., orc_fluid = 'R245fa')
+        # system = TotalSystemCO2(depth = depth, permeability = permeability / 100.)
         try:
-            results = system.minimizeLCOEBrownfield(time_years = 1.)
+            results = system.maximizePower(time_years = 1.)
             error_str =  'No error'
         except Exception as error:
             error_str = str(error).replace("\n", "").replace(",", " - ")
@@ -86,15 +87,28 @@ for depth in depths:
             results.optMdot = 0.
             results.capital_cost_model = Dummy()
             results.capital_cost_model.LCOE_brownfield = Dummy()
+            results.capital_cost_model.LCOE_greenfield = Dummy()
+            results.energy_results = Dummy()
+            results.energy_results.W_net = np.nan
             results.capital_cost_model.LCOE_brownfield.LCOE = np.nan
-        lcoe = results.capital_cost_model.LCOE_brownfield.LCOE * 1e6
+            results.capital_cost_model.LCOE_greenfield.LCOE = np.nan
+        lcoe_b = results.capital_cost_model.LCOE_brownfield.LCOE * 1e6
+        lcoe_g = results.capital_cost_model.LCOE_greenfield.LCOE * 1e6
         print(results.optMdot)
-        print(lcoe)
-        if np.isnan(lcoe):
-            lcoe = 0.
+        print(lcoe_b)
+        print(lcoe_g)
+        print(results.energy_results.W_net)
+        if np.isnan(lcoe_b):
+            lcoe_b = 0.
         else:
-            lcoe = lcoe
+            lcoe_b = lcoe_b
+        if np.isnan(lcoe_g):
+            lcoe_g = 0.
+        else:
+            lcoe_g = lcoe_g
         print(error_str)
-        file.write(','.join([str(i) for i in [depth, permeability, results.optMdot, lcoe, """%s\n"""%error_str]]))
+        end = time.time()
+        print('time', end - start)
+        file.write(','.join([str(i) for i in [depth, permeability, results.optMdot, lcoe_b, lcoe_g, """%s\n"""%error_str]]))
         # 1/0
 file.close()
