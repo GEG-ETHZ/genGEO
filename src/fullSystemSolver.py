@@ -4,12 +4,14 @@ import sys, re
 
 from scipy.optimize import root, minimize, newton
 
+from src.fullSystemSolverBase import FullSystemSolverBase
 
-class FullSystemSolver(object):
+
+class FullSystemSolver(FullSystemSolverBase):
     """FullSystemSolver provides a solver to determine minimum LCOE."""
 
     def __init__(self, system):
-        self.full_system = system
+        super().__init__(system)
 
     def minimizeFunctionBrownfield(self, initial_m_dot):
 
@@ -71,100 +73,15 @@ class FullSystemSolver(object):
         # print(output_val)
         return output_val
 
-    def minimizeLCOEBrownfield(self, time_years):
-
-        old_var = np.nan
-        best_var = np.nan
-        best_m_dot = np.nan
-
-        #Starting Massflow Guess (add 10)
-        m_dot_IP = 10
-
-        peaks = 0
-        d_m_dot = 10
-        d_m_dot_multiplier = 0.21 #0.25
-
-        point_towards_zero = False
-        change_m_dot_sign = False
-
-        # reversingFraction is the change past minimum to reverse
-        reversing_fraction = 3e-2
-
-        while peaks < 5:
-            # Make sure mass flowrate is positive
-            if m_dot_IP <= 0:
-                d_m_dot = -1 * d_m_dot * d_m_dot_multiplier
-                peaks = peaks + 1
-                m_dot_IP = abs(d_m_dot)
-                print('mdot<=0; peak %s'%peaks)
-
-            print('Trying a mass flowrate of %s'%m_dot_IP)
-            try:
-                system = self.full_system.solve(m_dot_IP, time_years)
-                output = self.full_system.gatherOutput()
-                var_out = output.capital_cost_model.LCOE_brownfield.LCOE
-
-                # See if this mass flowrate is better than previous values
-
-                if np.isnan(var_out):
-                    # make sure it is trending towards mdot of zero
-                    point_towards_zero = True
-                else:
-                    if var_out < best_var or np.isnan(best_var):
-                        best_var = var_out
-                        best_m_dot = m_dot_IP
-
-                    if peaks == 0:
-                        # before first peak, exceed best val by
-                        # reversingfraction
-                        reversing_threshold = best_var * (1 + reversing_fraction)
-                        if var_out > reversing_threshold:
-                            change_m_dot_sign = True
-                            print('Minimize first crossing; peak %s'%peaks)
-                    else:
-                        if var_out > old_var:
-                            change_m_dot_sign = True
-                            print('Minimize crossing; peak %s'%peaks)
-
-                # set residual
-                if np.isnan(var_out) or np.isnan(old_var) or d_m_dot == 0:
-                    residual = 0
-                else:
-                    residual = abs(var_out - old_var) / abs(d_m_dot)
-
-                # set current values as old value
-                old_var = var_out
-
-            except Exception as ex:
-                raise ex
-                print(str(ex))
-                old_var = np.nan
-                residual = 0
-                point_towards_zero = True
-
-            # # TODO: add raise exception
-
-            if point_towards_zero:
-                point_towards_zero = False
-                if d_m_dot > 0:
-                    change_m_dot_sign = True
-                    print('Pointing to zero.')
-
-            if change_m_dot_sign:
-                change_m_dot_sign = False
-                d_m_dot = -1 * d_m_dot * d_m_dot_multiplier
-                peaks += 1
-                print('Crossed peak %s, Changing direction.'%peaks)
-
-            m_dot_IP = m_dot_IP + d_m_dot
-
-
-        system = self.full_system.solve(m_dot_IP, time_years)
+    def getTargetVar(self):
         output = self.full_system.gatherOutput()
-        LCOE_brownfield = output.capital_cost_model.LCOE_brownfield.LCOE
+        return output.capital_cost_model.LCOE_brownfield.LCOE
 
-        print(m_dot_IP, LCOE_brownfield)
-        return m_dot_IP
+    def getDirection(self):
+        return -1
+
+    def minimizeLCOEBrownfield(self, time_years):
+        return self.findOptMdotForExtrema(time_years)
 
     def minimizeLCOEBrownfieldAuto(self, time_years):
 
