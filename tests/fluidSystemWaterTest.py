@@ -16,7 +16,7 @@ from src.capitalCostWell import CapitalCostWell
 from src.capitalCostWellField import CapitalCostWellField
 from src.capitalCostExploration import CapitalCostExploration
 from src.capitalCostSurfacePlantORC import CapitalCostSurfacePlantORC
-from src.fullSystemSolver import FullSystemSolver
+from src.fullSystemSolver import FullSystemSolverMinLCOEBrownfield
 
 from utils.globalProperties import GlobalSimulationProperties
 from utils.globalConstants import globalConstants
@@ -163,9 +163,9 @@ class FluidSystemWaterTest(unittest.TestCase):
 
         full_system = FullSystemORC(solver, capital_cost_system)
 
-        full_system_solver = FullSystemSolver(full_system)
+        full_system_solver = FullSystemSolverMinLCOEBrownfield(full_system)
 
-        optMdot = full_system_solver.minimizeLCOEBrownfield(time_years = 1)
+        optMdot = full_system_solver.solve(time_years = 1)
 
         output = full_system.gatherOutput()
         print(*testAssert(optMdot, 22.85, 'test_optMdot_solver_optMdot'))

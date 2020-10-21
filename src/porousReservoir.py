@@ -72,7 +72,7 @@ class PorousReservoir(object):
         res_energy = A_reservoir * self.thickness * self.params.rho_rock * self.params.c_rock * dT_initial
 
         # Model pressure transient (Figure 4.2, Adams (2015)), only for CO2 drying out
-        if self.modelPressureTransient == True and self.fluid=='CO2':
+        if self.modelPressureTransient == True and self.fluid.lower()=='co2':
             R = self.well_spacing
             nu_inj_fluid = self.initialState.mu_Pas() / self.initialState.rho_kgm3()
             # fit doesn't work before 2 years

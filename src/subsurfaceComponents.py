@@ -1,5 +1,7 @@
+import numpy as np
 
 from utils.fluidStateFromPT import FluidStateFromPT
+from utils.solver import Solver
 
 class DownHolePumpOutput(object):
     """DownHolePumpOutput."""
@@ -20,11 +22,13 @@ class DownHolePump(object):
         self.P_inj_surface = P_inj_surface
 
         # Now pumping and second well
+        d_dP_pump = 1e5
         dP_pump = 0
-        dP_surface = -100
-        d_dP_pump = 1e5 # 1e5 is one bar increments to increase pressure by pumping
+        dP_surface = np.nan
+        dP_loops = 1
+        dP_Solver = Solver()
 
-        while dP_surface <= -100:
+        while np.isnan(dP_surface) or abs(dP_surface) > 100:
             try:
                 if dP_pump > self.max_pump_dP:
                     dP_pump = self.max_pump_dP
@@ -40,24 +44,39 @@ class DownHolePump(object):
                 if dP_pump == self.max_pump_dP:
                     break
 
-                if dP_surface < 0:
-                    d_dP_pump = -1 * dP_surface
-                    dP_pump = dP_pump + d_dP_pump
+                # No pumping is needed in this system
+                if dP_pump == 0 and dP_surface >= 0:
+                    break
+
+                dP_pump = dP_Solver.addDataAndEstimate(dP_pump, dP_surface)
+                if np.isnan(dP_pump):
+                    dP_pump = -1 * dP_surface
+
+                # Pump can't be less than zero
+                if dP_pump < 0:
+                    dP_pump = 0
+
+                # Warn against excessive loops
+                if dP_loops > 10:
+                    print('Warning::DownHolePump:dP_loops is large: %s'%dP_loops)
+                dP_loops += 1
 
             except ValueError as error:
                 # Only catch problems of flashing fluid
-                if str(error).find('SemiAnalyticalWell:BelowSaturationPressure') > -1:
+                if str(error).find('DownHolePump:BelowSaturationPressure') > -1:
                     dP_pump = dP_pump + d_dP_pump
                 else:
                    raise error
         # if pump pressure greater than allowable, throw error
         if dP_pump >= self.max_pump_dP:
-            raise ValueError('TotalAnalyticSystemWater:ExceedsMaxProductionPumpPressure',
+            raise ValueError('DownHolePump:ExceedsMaxProductionPumpPressure ' \
             'Exceeds Max Pump Pressure of %.3f MPa!' %(self.max_pump_dP/1e6))
-        self.state_pump = state_in
+        self.output = DownHolePumpOutput()
+        self.output.w_pump = 0
+        if dP_pump > 0:
+            self.output.w_pump = (self.initial_state.h_Jkg() - state_in.h_Jkg()) / self.eta_pump
+
         return state
 
     def gatherOutput(self):
-        output = DownHolePumpOutput()
-        output.w_pump = (self.initial_state.h_Jkg() - self.state_pump.h_Jkg()) / self.eta_pump
-        return output
+        return self.output

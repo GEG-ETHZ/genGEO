@@ -1,65 +1,42 @@
+import numpy as np
 
-from scipy.optimize import root, minimize, newton
+from src.fullSystemSolverPeakIterator import FullSystemSolverPeakIterator
 
-
-class FullSystemSolver(object):
-    """FullSystemSolver provides a solver to determine minimum LCOE."""
+class FullSystemSolverMinLCOEBrownfield(FullSystemSolverPeakIterator):
+    """FullSystemSolver."""
 
     def __init__(self, system):
-        self.full_system = system
+        super().__init__(system)
 
-    def minimizeFunctionBrownfield(self, initial_m_dot):
-
-        system = self.full_system.solve(initial_m_dot, self.time_years)
-
+    def getTargetVar(self):
         output = self.full_system.gatherOutput()
-
-        # print(initial_m_dot)
-
         return output.capital_cost_model.LCOE_brownfield.LCOE
 
-    def minimizeLCOEBrownfield(self, time_years):
+    def getDirection(self):
+        return -1
 
-        initial_m_dot = 10.
-        self.time_years = time_years
+class FullSystemSolverMinLCOEGreenfield(FullSystemSolverPeakIterator):
+    """FullSystemSolver."""
 
-        sol = minimize(self.minimizeFunctionBrownfield, (initial_m_dot), method='Nelder-Mead', tol=1e-2)
+    def __init__(self, system):
+        super().__init__(system)
 
-        return sol.x[0]
-
-    def minimizeFunctionGreenfield(self, initial_m_dot):
-
-        system = self.full_system.solve(initial_m_dot, self.time_years)
-
+    def getTargetVar(self):
         output = self.full_system.gatherOutput()
-
         return output.capital_cost_model.LCOE_greenfield.LCOE
 
-    def minimizeLCOEGreenfield(self, time_years):
+    def getDirection(self):
+        return -1
 
-        initial_m_dot = 10.
-        self.time_years = time_years
+class FullSystemSolverMaxPower(FullSystemSolverPeakIterator):
+    """FullSystemSolver."""
 
-        sol = minimize(self.minimizeFunctionGreenfield, (initial_m_dot), method='Nelder-Mead', tol=1e-2)
+    def __init__(self, system):
+        super().__init__(system)
 
-        return sol.x[0]
-
-    def maximizeFunctionPower(self, initial_m_dot):
-
-        system = self.full_system.solve(initial_m_dot, self.time_years)
-
+    def getTargetVar(self):
         output = self.full_system.gatherOutput()
+        return output.energy_results.W_net
 
-        return - output.energy_results.W_net
-
-    def maximizePower(self, time_years):
-
-        initial_m_dot = 10.
-        self.time_years = time_years
-
-        sol = minimize(self.maximizeFunctionPower, (initial_m_dot), method='Nelder-Mead', tol=1e-2)
-
-        return sol.x[0]
-
-    def gatherOutput(self):
-        return self.full_system.gatherOutput()
+    def getDirection(self):
+        return 1

@@ -4,7 +4,6 @@ import numpy as np
 from src.semiAnalyticalWellResults import SemiAnalyticalWellResults
 
 from utils.globalConstants import globalConstants
-from utils.fluidStates import FluidState
 from utils.fluidStateFromPT import FluidStateFromPT
 
 class SemiAnalyticalWell(object):
@@ -46,10 +45,10 @@ class SemiAnalyticalWell(object):
         self.results.T_C_f[0] = T_f_initial       # C
         self.results.T_C_e[0] = self.T_e_initial       # C
         self.results.P_Pa[0] = P_f_initial        # Pa
-        self.results.h_Jkg[0] = FluidState.getHFromPT(self.results.P_Pa[0], self.results.T_C_f[0], self.fluid)
-        self.results.rho_kgm3[0] = FluidState.getRhoFromPT(self.results.P_Pa[0], self.results.T_C_f[0], self.fluid)
+        self.results.h_Jkg[0] = FluidStateFromPT.getHFromPT(self.results.P_Pa[0], self.results.T_C_f[0], self.fluid)
+        self.results.rho_kgm3[0] = FluidStateFromPT.getRhoFromPT(self.results.P_Pa[0], self.results.T_C_f[0], self.fluid)
         self.results.v_ms[0] = m_dot / A_c / self.results.rho_kgm3[0]  #m/s
-        mu_0 = FluidState.getMuFromPT(self.results.P_Pa[0], self.results.T_C_f[0], self.fluid)
+        mu_0 = FluidStateFromPT.getMuFromPT(self.results.P_Pa[0], self.results.T_C_f[0], self.fluid)
 
         # Calculate the Friction Factor
         # Use Colebrook-white equation for wellbore friction loss.
@@ -82,27 +81,20 @@ class SemiAnalyticalWell(object):
             # Calculate Pressure
             self.results.delta_P_loss[i] =  ff * dL / ( 2 * self.wellRadius) * \
                                     self.results.rho_kgm3[i-1] * self.results.v_ms[i]**2. / 2.  #Pa
-            self.results.rho_kgm3[i] = FluidState.getRhoFromPh(self.results.P_Pa[i-1], self.results.h_Jkg[i-1], self.fluid)
+            self.results.rho_kgm3[i] = FluidStateFromPT.getRhoFromPh(self.results.P_Pa[i-1], self.results.h_Jkg[i-1], self.fluid)
             self.results.P_Pa[i]         = self.results.P_Pa[i-1] - self.results.rho_kgm3[i]* self.params.g * dz \
                                     - self.results.delta_P_loss[i]
-            # If pressure is very near and below the critical point of 7.377 MPa (for CO2),
-            # there will be a coolprop convergence error
-            if self.fluid == 'CO2' and self.results.P_Pa[i] < 7.38e6 and self.results.P_Pa[i] > 7.37e6:
-                print('Semi_analytic_well: Manually adjusting pressure from %s' \
-                        ' MPa to 7.37 MPa to avoid CoolProp CO2 critical point' \
-                        ' convergence issues.'%(self.results.P_Pa[i]/1e6))
-                self.results.P_Pa[i] = 7.37e6
 
             # Throw exception if below saturation pressure of water at previous temperature
-            if self.fluid == 'Water':
-                P_sat = FluidState.getPFromTQ(self.results.T_C_f[i-1], 0, self.fluid)
+            if self.fluid.lower() == 'water':
+                P_sat = FluidStateFromPT.getPFromTQ(self.results.T_C_f[i-1], 0, self.fluid)
                 if self.results.P_Pa[i] < P_sat:
                     raise ValueError('SemiAnalyticalWell:BelowSaturationPressure - ' \
                     'Below saturation pressure of water at %s m !' %(self.results.z_m[i]))
 
             h_noHX = self.results.h_Jkg[i-1] - self.params.g * dz
-            T_noHX = FluidState.getTFromPh(self.results.P_Pa[i], h_noHX, self.fluid)
-            self.results.cp_JK[i] = FluidState.getCpFromPh(self.results.P_Pa[i], h_noHX, self.fluid)
+            T_noHX = FluidStateFromPT.getTFromPh(self.results.P_Pa[i], h_noHX, self.fluid)
+            self.results.cp_JK[i] = FluidStateFromPT.getCpFromPh(self.results.P_Pa[i], h_noHX, self.fluid)
 
             #Find Fluid Temp
             if not self.params.useWellboreHeatLoss:
@@ -120,7 +112,7 @@ class SemiAnalyticalWell(object):
                 else:
                     self.results.T_C_f[i] = (y * T_noHX + x *self.results. T_C_e[i]) / (x + y)
                 self.results.q[i] = y * (T_noHX - self.results.T_C_f[i])
-                self.results.h_Jkg[i] = FluidState.getHFromPT(self.results.P_Pa[i], self.results.T_C_f[i], self.fluid)
+                self.results.h_Jkg[i] = FluidStateFromPT.getHFromPT(self.results.P_Pa[i], self.results.T_C_f[i], self.fluid)
         return FluidStateFromPT(self.results.P_Pa[i], self.results.T_C_f[i], self.fluid)
 
     def gatherOutput(self):

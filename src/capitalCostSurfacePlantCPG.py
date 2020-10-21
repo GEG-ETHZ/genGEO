@@ -28,11 +28,21 @@ class CapitalCostSurfacePlantCPG(object):
         W_pump_inj = energy_results.W_pump_total
         W_turbine = energy_results.W_turbine_total
 
-        # # TODO: Do some checks if temp is correct
+        if 0. < W_pump_inj < 10000.: W_pump_inj = 0.
+
+        # Check heats & powers
+        if W_turbine < 0:
+            raise Exception('CapitalCost_SurfacePlant:NegativeTurbinePower - Negative Turbine Power')
+        elif Q_desuperheater > 0 or Q_condenser > 0:
+            raise Exception('CapitalCost_SurfacePlant:PositiveCondenserHeat - Positive Condenser Heat')
+        elif W_pump_inj > 0:
+            raise Exception('CapitalCost_SurfacePlant:PositiveCpgPumpPower - Positive CPG Pump Power')
+
+        # Check temps
+        if dT_approach_CT < 0 or dT_range_CT < 0:
+            raise Exception('CapitalCost_SurfacePlant:NegativedT - Negative Temp Difference')
 
         results = CapitalCostSurfacePlantCPGResults()
-
-        if 0. < W_pump_inj < 10000.: W_pump_inj = 0.
 
         # C_T_G
         # Regular fluid
