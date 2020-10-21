@@ -46,7 +46,7 @@ def testSuite(full=False):
 
 if __name__ == '__main__':
     runner = unittest.TextTestRunner(verbosity=2)
-    if sys.argv[-1] == 'FULL':
+    if sys.argv[-1].lower() == 'full':
         runner.run(testSuite(full=True))
     else:
         runner.run(testSuite())
