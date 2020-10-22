@@ -2,8 +2,7 @@ import unittest
 import numpy as np
 
 from src.semiAnalyticalWell import SemiAnalyticalWell
-from utils.globalProperties import GlobalSimulationProperties
-from utils.globalConstants import globalConstants
+from utils.simulationParameters import SimulationParameters
 from utils.fluidStateFromPT import FluidStateFromPT
 from tests.testAssertion import testAssert
 
@@ -19,7 +18,7 @@ class SemiAnalyticalWellTest(unittest.TestCase):
         #  Testing SemiAnalyticalWell for vertical production well settings
         ###
         # load global physical properties
-        gpp = GlobalSimulationProperties()
+        gpp = SimulationParameters()
         # Water
         well = SemiAnalyticalWell(params = gpp,
                                 dz_total = 2500.,
@@ -61,7 +60,7 @@ class SemiAnalyticalWellTest(unittest.TestCase):
         #  Testing SemiAnalyticalWell for vertical and horizontal injection well settings
         ###
         # load global physical properties
-        gpp = GlobalSimulationProperties()
+        gpp = SimulationParameters()
 
         vertical_well = SemiAnalyticalWell(params = gpp,
                                         dz_total = -3500.,
@@ -108,7 +107,7 @@ class SemiAnalyticalWellTest(unittest.TestCase):
         #  Testing SemiAnalyticalWell for horizontal injection well settings
         ###
         # load global physical properties
-        gpp = GlobalSimulationProperties()
+        gpp = SimulationParameters()
 
         vertical_well = SemiAnalyticalWell(params = gpp,
                                             dz_total = -3500.,
@@ -155,7 +154,7 @@ class SemiAnalyticalWellTest(unittest.TestCase):
         #  Testing SemiAnalyticalWell for horizontal injection well settings
         ###
         # load global physical properties
-        gpp = GlobalSimulationProperties()
+        gpp = SimulationParameters()
 
         vertical_well = SemiAnalyticalWell(params = gpp,
                                             dz_total = -3500.,
@@ -182,7 +181,7 @@ class SemiAnalyticalWellTest(unittest.TestCase):
         #  Testing SemiAnalyticalWell for horizontal injection well settings
         ###
         # load global physical properties
-        gpp = GlobalSimulationProperties()
+        gpp = SimulationParameters()
 
         vertical_well = SemiAnalyticalWell(params = gpp,
                                             dz_total = -3500.,

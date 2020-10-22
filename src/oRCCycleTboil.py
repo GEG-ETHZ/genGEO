@@ -4,7 +4,7 @@ import numpy as np
 from src.parasiticPowerFractionCoolingTower import parasiticPowerFractionCoolingTower
 from src.powerPlantOutput import PowerPlantOutput
 
-from utils.globalConstants import getTboilOptimum
+from utils.constantsAndPaths import getTboilOptimum
 from utils.fluidStates import FluidState
 from utils.fluidStateFromTQ import FluidStateFromTQ
 from utils.fluidStateFromPh import FluidStateFromPh

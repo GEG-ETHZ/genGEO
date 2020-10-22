@@ -1,6 +1,6 @@
 import pandas as pd
 
-from utils.globalConstants import getWellCost
+from utils.constantsAndPaths import getWellCost
 
 def readXlsxColumn(file, sheet, headers, headerline):
     return pd.read_excel(file, sheet_name = sheet, header = headerline, usecols = headers)

@@ -3,33 +3,24 @@ import numpy as np
 
 from src.porousReservoir import PorousReservoir
 from utils.depletionCurve import depletionCurve
-from utils.globalProperties import GlobalSimulationProperties
-from utils.globalConstants import globalConstants
+from utils.simulationParameters import SimulationParameters
 from tests.testAssertion import testAssert
 from utils.fluidStateFromPT import FluidStateFromPT
 
 
 # define global methods to be used in the tests
-gpp = GlobalSimulationProperties()
-gpp.k_rock = 2.1        #W/m/C
-gpp.rho_rock = 2300     #kg/m^3
-gpp.c_rock = 920.       #J/kg/C
+gpp = SimulationParameters()
+gpp.working_fluid = 'co2'
+gpp.k_rock = 2.1
+gpp.rho_rock = 2300
+gpp.c_rock = 920.
+gpp.reservoir_thickness = 300
+gpp.permeability = 50e-15
+gpp.time_years = 30
 
-reservoir = PorousReservoir(
-            params = gpp,
-            well_spacing = 707.,
-            thickness = 300,
-            permeability = 50e-15,
-            T_surface_rock = 15,
-            depth = 2500,
-            dT_dz = 0.035,
-            wellRadius = 0.205,
-            reservoirConfiguration = '5spot',
-            fluid = 'CO2',
-            modelPressureTransient = False,
-            modelTemperatureDepletion = False)
+reservoir = PorousReservoir(params = gpp)
 
-initialState = FluidStateFromPT(25.e6, 40., reservoir.fluid)
+initialState = FluidStateFromPT(25.e6, 40., gpp.working_fluid)
 
 class ReservoirDepletionTest(unittest.TestCase):
 
@@ -44,11 +35,10 @@ class ReservoirDepletionTest(unittest.TestCase):
 
 
     def testNoTransient(self):
-
-        reservoir.solve(
-                        initialState = initialState,
-                        m_dot = 100,
-                        time_years = 30)
+        reservoir.modelPressureTransient = False
+        reservoir.modelTemperatureDepletion = False
+        reservoir.solve(initialState = initialState,
+                        m_dot = 100)
         results = reservoir.gatherOutput()
         self.assertTrue(*testAssert(results.end_P_Pa, 2.0351e7, 'test2_pressure'))
         self.assertTrue(*testAssert(results.end_T_C, 102.5, 'test2_temp'))
@@ -58,10 +48,8 @@ class ReservoirDepletionTest(unittest.TestCase):
     def testTransientPNoT(self):
         reservoir.modelPressureTransient = False
         reservoir.modelTemperatureDepletion = True
-        reservoir.solve(
-                        initialState = initialState,
-                        m_dot = 100,
-                        time_years = 30)
+        reservoir.solve(initialState = initialState,
+                        m_dot = 100)
 
         results = reservoir.gatherOutput()
         self.assertTrue(*testAssert(results.end_P_Pa, 2.0351e7, 'test3_pressure'))
@@ -72,10 +60,8 @@ class ReservoirDepletionTest(unittest.TestCase):
     def testTransientPT(self):
         reservoir.modelPressureTransient = True
         reservoir.modelTemperatureDepletion = True
-        reservoir.solve(
-                        initialState = initialState,
-                        m_dot = 100,
-                        time_years = 30)
+        reservoir.solve(initialState = initialState,
+                        m_dot = 100)
 
         results = reservoir.gatherOutput()
         self.assertTrue(*testAssert(results.end_P_Pa, 1.9325e7, 'test4_pressure'))
@@ -86,10 +72,8 @@ class ReservoirDepletionTest(unittest.TestCase):
     def testTransientTNoP(self):
         reservoir.modelPressureTransient = False
         reservoir.modelTemperatureDepletion = True
-        reservoir.solve(
-                        initialState = initialState,
-                        m_dot = 200,
-                        time_years = 30)
+        reservoir.solve(initialState = initialState,
+                        m_dot = 200)
 
         results = reservoir.gatherOutput()
         self.assertTrue(*testAssert(results.end_P_Pa, 1.5702e7, 'test5_pressure'))

@@ -29,7 +29,7 @@ class FluidSystemWater(object):
         stop =  False
         while np.isnan(dP_downhole) or abs(dP_downhole) > 10e3:
             injection_well_state    = self.injection_well.solve(injection_state, m_dot, time_years)
-            reservoir_state         = self.reservoir.solve(injection_well_state, m_dot, time_years)
+            reservoir_state         = self.reservoir.solve(injection_well_state, m_dot)
 
             # if already at P_system_min, stop looping
             if stop:

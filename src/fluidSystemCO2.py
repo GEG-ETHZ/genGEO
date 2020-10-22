@@ -59,7 +59,7 @@ class FluidSystemCO2(object):
 
             injection_well_state    = self.injection_well.solve(surface_injection_state, m_dot, time_years)
 
-            reservoir_state         = self.reservoir.solve(injection_well_state, m_dot, time_years)
+            reservoir_state         = self.reservoir.solve(injection_well_state, m_dot)
 
             # find downhole pressure difference (negative means
             # overpressure

@@ -13,8 +13,8 @@ def getPboilOptimum():
 def getTboilOptimum(orcFluid):
     return os.path.join(getProjectRoot(), 'data', 'ORC_Tboil_optimum_%s.csv'%orcFluid)
 
-class globalConstants(object):
-    """globalConstants carries global constants to convert units."""
+class ConversionConstants(object):
+    """ConversionConstants carries global constants."""
 
-    secPerYear = 3600. * 24. * 365#.25
+    secPerYear = 3600. * 24. * 365.
     kelvin2celsius = 273.15

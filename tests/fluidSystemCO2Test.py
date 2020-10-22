@@ -18,20 +18,20 @@ from src.capitalCostExploration import CapitalCostExploration
 from src.capitalCostSurfacePlantCPG import CapitalCostSurfacePlantCPG
 from src.fullSystemSolver import FullSystemSolverMinLCOEBrownfield
 
-from utils.globalProperties import GlobalSimulationProperties
-from utils.globalConstants import globalConstants
+from utils.simulationParameters import SimulationParameters
 from utils.fluidStateFromPT import FluidStateFromPT
 
 from tests.testAssertion import testAssert
 
 
 # define global methods to be used in this tests
-gsp = GlobalSimulationProperties()
+gsp = SimulationParameters()
 # alternative simulation properties for porous reservoir
-gsp2 = GlobalSimulationProperties()
+gsp2 = SimulationParameters()
 gsp2.k_rock = 2.1        #W/m/C
 gsp2.rho_rock = 2300     #kg/m^3
 gsp2.c_rock = 920.       #J/kg/C
+gsp2.working_fluid = 'co2'
 
 fluid_system = FluidSystemCO2(T_ambient_C = 15.,
                         dT_approach = 7.,
@@ -48,18 +48,7 @@ fluid_system.injection_well = SemiAnalyticalWell(params = gsp,
                                     dT_dz = 0.035,
                                     T_e_initial = 15.)
 
-fluid_system.reservoir = PorousReservoir(params = gsp2,
-                                well_spacing = 707.,
-                                thickness = 100,
-                                permeability = 1.0e-15 * 15000 / 100., # permeability = transmissivity / thickness
-                                T_surface_rock = 15,
-                                depth = 2500,
-                                dT_dz = 0.035,
-                                wellRadius = 0.205,
-                                reservoirConfiguration = '5spot',
-                                fluid = 'CO2',
-                                modelPressureTransient = False,
-                                modelTemperatureDepletion = True)
+fluid_system.reservoir = PorousReservoir(params = gsp2)
 
 fluid_system.production_well = SemiAnalyticalWell(params = gsp,
                                     dz_total = 2500.,

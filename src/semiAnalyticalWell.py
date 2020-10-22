@@ -3,7 +3,7 @@ import numpy as np
 
 from src.semiAnalyticalWellResults import SemiAnalyticalWellResults
 
-from utils.globalConstants import globalConstants
+from utils.constantsAndPaths import ConversionConstants
 from utils.fluidStateFromPT import FluidStateFromPT
 
 class SemiAnalyticalWell(object):
@@ -32,7 +32,7 @@ class SemiAnalyticalWell(object):
 
         P_f_initial = initial_state.P_Pa()
         T_f_initial = initial_state.T_C()
-        time_seconds = time_years * globalConstants.secPerYear
+        time_seconds = time_years * ConversionConstants.secPerYear
 
         # set geometry
         dz = self.dz_total/self.params.N_dx           # m

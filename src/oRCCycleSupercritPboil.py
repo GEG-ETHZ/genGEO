@@ -6,7 +6,7 @@ from src.heatExchanger import heatExchanger
 from src.heatExchangerOptMdot import heatExchangerOptMdot
 from src.powerPlantOutput import PowerPlantOutput
 
-from utils.globalConstants import getPboilOptimum
+from utils.constantsAndPaths import getPboilOptimum
 from utils.fluidStates import FluidState
 from utils.fluidStateFromTQ import FluidStateFromTQ
 from utils.fluidStateFromPh import FluidStateFromPh

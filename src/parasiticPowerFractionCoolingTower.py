@@ -1,10 +1,10 @@
-from utils.globalConstants import globalConstants
+from utils.constantsAndPaths import ConversionConstants
 
 
 def computeProcess(a, b, c, d, T_ambient_C, dT_approach_CT, dT_range_CT):
     A = a * (1/dT_approach_CT)
-    B = b * (T_ambient_C+globalConstants.kelvin2celsius)
-    C = c * (T_ambient_C+globalConstants.kelvin2celsius)/dT_approach_CT
+    B = b * (T_ambient_C+ConversionConstants.kelvin2celsius)
+    C = c * (T_ambient_C+ConversionConstants.kelvin2celsius)/dT_approach_CT
     D = d * (1/(dT_approach_CT + dT_range_CT))
     return A + B + C + D
 
