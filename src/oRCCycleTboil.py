@@ -15,59 +15,52 @@ class ORCCycleTboil(object):
     Heat/power is output as specific heat and specific work. To find the
     actual power, multiply by the flowrate of geofluid through the system."""
 
-    def __init__(self, T_ambient_C, dT_approach, dT_pinch, eta_pump, eta_turbine, coolingMode, orcFluid):
+    def __init__(self, params):
 
-        self.T_ambient_C = T_ambient_C
-        self.dT_approach = dT_approach
-        self.dT_pinch = dT_pinch
-        self.eta_pump = eta_pump
-        self.eta_turbine = eta_turbine
-        self.coolingMode = coolingMode
-        self.orcFluid = orcFluid
-        self.filepath = getTboilOptimum(orcFluid)
+        self.params = params
+        self.data = np.genfromtxt(getTboilOptimum(params.orc_fluid), delimiter=',')
 
-    def solve(self, initialState, m_dot = 0., time_years = 0., T_boil_C = False):
+    def solve(self, initialState, T_boil_C = False):
 
         T_in_C = initialState.T_C()
 
         if not T_boil_C:
-            data = np.genfromtxt(self.filepath, delimiter=',')
-            T_boil_C = np.interp(T_in_C, data[:,0], data[:,1])
-        if T_boil_C > FluidState.getTcrit(self.orcFluid):
+            T_boil_C = np.interp(T_in_C, self.data[:,0], self.data[:,1])
+        if T_boil_C > FluidState.getTcrit(self.params.orc_fluid):
             raise ValueError('ORC_Cycle_Tboil:Tboil_Too_Large - Boiling temperature above critical point')
 
-        T_condense_C = self.T_ambient_C + self.dT_approach
+        T_condense_C = self.params.T_ambient_C + self.params.dT_approach
 
         # create empty list to compute cycle of 6 states
         state   = [None] * 6
 
         #State 1 (Condenser -> Pump)
         #saturated liquid
-        state[0] = FluidStateFromTQ(T_condense_C, 0, self.orcFluid)
+        state[0] = FluidStateFromTQ(T_condense_C, 0, self.params.orc_fluid)
 
         #State 6 (Desuperheater -> Condenser)
         #saturated vapor
-        state[5] = FluidStateFromTQ(state[0].T_C(), 1, self.orcFluid)
+        state[5] = FluidStateFromTQ(state[0].T_C(), 1, self.params.orc_fluid)
         # state[5].P_Pa = state[0].P_Pa
 
         #State 3 (Preheater -> Boiler)
         #saturated liquid
-        state[2] = FluidStateFromTQ(T_boil_C, 0, self.orcFluid)
+        state[2] = FluidStateFromTQ(T_boil_C, 0, self.params.orc_fluid)
 
         #State 4 (Boiler -> Turbine)
         #saturated vapor
-        state[3] = FluidStateFromTQ(state[2].T_C(), 1, self.orcFluid)
+        state[3] = FluidStateFromTQ(state[2].T_C(), 1, self.params.orc_fluid)
         # state[3].P_Pa = state[2].P_Pa
 
         #State 5 (Turbine -> Desuperheater)
-        h_5s = FluidState.getHFromPS(state[0].P_Pa(), state[3].S_JK(), self.orcFluid)
-        h_5 = state[3].h_Jkg() - self.eta_turbine * (state[3].h_Jkg() - h_5s)
-        state[4] = FluidStateFromPh(state[0].P_Pa(), h_5, self.orcFluid)
+        h_5s = FluidState.getHFromPS(state[0].P_Pa(), state[3].S_JK(), self.params.orc_fluid)
+        h_5 = state[3].h_Jkg() - self.params.eta_turbine_orc * (state[3].h_Jkg() - h_5s)
+        state[4] = FluidStateFromPh(state[0].P_Pa(), h_5, self.params.orc_fluid)
 
         # #State 2 (Pump -> Preheater)
-        h_2s = FluidState.getHFromPS(state[2].P_Pa(), state[0].S_JK(), self.orcFluid)
-        h_2 = state[0].h_Jkg() - ((state[0].h_Jkg() - h_2s) / self.eta_pump)
-        state[1] = FluidStateFromPh(state[2].P_Pa(), h_2, self.orcFluid)
+        h_2s = FluidState.getHFromPS(state[2].P_Pa(), state[0].S_JK(), self.params.orc_fluid)
+        h_2 = state[0].h_Jkg() - ((state[0].h_Jkg() - h_2s) / self.params.eta_pump_orc)
+        state[1] = FluidStateFromPh(state[2].P_Pa(), h_2, self.params.orc_fluid)
 
         # #Calculate orc heat/work
         self.w_pump_orc = state[0].h_Jkg() - state[1].h_Jkg()
@@ -79,7 +72,7 @@ class ORCCycleTboil(object):
 
         # Cooling Tower Parasitic load
         dT_range = state[4].T_C() - state[5].T_C()
-        parasiticPowerFraction = parasiticPowerFractionCoolingTower(self.T_ambient_C, self.dT_approach, dT_range, self.coolingMode)
+        parasiticPowerFraction = parasiticPowerFractionCoolingTower(self.params.T_ambient_C, self.params.dT_approach, dT_range, self.params.cooling_mode)
         self.w_cooler_orc = self.q_desuperheater_orc * parasiticPowerFraction('cooling')
         self.w_condenser_orc = self.q_condenser_orc * parasiticPowerFraction('condensing')
 
@@ -88,16 +81,16 @@ class ORCCycleTboil(object):
         cp = FluidState.getCpFromPT(P_sat + 100e3, T_in_C, 'Water')
         #Water state 11, inlet, 12, mid, 13 exit
         self.T_C_11 = T_in_C;
-        self.T_C_12 = T_boil_C + self.dT_pinch;
+        self.T_C_12 = T_boil_C + self.params.dT_pinch;
         #mdot_ratio = mdot_orc / mdot_water
         self.mdot_ratio = cp * (self.T_C_11 - self.T_C_12) / self.q_boiler_orc;
         self.T_C_13 = self.T_C_12 - self.mdot_ratio * self.q_preheater_orc / cp;
 
         # check that T_C(13) isn't below pinch constraint
-        if self.T_C_13 < (state[1].T_C() + self.dT_pinch):
+        if self.T_C_13 < (state[1].T_C() + self.params.dT_pinch):
             # pinch constraint is here, not at 12
             # outlet is pump temp plus pinch
-            self.T_C_13 = state[1].T_C() + self.dT_pinch
+            self.T_C_13 = state[1].T_C() + self.params.dT_pinch
             R = self.q_boiler_orc / (self.q_boiler_orc + self.q_preheater_orc)
             self.T_C_12 = self.T_C_11 - (self.T_C_11 - self.T_C_13) * R
             self.mdot_ratio = cp * (self.T_C_11 - self.T_C_12) / self.q_boiler_orc
@@ -106,7 +99,7 @@ class ORCCycleTboil(object):
         self.state = state
 
         # return temperature
-        self.state_out = FluidStateFromPT(initialState.P_Pa(), self.T_C_13, initialState.fluid)
+        self.state_out = FluidStateFromPT(initialState.P_Pa(), self.T_C_13, self.params.working_fluid)
 
         return self.state_out
 

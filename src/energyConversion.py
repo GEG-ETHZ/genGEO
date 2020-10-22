@@ -4,8 +4,8 @@ class EnergyConversionORC(object):
     """EnergyConversionORC."""
 
     @staticmethod
-    def gatherOutput(m_dot, input):
-        N_IP_multiplier = input.injection_well.wellMultiplier
+    def gatherOutput(params, m_dot, input):
+        N_IP_multiplier = params.well_multiplier
         input = input.gatherOutput()
         ec = EnergyConversionORC()
         ec.Q_preheater = m_dot * input.pp.q_preheater
@@ -38,8 +38,8 @@ class EnergyConversionCPG(object):
     """EnergyConversionCPG."""
 
     @staticmethod
-    def gatherOutput(m_dot, input):
-        N_IP_multiplier = input.injection_well.wellMultiplier
+    def gatherOutput(params, m_dot, input):
+        N_IP_multiplier = params.well_multiplier
         input = input.gatherOutput()
         ec = EnergyConversionCPG()
         ec.Q_preheater = m_dot * input.pp.q_preheater

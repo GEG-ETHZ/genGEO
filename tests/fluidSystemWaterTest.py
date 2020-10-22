@@ -24,72 +24,40 @@ from utils.fluidStateFromPT import FluidStateFromPT
 from tests.testAssertion import testAssert
 
 
-# define global methods to be used in this tests
-gsp = SimulationParameters()
-# alternative simulation properties for porous reservoir
-gsp2 = SimulationParameters()
-gsp2.k_rock = 2.1        #W/m/C
-gsp2.rho_rock = 2300     #kg/m^3
-gsp2.c_rock = 920.       #J/kg/C
-gsp2.working_fluid = 'water'
+# load simulaiton parameters
+params = SimulationParameters(working_fluid = 'water')
+params.wellMultiplier = 4.
+params.orc_fluid = 'R245fa'
+
 
 fluid_system = FluidSystemWater()
-fluid_system.injection_well = SemiAnalyticalWell(params = gsp,
+fluid_system.injection_well = SemiAnalyticalWell(params = params,
                                     dz_total = -2500.,
-                                    wellRadius = 0.205,
-                                    wellMultiplier = 4.,
-                                    fluid = 'Water',
-                                    epsilon = 55 * 1e-6,
-                                    dT_dz = 0.035,
-                                    T_e_initial = 15.)
+                                    T_e_initial = params.T_ambient_C)
 
-fluid_system.reservoir = PorousReservoir(params = gsp2)
+fluid_system.reservoir = PorousReservoir(params = params)
 
-fluid_system.production_well1 = SemiAnalyticalWell(params = gsp,
+fluid_system.production_well1 = SemiAnalyticalWell(params = params,
                                     dz_total = 2000.,
-                                    wellRadius = 0.205,
-                                    wellMultiplier = 4.,
-                                    fluid = 'Water',
-                                    epsilon = 55 * 1e-6,
-                                    dT_dz = 0.035,
                                     T_e_initial = 15. + 0.035 * 2500.)
 
-prod_well2 = SemiAnalyticalWell(params = gsp,
-                                    dz_total = 500.,
-                                    wellRadius = 0.205,
-                                    wellMultiplier = 4.,
-                                    fluid = 'Water',
-                                    epsilon = 55 * 1e-6,
-                                    dT_dz = 0.035,
-                                    T_e_initial = 15. + 0.035 * 500.)
+prod_well2 = SemiAnalyticalWell(params = params,
+                                dz_total = params.pump_depth,
+                                T_e_initial = params.T_ambient_C + params.dT_dz * params.pump_depth)
 
 fluid_system.pump = DownHolePump(well = prod_well2,
-                    pump_depth = 500.,
-                    max_pump_dP = 10.e6,
-                    eta_pump = 0.75)
+                                params = params)
 
-fluid_system.pp = ORCCycleTboil(T_ambient_C = 15.,
-                        dT_approach = 7.,
-                        dT_pinch = 5.,
-                        eta_pump = 0.9,
-                        eta_turbine = 0.8,
-                        coolingMode = 'Wet',
-                        orcFluid = 'R245fa')
+fluid_system.pp = ORCCycleTboil(params = params)
 
-capital_cost_system = CapitalCostSystem(2019)
-capital_cost_system.CapitalCost_SurfacePlant = CapitalCostSurfacePlantORC(2019)
+capital_cost_system = CapitalCostSystem(params)
+capital_cost_system.CapitalCost_SurfacePlant = CapitalCostSurfacePlantORC(params)
 capital_cost_system.CapitalCost_SurfacePipe = CapitalCostSurfacePipes(N = 0)
-capital_cost_system.CapitalCost_Production_Well = CapitalCostWell.waterBaseline(well_length = 2500,
-                                                                    well_diameter = 0.205 * 2,
-                                                                    success_rate = 0.95,
-                                                                    cost_year = 2019)
-capital_cost_system.CapitalCost_Injection_Well = CapitalCostWell.waterBaseline(well_length = 2500,
-                                                                    well_diameter = 0.205 * 2,
-                                                                    success_rate = 0.95,
-                                                                    cost_year = 2019)
+capital_cost_system.CapitalCost_Production_Well = CapitalCostWell.waterBaseline(params)
+capital_cost_system.CapitalCost_Injection_Well = CapitalCostWell.waterBaseline(params)
 capital_cost_system.CapitalCost_Wellfield = CapitalCostWellField.water(2019)
 capital_cost_system.CapitalCost_Exploration = CapitalCostExploration.waterBaseline(well_length = 2500,
-                                                                    well_diameter = 0.205 * 2,
+                                                                    well_diameter = 0.205,
                                                                     success_rate = 0.95,
                                                                     cost_year = 2019)
 capital_cost_system.lcoe_model = LCOESimple(F_OM = 0.045,
@@ -97,7 +65,7 @@ capital_cost_system.lcoe_model = LCOESimple(F_OM = 0.045,
                                             Lifetime = 25,
                                             CapacityFactor = 0.9)
 
-initialState = FluidStateFromPT(1.e6, 60., fluid_system.fluid)
+initialState = FluidStateFromPT(1.e6, 60., params.working_fluid)
 
 class FluidSystemWaterTest(unittest.TestCase):
 
@@ -112,7 +80,7 @@ class FluidSystemWaterTest(unittest.TestCase):
     def testFluidSystemWaterSolverMdot1(self):
         solver = FluidSystemWaterSolver(fluid_system)
 
-        full_system = FullSystemORC(solver, capital_cost_system)
+        full_system = FullSystemORC(params, solver, capital_cost_system)
         full_system.solve(m_dot = 1, time_years = 1)
 
         output = full_system.gatherOutput()
@@ -135,7 +103,7 @@ class FluidSystemWaterTest(unittest.TestCase):
     def testFluidSystemWaterSolverMdot40(self):
         solver = FluidSystemWaterSolver(fluid_system)
 
-        full_system = FullSystemORC(solver, capital_cost_system)
+        full_system = FullSystemORC(params, solver, capital_cost_system)
         full_system.solve(m_dot = 40, time_years = 1)
 
         output = full_system.gatherOutput()
@@ -150,7 +118,7 @@ class FluidSystemWaterTest(unittest.TestCase):
     def testFluidSystemWaterSolverOptMdot(self):
         solver = FluidSystemWaterSolver(fluid_system)
 
-        full_system = FullSystemORC(solver, capital_cost_system)
+        full_system = FullSystemORC(params, solver, capital_cost_system)
 
         full_system_solver = FullSystemSolverMinLCOEBrownfield(full_system)
 

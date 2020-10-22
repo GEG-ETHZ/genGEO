@@ -12,16 +12,17 @@ class CapitalCostSurfacePlantCPGResults(object):
 class CapitalCostSurfacePlantCPG(object):
     """CapitalCostSurfacePlantCPG."""
 
-    def __init__(self, cost_year):
-        self.cost_year = cost_year
-        self.ppi_T_G = readCostTable(cost_year, 'PPI_T-G')
-        self.ppi_pump = readCostTable(cost_year, 'PPI_Pump')
+    def __init__(self, params):
+        self.params = params
+        self.cost_year = params.cost_year
+        self.ppi_T_G = readCostTable(self.cost_year, 'PPI_T-G')
+        self.ppi_pump = readCostTable(self.cost_year, 'PPI_Pump')
 
     def solve(self, energy_results, fluid_system):
 
         dT_range_CT =  0.
-        T_ambient_C = fluid_system.T_ambient_C
-        dT_approach_CT = fluid_system.dT_approach
+        T_ambient_C = self.params.T_ambient_C
+        dT_approach_CT = self.params.dT_approach
 
         Q_condenser = energy_results.Q_condenser_total
         Q_desuperheater = energy_results.Q_desuperheater_total

@@ -10,11 +10,9 @@ class DownHolePumpOutput(object):
 class DownHolePump(object):
     """DownHolePump."""
 
-    def __init__(self, well, pump_depth, max_pump_dP, eta_pump):
+    def __init__(self, well, params):#pump_depth, max_pump_dP, eta_pump):
         self.well = well
-        self.pump_depth = pump_depth
-        self.max_pump_dP = max_pump_dP
-        self.eta_pump = eta_pump
+        self.params = params
 
     def solve(self, initial_state, m_dot, time_years, P_inj_surface):
 
@@ -30,18 +28,18 @@ class DownHolePump(object):
 
         while np.isnan(dP_surface) or abs(dP_surface) > 100:
             try:
-                if dP_pump > self.max_pump_dP:
-                    dP_pump = self.max_pump_dP
+                if dP_pump > self.params.max_pump_dP:
+                    dP_pump = self.params.max_pump_dP
 
                 P_prod_pump_out = self.initial_state.P_Pa() + dP_pump
                 T_prod_pump_out = self.initial_state.T_C()
-                temp_at_pump_depth = self.well.T_e_initial + self.well.dT_dz * self.pump_depth
+                temp_at_pump_depth = self.well.T_e_initial + self.params.dT_dz * self.params.pump_depth
 
-                state_in = FluidStateFromPT(P_prod_pump_out, T_prod_pump_out, self.well.fluid)
-                state = self.well.solve(state_in, m_dot, time_years)
+                state_in = FluidStateFromPT(P_prod_pump_out, T_prod_pump_out, self.params.working_fluid)
+                state = self.well.solve(state_in, m_dot)
 
                 dP_surface = (state.P_Pa() - self.P_inj_surface)
-                if dP_pump == self.max_pump_dP:
+                if dP_pump == self.params.max_pump_dP:
                     break
 
                 # No pumping is needed in this system
@@ -68,13 +66,13 @@ class DownHolePump(object):
                 else:
                    raise error
         # if pump pressure greater than allowable, throw error
-        if dP_pump >= self.max_pump_dP:
+        if dP_pump >= self.params.max_pump_dP:
             raise ValueError('DownHolePump:ExceedsMaxProductionPumpPressure ' \
-            'Exceeds Max Pump Pressure of %.3f MPa!' %(self.max_pump_dP/1e6))
+            'Exceeds Max Pump Pressure of %.3f MPa!' %(self.params.max_pump_dP/1e6))
         self.output = DownHolePumpOutput()
         self.output.w_pump = 0
         if dP_pump > 0:
-            self.output.w_pump = (self.initial_state.h_Jkg() - state_in.h_Jkg()) / self.eta_pump
+            self.output.w_pump = (self.initial_state.h_Jkg() - state_in.h_Jkg()) / self.params.eta_pump
 
         return state
 

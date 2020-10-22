@@ -10,11 +10,11 @@ class SimulationParameters(object):
                 depth = 2500.,
                 pump_depth = 500.,
                 well_radius = 0.205,
-                well_multiplier = 4.,
+                well_multiplier = 1.,
                 well_spacing = 707.,
-                monitoring_well_diameter = 0.216,
+                monitoring_well_radius = 0.108,
                 dT_dz = 0.035,
-                T_e_initial = 15.,
+                # T_e_initial = 15.,
                 T_surface_rock = 15,
                 T_ambient_C = 15.,
                 reservoir_thickness = 100.,
@@ -32,7 +32,7 @@ class SimulationParameters(object):
                 cooling_mode = 'Wet',
                 # cost model
                 cost_year = 2019,
-                well_success_rate = 0.95,
+                success_rate = 0.95,
                 F_OM = 0.045,
                 discount_rate = 0.096,
                 lifetime = 25,
@@ -56,9 +56,9 @@ class SimulationParameters(object):
         self.well_radius = well_radius
         self.well_multiplier = well_multiplier
         self.well_spacing = well_spacing
-        self.monitoring_well_diameter = monitoring_well_diameter
+        self.monitoring_well_radius = monitoring_well_radius
         self.dT_dz = dT_dz
-        self.T_e_initial = T_e_initial
+        # self.T_e_initial = T_e_initial
         self.T_surface_rock = T_surface_rock
         self.T_ambient_C = T_ambient_C
         self.reservoir_thickness = reservoir_thickness
@@ -73,8 +73,9 @@ class SimulationParameters(object):
         self.eta_pump_co2 = eta_pump_co2
         self.eta_turbine_co2 = eta_turbine_co2
         self.cooling_mode = cooling_mode
+        self.well_length = self.depth
         self.cost_year = cost_year
-        self.well_success_rate = well_success_rate
+        self.success_rate = success_rate
         self.F_OM = F_OM
         self.discount_rate = discount_rate
         self.lifetime = lifetime

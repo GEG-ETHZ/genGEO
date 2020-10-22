@@ -4,6 +4,7 @@ from src.oRCCycleTboil import ORCCycleTboil
 from src.parasiticPowerFractionCoolingTower import parasiticPowerFractionCoolingTower
 
 from utils.fluidStateFromPT import FluidStateFromPT
+from utils.simulationParameters import SimulationParameters
 
 from tests.testAssertion import testAssert
 
@@ -24,13 +25,9 @@ class ORCCycleTboilTest(unittest.TestCase):
 
     def testORCCycleTboil(self):
 
-        cycle = ORCCycleTboil(T_ambient_C = 15.,
-                                dT_approach = 7.,
-                                dT_pinch = 5.,
-                                eta_pump = 0.9,
-                                eta_turbine = 0.8,
-                                coolingMode = 'Wet',
-                                orcFluid = 'R245fa')
+        params = SimulationParameters(orc_fluid = 'R245fa')
+
+        cycle = ORCCycleTboil(params = params)
 
         initialState = FluidStateFromPT(1.e6, 150., 'water')
         results = cycle.solve(initialState, T_boil_C = 100.)

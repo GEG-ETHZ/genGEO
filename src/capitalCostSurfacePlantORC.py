@@ -12,11 +12,12 @@ class CapitalCostSurfacePlantORCResults(object):
 class CapitalCostSurfacePlantORC(object):
     """CapitalCostSurfacePlantORC."""
 
-    def __init__(self, cost_year):
-        self.cost_year = cost_year
-        self.ppi_T_G = readCostTable(cost_year, 'PPI_T-G')
-        self.ppi_pump = readCostTable(cost_year, 'PPI_Pump')
-        self.ppi_HX = readCostTable(cost_year, 'PPI_HX')
+    def __init__(self, params):
+        self.params = params
+        self.cost_year = params.cost_year
+        self.ppi_T_G = readCostTable(params.cost_year, 'PPI_T-G')
+        self.ppi_pump = readCostTable(params.cost_year, 'PPI_Pump')
+        self.ppi_HX = readCostTable(params.cost_year, 'PPI_HX')
 
     def solve(self, energy_results, fluid_system):
 
@@ -29,9 +30,8 @@ class CapitalCostSurfacePlantORC(object):
         W_pump_orc = energy_results.W_pump_orc_total
         W_pump_prod = energy_results.W_pump_prod_total
 
-        orc_system = fluid_system.pp
-        T_ambient_C = fluid_system.pp.T_ambient_C
-        dT_approach_CT = fluid_system.pp.dT_approach
+        T_ambient_C = self.params.T_ambient_C
+        dT_approach_CT = self.params.dT_approach
 
         orc_results = fluid_system.pp.gatherOutput()
         dT_range_CT = orc_results.dT_range_CT

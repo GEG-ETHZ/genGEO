@@ -28,7 +28,7 @@ class FluidSystemWater(object):
         dP_loops = 1
         stop =  False
         while np.isnan(dP_downhole) or abs(dP_downhole) > 10e3:
-            injection_well_state    = self.injection_well.solve(injection_state, m_dot, time_years)
+            injection_well_state    = self.injection_well.solve(injection_state, m_dot)
             reservoir_state         = self.reservoir.solve(injection_well_state, m_dot)
 
             # if already at P_system_min, stop looping
@@ -57,9 +57,9 @@ class FluidSystemWater(object):
             raise Exception('FluidSystemWater:ExceedsMaxReservoirPressure - '
                         'Exceeds Max Reservoir Pressure of %.3f MPa!'%(self.reservoir.P_reservoir_max/1e6))
 
-        production_well1_state  = self.production_well1.solve(reservoir_state, m_dot, time_years)
+        production_well1_state  = self.production_well1.solve(reservoir_state, m_dot)
         production_well2_state  = self.pump.solve(production_well1_state, m_dot, time_years, injection_state.P_Pa())
-        pp_state                = self.pp.solve(production_well2_state, m_dot, time_years)
+        pp_state                = self.pp.solve(production_well2_state)
         return pp_state
 
     def gatherOutput(self):

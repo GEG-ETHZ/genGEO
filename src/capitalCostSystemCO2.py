@@ -6,8 +6,8 @@ class CapitalCostSystemWaterOutput(object):
 class CapitalCostSystemWater(object):
     """CapitalCostSystemWater."""
 
-    def __init__(self, cost_year):
-        self.cost_year = cost_year
+    def __init__(self, params):
+        self.cost_year = params.cost_year
         self.energy_results = None
         self.fluid_system = None
         self.CapitalCost_SurfacePlant = None

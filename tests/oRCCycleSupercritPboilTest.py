@@ -3,6 +3,7 @@ import unittest
 from src.oRCCycleSupercritPboil import ORCCycleSupercritPboil
 
 from utils.fluidStateFromPT import FluidStateFromPT
+from utils.simulationParameters import SimulationParameters
 
 from tests.testAssertion import testAssert
 
@@ -10,15 +11,11 @@ from tests.testAssertion import testAssert
 class ORCCycleSupercritPboilTest(unittest.TestCase):
     def testORCCycleSupercritPboil(self):
 
-        cycle = ORCCycleSupercritPboil(T_ambient_C = 15.,
-                                        dT_approach = 7.,
-                                        dT_pinch = 5.,
-                                        eta_pump = 0.9,
-                                        eta_turbine = 0.8,
-                                        coolingMode = 'Wet',
-                                        orcFluid = 'R245fa')
+        params = SimulationParameters(orc_fluid = 'R245fa')
 
-        initialState = FluidStateFromPT(1.e6, 190., 'CO2')
+        cycle = ORCCycleSupercritPboil(params = params)
+
+        initialState = FluidStateFromPT(1.e6, 190., 'water')
         results = cycle.solve(initialState = initialState,
                                 P_boil_Pa = 5e6)
 

@@ -6,29 +6,29 @@ from src.capitalCostWell import CapitalCostWell
 class CapitalCostExploration(object):
     """CapitalCostExploration."""
     @staticmethod
-    def cO2Ideal(N, well_length, well_diameter, success_rate, cost_year):
+    def cO2Ideal(N, well_length, well_radius, success_rate, cost_year):
         A = cModeling(cost_year)
-        B = dCCharacterizationWellsIdeal(cost_year, well_length, well_diameter, success_rate)
+        B = dCCharacterizationWellsIdeal(cost_year, well_length, well_radius, success_rate)
         C = dCModelingCO2(N, cost_year)
         return A + B + C
 
     @staticmethod
-    def cO2Baseline(N, well_length, well_diameter, success_rate, cost_year):
+    def cO2Baseline(N, well_length, well_radius, success_rate, cost_year):
         A = cModeling(cost_year)
-        B = dCCharacterizationWellsBaseline(cost_year, well_length, well_diameter, success_rate)
+        B = dCCharacterizationWellsBaseline(cost_year, well_length, well_radius, success_rate)
         C = dCModelingCO2(N, cost_year)
         return A + B + C
 
     @staticmethod
-    def waterIdeal(well_length, well_diameter, success_rate, cost_year):
+    def waterIdeal(well_length, well_radius, success_rate, cost_year):
         A = cModeling(cost_year)
-        B = dCCharacterizationWellsIdeal(cost_year, well_length, well_diameter, success_rate)
+        B = dCCharacterizationWellsIdeal(cost_year, well_length, well_radius, success_rate)
         return A + B
 
     @staticmethod
-    def waterBaseline(well_length, well_diameter, success_rate, cost_year):
+    def waterBaseline(well_length, well_radius, success_rate, cost_year):
         A = cModeling(cost_year)
-        B = dCCharacterizationWellsBaseline(cost_year, well_length, well_diameter, success_rate)
+        B = dCCharacterizationWellsBaseline(cost_year, well_length, well_radius, success_rate)
         return A + B
 
 def aCO2AMA(N):
@@ -42,12 +42,12 @@ g_characterization_wells = 2
 def cModeling(cost_year):
     return X_IC_expl * X_PC_expl * readCostTable(cost_year, 'PPI_O&G-s') * 508000
 
-def dCCharacterizationWellsIdeal(cost_year, well_length, well_diameter, success_rate):
-    c_well = CapitalCostWell.waterIdeal(well_length, well_diameter, 1., cost_year)
+def dCCharacterizationWellsIdeal(cost_year, well_length, well_radius, success_rate):
+    c_well = CapitalCostWell.waterIdeal(well_length = well_length, well_radius = well_radius, success_rate = 1., cost_year = cost_year)
     return 0.2 * c_well * g_characterization_wells / success_rate
 
-def dCCharacterizationWellsBaseline(cost_year, well_length, well_diameter, success_rate):
-    c_well = CapitalCostWell.waterBaseline(well_length, well_diameter, 1., cost_year)
+def dCCharacterizationWellsBaseline(cost_year, well_length, well_radius, success_rate):
+    c_well = CapitalCostWell.waterBaseline(well_length = well_length, well_radius = well_radius, success_rate = 1., cost_year = cost_year)
     return 0.2 * c_well * g_characterization_wells / success_rate
 
 def dCModelingCO2(N, cost_year):

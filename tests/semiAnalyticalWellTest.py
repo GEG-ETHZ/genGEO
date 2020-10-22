@@ -17,87 +17,75 @@ class SemiAnalyticalWellTest(unittest.TestCase):
         ###
         #  Testing SemiAnalyticalWell for vertical production well settings
         ###
-        # load global physical properties
-        gpp = SimulationParameters()
+        # load parameters
+        gpp = SimulationParameters(working_fluid = 'water')
+        gpp.time_years = 10.
         # Water
         well = SemiAnalyticalWell(params = gpp,
-                                dz_total = 2500.,
-                                wellRadius = 0.205,
-                                fluid = 'water',
-                                epsilon = 55 * 1e-6,
-                                dT_dz = -0.035,
+                                dz_total = gpp.depth,
                                 T_e_initial = 102.5)
 
         # initial state
-        initial_state = FluidStateFromPT(25.e6, 97., well.fluid)
+        initial_state = FluidStateFromPT(25.e6, 97., gpp.working_fluid)
 
         well.solve(initial_state = initial_state,
-                                m_dot = 136.,
-                                time_years = 10.)
+                                m_dot = 136.)
 
         wellresult = well.gatherOutput()
-        self.assertMessages(well.fluid,
-                        (wellresult.end_P_Pa(), 1.2432e6),
-                        (wellresult.end_T_C(), 96.076),
-                        (wellresult.end_h_Jkg(), 4.0350e5))
+        self.assertMessages(gpp.working_fluid,
+                        (wellresult.end_P_Pa(), 1.2372e6),
+                        (wellresult.end_T_C(), 95.0133),
+                        (wellresult.end_h_Jkg(), 3.9902e5))
 
         # CO2
-        well.fluid = 'CO2'
+        gpp.working_fluid = 'CO2'
         # initial state
-        initial_state = FluidStateFromPT(25.e6, 97., well.fluid)
+        initial_state = FluidStateFromPT(25.e6, 97., gpp.working_fluid)
         well.solve(initial_state = initial_state,
-                    time_years = 10.,
-                    m_dot = 136.)
+                                m_dot = 136.)
 
         wellresult = well.gatherOutput()
-        self.assertMessages(well.fluid,
-                        (wellresult.end_P_Pa(), 1.1762e7),
-                        (wellresult.end_T_C(), 57.257),
-                        (wellresult.end_h_Jkg(), 3.7672e5))
+        self.assertMessages(gpp.working_fluid,
+                        (wellresult.end_P_Pa(), 1.1674e7),
+                        (wellresult.end_T_C(), 55.9783),
+                        (wellresult.end_h_Jkg(), 3.7225e5))
 
     def testInjectionWellWater(self):
         ###
         #  Testing SemiAnalyticalWell for vertical and horizontal injection well settings
         ###
-        # load global physical properties
-        gpp = SimulationParameters()
+        # load parameters
+        gpp = SimulationParameters(working_fluid = 'water')
+        gpp.time_years = 10.
+        gpp.dT_dz = 0.06
+        gpp.well_radius = 0.279
 
         vertical_well = SemiAnalyticalWell(params = gpp,
                                         dz_total = -3500.,
-                                        wellRadius = 0.279,
-                                        fluid = 'water',
-                                        epsilon = 55 * 1e-6,
-                                        dT_dz = 0.06,
                                         T_e_initial = 15.)
 
         # initial state
-        initial_state = FluidStateFromPT(1.e6, 25., vertical_well.fluid)
+        initial_state = FluidStateFromPT(1.e6, 25., gpp.working_fluid)
         vertical_well.solve(initial_state = initial_state,
-                                                    m_dot = 5.,
-                                                    time_years = 10.)
+                                                    m_dot = 5.)
 
         vertical_well_results = vertical_well.gatherOutput()
-        self.assertMessages(vertical_well.fluid,
+        self.assertMessages(gpp.working_fluid,
                         (vertical_well_results.end_P_Pa(), 3.533e7),
                         (vertical_well_results.end_T_C(), 67.03),
                         (vertical_well_results.end_h_Jkg(), 3.0963e5))
 
         horizontal_well = SemiAnalyticalWell(params = gpp,
                                         dr_total = 3000.,
-                                        wellRadius = 0.279,
-                                        fluid = 'water',
-                                        epsilon = 55 * 1e-6,
-                                        dT_dz = 0.06,
-                                        T_e_initial = 15.+ 0.06 * abs(vertical_well.dz_total))
+                                        T_e_initial = 15.+ gpp.dT_dz * abs(vertical_well.dz_total))
 
         # initial state
-        initial_state = FluidStateFromPT(vertical_well_results.end_P_Pa(), vertical_well_results.end_T_C(), vertical_well_results.fluid)
+        initial_state = FluidStateFromPT(vertical_well_results.end_P_Pa(), vertical_well_results.end_T_C(), gpp.working_fluid)
         horizontal_well.solve(initial_state = initial_state,
-                            m_dot = 5.,
-                            time_years = 10.)
+                                                    m_dot = 5.)
 
         horizontal_well_results = horizontal_well.gatherOutput()
-        self.assertMessages(horizontal_well.fluid,
+        self.assertMessages(gpp.working_fluid,
                         (horizontal_well_results.end_P_Pa(), 3.533e7),
                         (horizontal_well_results.end_T_C(), 121.99),
                         (horizontal_well_results.end_h_Jkg(), 5.3712e5))
@@ -107,44 +95,37 @@ class SemiAnalyticalWellTest(unittest.TestCase):
         #  Testing SemiAnalyticalWell for horizontal injection well settings
         ###
         # load global physical properties
-        gpp = SimulationParameters()
+        gpp = SimulationParameters(working_fluid = 'co2')
+        gpp.time_years = 10.
+        gpp.dT_dz = 0.06
+        gpp.well_radius = 0.279
 
         vertical_well = SemiAnalyticalWell(params = gpp,
                                             dz_total = -3500.,
-                                            wellRadius = 0.279,
-                                            fluid = 'CO2',
-                                            epsilon = 55 * 1e-6,
-                                            dT_dz = 0.06,
                                             T_e_initial = 15.)
 
         # initial state
-        initial_state = FluidStateFromPT(1.e6, 25., vertical_well.fluid)
+        initial_state = FluidStateFromPT(1.e6, 25., gpp.working_fluid)
         vertical_well.solve(initial_state = initial_state,
-                                                    m_dot = 5.,
-                                                    time_years = 10.)
+                                                    m_dot = 5.)
 
         vertical_well_results = vertical_well.gatherOutput()
-        self.assertMessages(vertical_well.fluid,
+        self.assertMessages(gpp.working_fluid,
                         (vertical_well_results.end_P_Pa(), 1.7245e6),
                         (vertical_well_results.end_T_C(), 156.08),
                         (vertical_well_results.end_h_Jkg(), 6.1802e5))
 
         horizontal_well = SemiAnalyticalWell(params = gpp,
                                             dr_total = 3000.,
-                                            wellRadius = 0.279,
-                                            fluid = 'CO2',
-                                            epsilon = 55 * 1e-6,
-                                            dT_dz = 0.06,
-                                            T_e_initial = 15. + 0.06 * abs(vertical_well.dz_total))
+                                            T_e_initial = 15. + gpp.dT_dz * abs(vertical_well.dz_total))
 
         # initial state
-        initial_state = FluidStateFromPT(vertical_well_results.end_P_Pa(), vertical_well_results.end_T_C(), vertical_well.fluid)
+        initial_state = FluidStateFromPT(vertical_well_results.end_P_Pa(), vertical_well_results.end_T_C(), gpp.working_fluid)
         horizontal_well.solve(initial_state = initial_state,
-                            m_dot = 5.,
-                            time_years = 10.)
+                                                        m_dot = 5.)
 
         horizontal_well_results = horizontal_well.gatherOutput()
-        self.assertMessages(horizontal_well.fluid,
+        self.assertMessages(gpp.working_fluid,
                         (horizontal_well_results.end_P_Pa(), 1.7235e6),
                         (horizontal_well_results.end_T_C(), 212.746),
                         (horizontal_well_results.end_h_Jkg(), 6.755e5))
@@ -154,24 +135,22 @@ class SemiAnalyticalWellTest(unittest.TestCase):
         #  Testing SemiAnalyticalWell for horizontal injection well settings
         ###
         # load global physical properties
-        gpp = SimulationParameters()
+        gpp = SimulationParameters(working_fluid = 'co2')
+        gpp.time_years = 10.
+        gpp.dT_dz = 0.06
+        gpp.well_radius = 0.279
 
         vertical_well = SemiAnalyticalWell(params = gpp,
                                             dz_total = -3500.,
-                                            wellRadius = 0.279,
-                                            fluid = 'CO2',
-                                            epsilon = 55 * 1e-6,
-                                            dT_dz = 0.06,
                                             T_e_initial = 15.)
 
         # initial state
-        initial_state = FluidStateFromPT(1.e6, 25., vertical_well.fluid)
+        initial_state = FluidStateFromPT(1.e6, 25., gpp.working_fluid)
         vertical_well.solve(initial_state = initial_state,
-                                                    m_dot = 150.,
-                                                    time_years = 10.)
+                                                    m_dot = 150.)
 
         vertical_well_results = vertical_well.gatherOutput()
-        self.assertMessages(vertical_well.fluid,
+        self.assertMessages(gpp.working_fluid,
                         (vertical_well_results.end_P_Pa(), 5.1170e5),
                         (vertical_well_results.end_T_C(), 63.9786),
                         (vertical_well_results.end_h_Jkg(), 5.3677e5))
@@ -181,24 +160,22 @@ class SemiAnalyticalWellTest(unittest.TestCase):
         #  Testing SemiAnalyticalWell for horizontal injection well settings
         ###
         # load global physical properties
-        gpp = SimulationParameters()
+        gpp = SimulationParameters(working_fluid = 'co2')
+        gpp.time_years = 10.
+        gpp.dT_dz = 0.06
+        gpp.well_radius = 0.02
 
         vertical_well = SemiAnalyticalWell(params = gpp,
                                             dz_total = -3500.,
-                                            wellRadius = 0.02,
-                                            fluid = 'CO2',
-                                            epsilon = 55 * 1e-6,
-                                            dT_dz = 0.06,
                                             T_e_initial = 15.)
 
         # initial state
-        initial_state = FluidStateFromPT(1.e6, 25., vertical_well.fluid)
+        initial_state = FluidStateFromPT(1.e6, 25., gpp.working_fluid)
         vertical_well.solve(initial_state = initial_state,
-                                                    m_dot = 0.1,
-                                                    time_years = 10.)
+                                                    m_dot = 0.1)
 
         vertical_well_results = vertical_well.gatherOutput()
-        self.assertMessages(vertical_well.fluid,
+        self.assertMessages(gpp.working_fluid,
                         (vertical_well_results.end_P_Pa(), 1.1431e6),
                         (vertical_well_results.end_T_C(), 222.2246),
                         (vertical_well_results.end_h_Jkg(), 6.8717e5))

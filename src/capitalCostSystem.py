@@ -6,8 +6,8 @@ class CapitalCostSystemOutput(object):
 class CapitalCostSystem(object):
     """CapitalCostSystemWater."""
 
-    def __init__(self, cost_year):
-        self.cost_year = cost_year
+    def __init__(self, params):
+        self.cost_year = params.cost_year
         self.energy_results = None
         self.fluid_system = None
         self.CapitalCost_SurfacePlant = None
@@ -30,8 +30,6 @@ class CapitalCostSystem(object):
         C_wellfield = self.CapitalCost_Wellfield
         C_exploration = self.CapitalCost_Exploration
         C_stimulation = 0.
-
-        # breakpoint()
 
         self.capital_cost_greenfield = C_surfacePlant + C_gatheringSystem + C_wells_production + C_wells_injection + C_wellfield + C_exploration + C_stimulation
         self.capital_cost_brownfield = C_surfacePlant + C_gatheringSystem + C_wells_production

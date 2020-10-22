@@ -10,14 +10,15 @@ class FullSystemOutput(object):
 class FullSystemORC(object):
     """FullSystemORC."""
 
-    def __init__(self, fluid_system_solver, capital_cost_model):
+    def __init__(self, params, fluid_system_solver, capital_cost_model):
+        self.params = params
         self.fluid_system_solver = fluid_system_solver
         self.capital_cost_model = capital_cost_model
 
     def solve(self, m_dot, time_years):
         self.m_dot = m_dot
         self.fluid_system_solver.solve(m_dot, time_years)
-        self.energy_results = EnergyConversionORC.gatherOutput(self.m_dot, self.fluid_system_solver.fluid_system)
+        self.energy_results = EnergyConversionORC.gatherOutput(self.params, self.m_dot, self.fluid_system_solver.fluid_system)
         self.capital_cost_model.energy_results = self.energy_results
         self.capital_cost_model.fluid_system = self.fluid_system_solver.fluid_system
         self.capital_cost_model.solve()
@@ -33,14 +34,15 @@ class FullSystemORC(object):
 class FullSystemCPG(object):
     """FullSystemCPG."""
 
-    def __init__(self, fluid_system_solver, capital_cost_model):
+    def __init__(self, params, fluid_system_solver, capital_cost_model):
+        self.params = params
         self.fluid_system_solver = fluid_system_solver
         self.capital_cost_model = capital_cost_model
 
     def solve(self, m_dot, time_years):
         self.m_dot = m_dot
         self.fluid_system_solver.solve(m_dot, time_years)
-        self.energy_results = EnergyConversionCPG.gatherOutput(self.m_dot, self.fluid_system_solver)
+        self.energy_results = EnergyConversionCPG.gatherOutput(self.params, self.m_dot, self.fluid_system_solver)
         self.capital_cost_model.energy_results = self.energy_results
         self.capital_cost_model.fluid_system = self.fluid_system_solver
         self.capital_cost_model.solve()

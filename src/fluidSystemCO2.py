@@ -14,25 +14,21 @@ class FluidSystemCO2Output(object):
 class FluidSystemCO2(object):
     """FluidSystemCO2 provides methods to compute the water fluid cycle."""
 
-    def __init__(self, T_ambient_C, dT_approach, eta_pump, eta_turbine, coolingMode):
-        self.fluid = 'CO2'
+    def __init__(self, params):
+
+        self.params = params
+
         self.injection_well = None
         self.reservoir = None
         self.production_well = None
-
-        self.T_ambient_C = T_ambient_C
-        self.dT_approach = dT_approach
-        self.eta_pump = eta_pump
-        self.eta_turbine = eta_turbine
-        self.coolingMode = coolingMode
 
     def solve(self, m_dot, time_years):
 
         self.pp_output = PowerPlantEnergyOutput()
 
         # Find condensation pressure
-        T_condensation = self.T_ambient_C + self.dT_approach
-        P_condensation = FluidStateFromPT.getPFromTQ(T_condensation, 0, self.fluid) + 50e3
+        T_condensation = self.params.T_ambient_C + self.params.dT_approach
+        P_condensation = FluidStateFromPT.getPFromTQ(T_condensation, 0, self.params.working_fluid) + 50e3
         dP_pump = 0
 
         dP_downhole_threshold = 1e3
@@ -46,18 +42,18 @@ class FluidSystemCO2(object):
             P_pump_outlet = P_pump_inlet + dP_pump
 
             T_pump_inlet = T_condensation
-            pump_inlet_state = FluidStateFromPT(P_pump_inlet, T_pump_inlet, self.fluid)
+            pump_inlet_state = FluidStateFromPT(P_pump_inlet, T_pump_inlet, self.params.working_fluid)
 
             h_pump_outlet = pump_inlet_state.h_Jkg()
             if dP_pump > 0:
-                h_pump_outletS = FluidStateFromPT.getHFromPS(P_pump_outlet, pump_inlet_state.S_JK(), self.fluid)
-                h_pump_outlet = pump_inlet_state.h_Jkg() + (h_pump_outletS - pump_inlet_state.h_Jkg()) / self.eta_pump
+                h_pump_outletS = FluidStateFromPT.getHFromPS(P_pump_outlet, pump_inlet_state.S_JK(), self.params.working_fluid)
+                h_pump_outlet = pump_inlet_state.h_Jkg() + (h_pump_outletS - pump_inlet_state.h_Jkg()) / self.params.eta_pump_co2
 
             self.pp_output.w_pump = -1 * (h_pump_outlet - pump_inlet_state.h_Jkg())
 
-            surface_injection_state = FluidStateFromPh(P_pump_outlet, h_pump_outlet, self.fluid)
+            surface_injection_state = FluidStateFromPh(P_pump_outlet, h_pump_outlet, self.params.working_fluid)
 
-            injection_well_state    = self.injection_well.solve(surface_injection_state, m_dot, time_years)
+            injection_well_state    = self.injection_well.solve(surface_injection_state, m_dot)
 
             reservoir_state         = self.reservoir.solve(injection_well_state, m_dot)
 
@@ -80,24 +76,24 @@ class FluidSystemCO2(object):
             raise Exception('FluidSystemCO2:ExceedsMaxReservoirPressure - '
                         'Exceeds Max Reservoir Pressure of %.3f MPa!'%(self.reservoir.P_reservoir_max/1e6))
 
-        production_well_state  = self.production_well.solve(reservoir_state, m_dot, time_years)
+        production_well_state  = self.production_well.solve(reservoir_state, m_dot)
 
         # Calculate Turbine Power
-        h_turbine_outS = FluidStateFromPT.getHFromPS(P_condensation, production_well_state.S_JK(), self.fluid)
-        h_turbine_out = production_well_state.h_Jkg() - self.eta_turbine * (production_well_state.h_Jkg() - h_turbine_outS)
+        h_turbine_outS = FluidStateFromPT.getHFromPS(P_condensation, production_well_state.S_JK(), self.params.working_fluid)
+        h_turbine_out = production_well_state.h_Jkg() - self.params.eta_turbine_co2 * (production_well_state.h_Jkg() - h_turbine_outS)
 
         self.pp_output.w_turbine = production_well_state.h_Jkg() - h_turbine_out
         if self.pp_output.w_turbine < 0:
             raise Exception('FluidSystemCO2:TurbinePowerNegative - Turbine Power is Negative')
 
         # heat rejection
-        h_satVapor = FluidStateFromPT.getHFromPQ(P_condensation, 1,  self.fluid)
-        h_condensed = FluidStateFromPT.getHFromPQ(P_condensation, 0,  self.fluid)
+        h_satVapor = FluidStateFromPT.getHFromPQ(P_condensation, 1,  self.params.working_fluid)
+        h_condensed = FluidStateFromPT.getHFromPQ(P_condensation, 0,  self.params.working_fluid)
         if h_turbine_out > h_satVapor:
             # desuperheating needed
             self.pp_output.q_cooler = h_satVapor - h_turbine_out
             self.pp_output.q_condenser = h_condensed - h_satVapor
-            T_turbine_out = FluidStateFromPT.getTFromPh(P_condensation, h_turbine_out, self.fluid)
+            T_turbine_out = FluidStateFromPT.getTFromPh(P_condensation, h_turbine_out, self.params.working_fluid)
             dT_range = T_turbine_out - T_condensation
         else:
             # no desuperheating
@@ -105,7 +101,7 @@ class FluidSystemCO2(object):
             self.pp_output.q_condenser = h_condensed - h_turbine_out
             dT_range = 0
 
-        parasiticPowerFraction = parasiticPowerFractionCoolingTower(self.T_ambient_C, self.dT_approach, dT_range, self.coolingMode)
+        parasiticPowerFraction = parasiticPowerFractionCoolingTower(self.params.T_ambient_C, self.params.dT_approach, dT_range, self.params.cooling_mode)
         self.pp_output.w_cooler = self.pp_output.q_cooler * parasiticPowerFraction('cooling')
         self.pp_output.w_condenser = self.pp_output.q_condenser * parasiticPowerFraction('condensing')
 

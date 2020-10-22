@@ -79,4 +79,4 @@ class TotalSystemCO2(TotalSystemBase):
                                                     Lifetime = gsp.lifetime,
                                                     CapacityFactor = gsp.capacity_factor)
 
-        self.full_system = FullSystemCPG(fluid_system, capital_cost_system)
+        self.full_system = FullSystemCPG(gsp, fluid_system, capital_cost_system)
