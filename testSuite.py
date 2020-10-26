@@ -30,9 +30,7 @@ def testSuite(full=False):
     suite.addTest(HeatExchangerTest('testHeatExchanger'))
     suite.addTest(HeatExchangerTest('testHeatExchangerOptMdot'))
     # fluidsystem Water
-    suite.addTest(FluidSystemWaterTest('testFluidSystemWaterMdot1'))
     suite.addTest(FluidSystemWaterTest('testFluidSystemWaterSolverMdot1'))
-    suite.addTest(FluidSystemWaterTest('testFluidSystemWaterMdot40'))
     suite.addTest(FluidSystemWaterTest('testFluidSystemWaterSolverMdot40'))
     # fluidsystem CO2
     suite.addTest(FluidSystemCO2Test('testFluidSystemCO2Mdot10'))

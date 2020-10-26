@@ -6,21 +6,27 @@ class LCOESimpleOutput(object):
 
 class LCOESimple(object):
     """LCOESimple."""
-    def __init__(self, F_OM, discountRate, Lifetime, CapacityFactor):
-        self.F_OM = F_OM
-        self.discountRate = discountRate
-        self.Lifetime = Lifetime
-        self.CapacityFactor = CapacityFactor
+    def __init__(self, params = None, F_OM = None, discount_rate = None, lifetime = None, capacity_factor = None):
+        if params:
+            self.F_OM = params.F_OM
+            self.discount_rate = params.discount_rate
+            self.lifetime = params.lifetime
+            self.capacity_factor = params.capacity_factor
+        else:
+            self.F_OM = F_OM
+            self.discount_rate = discount_rate
+            self.lifetime = lifetime
+            self.capacity_factor = capacity_factor
 
         #Check heats & powers
-        if F_OM < 0:
+        if self.F_OM < 0:
             raise ValueError('LCOE_Simple:NegativeF_OM - Negative O&M Fraction!')
-        elif discountRate < 0:
+        elif self.discount_rate < 0:
             raise ValueError('LCOE_Simple:NegativeDiscountRate - Negative Discount Rate!')
-        elif Lifetime <= 0:
-            raise ValueError('LCOE_Simple:NegativeLifetime - Negative Lifetime!')
-        elif CapacityFactor <= 0 or CapacityFactor > 1:
-            raise ValueError('LCOE_Simple:BadCapacityFactor - Bad Capacity Factor!')
+        elif self.lifetime <= 0:
+            raise ValueError('LCOE_Simple:Negativelifetime - Negative lifetime!')
+        elif self.capacity_factor <= 0 or self.capacity_factor > 1:
+            raise ValueError('LCOE_Simple:Badcapacity_factor - Bad Capacity Factor!')
 
     def specificCapitalCost(self, CapitalCost):
         if self.Capacity_W <= 0 or CapitalCost <= 0:
@@ -30,8 +36,8 @@ class LCOESimple(object):
     def lCOE(self, CapitalCost):
         if self.Capacity_W <= 0 or CapitalCost <= 0:
             return np.nan
-        CRF = self.discountRate * (1 + self.discountRate)**self.Lifetime / ((1 + self.discountRate)**self.Lifetime - 1)
-        return CapitalCost * (CRF + self.F_OM) / (self.Capacity_W * self.CapacityFactor * 8760)
+        CRF = self.discount_rate * (1 + self.discount_rate)**self.lifetime / ((1 + self.discount_rate)**self.lifetime - 1)
+        return CapitalCost * (CRF + self.F_OM) / (self.Capacity_W * self.capacity_factor * 8760)
 
     def solve(self, CapitalCost, energy_results):
         self.Capacity_W = energy_results.W_net_total

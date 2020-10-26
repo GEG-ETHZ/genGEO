@@ -7,20 +7,34 @@ from src.capitalCostWell import CapitalCostWell
 class CapitalCostWellField(object):
     """CapitalCostWellField."""
     @staticmethod
-    def cO2MonitoringBaseline(N, monitoring_well_length, monitoring_well_radius, cost_year):
-        return cPermitting(cost_year) + dCPermittingCO2(N, cost_year) + dCMonitoringCO2Baseline(N, cost_year, monitoring_well_length, monitoring_well_radius)
+    def cO2MonitoringBaseline(params = None, well_cost_N =  None, cost_year =  None, monitoring_well_length =  None, monitoring_well_radius =  None):
+        if params:
+            well_cost_N = params.well_cost_N
+            monitoring_well_length = params.monitoring_well_length
+            monitoring_well_radius = params.monitoring_well_radius
+            cost_year = params.cost_year
+        return cPermitting(cost_year) + dCPermittingCO2(well_cost_N, cost_year) + dCMonitoringCO2Baseline(well_cost_N, cost_year, monitoring_well_length, monitoring_well_radius)
 
     @staticmethod
-    def cO2MonitoringIdeal(N, monitoring_well_length, monitoring_well_radius, cost_year):
-        return cPermitting(cost_year) + dCPermittingCO2(N, cost_year) + dCMonitoringCO2Ideal(N, cost_year, monitoring_well_length, monitoring_well_radius)
+    def cO2MonitoringIdeal(params = None, well_cost_N =  None, cost_year =  None, monitoring_well_length =  None, monitoring_well_radius =  None):
+        if params:
+            well_cost_N = params.well_cost_N
+            monitoring_well_length = params.monitoring_well_length
+            monitoring_well_radius = params.monitoring_well_radius
+            cost_year = params.cost_year
+        return cPermitting(cost_year) + dCPermittingCO2(well_cost_N, cost_year) + dCMonitoringCO2Ideal(well_cost_N, cost_year, monitoring_well_length, monitoring_well_radius)
 
     @staticmethod
-    def cO2(params):
-        return cPermitting(params.cost_year)
+    def cO2(params = None, cost_year = None):
+        if params:
+            cost_year = params.cost_year
+        return cPermitting(cost_year)
 
     @staticmethod
-    def water(params):
-        return cPermitting(params.cost_year)
+    def water(params = None, cost_year = None):
+        if params:
+            cost_year = params.cost_year
+        return cPermitting(cost_year)
 
 X_IC_wf = 1.05
 X_PC_wf = 1.15

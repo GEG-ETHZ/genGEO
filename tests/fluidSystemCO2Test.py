@@ -27,38 +27,25 @@ from tests.testAssertion import testAssert
 # load simulaiton parameters
 params = SimulationParameters(working_fluid = 'co2')
 params.wellMultiplier = 4.
+params.capacity_factor = 0.9
 
 fluid_system = FluidSystemCO2(params = params)
-
 fluid_system.injection_well = SemiAnalyticalWell(params = params,
                                     dz_total = -params.depth,
                                     T_e_initial = params.T_ambient_C)
-
 fluid_system.reservoir = PorousReservoir(params = params)
-
 fluid_system.production_well = SemiAnalyticalWell(params = params,
                                     dz_total = params.depth,
                                     T_e_initial = params.T_ambient_C + params.dT_dz * params.depth)
 
-
-capital_cost_system = CapitalCostSystem(params)
-capital_cost_system.CapitalCost_SurfacePlant = CapitalCostSurfacePlantCPG(params)
-capital_cost_system.CapitalCost_SurfacePipe = CapitalCostSurfacePipes(N = 0)
-capital_cost_system.CapitalCost_Production_Well = CapitalCostWell.cO2Baseline(params)
-capital_cost_system.CapitalCost_Injection_Well = CapitalCostWell.cO2Baseline(params)
-capital_cost_system.CapitalCost_Wellfield = CapitalCostWellField.cO2MonitoringBaseline(N=1,
-                                                                    monitoring_well_length=2500,
-                                                                    monitoring_well_diameter=0.108,
-                                                                    cost_year=2019)
-capital_cost_system.CapitalCost_Exploration = CapitalCostExploration.cO2Baseline(N=1,
-                                                                    well_length = 2500,
-                                                                    well_diameter = 0.205,
-                                                                    success_rate = 0.95,
-                                                                    cost_year = 2019)
-capital_cost_system.lcoe_model = LCOESimple(F_OM = 0.045,
-                                            discountRate = 0.096,
-                                            Lifetime = 25,
-                                            CapacityFactor = 0.9)
+capital_cost_system = CapitalCostSystem(params = params)
+capital_cost_system.CapitalCost_SurfacePlant = CapitalCostSurfacePlantCPG(params = params)
+capital_cost_system.CapitalCost_SurfacePipe = CapitalCostSurfacePipes(params = params)
+capital_cost_system.CapitalCost_Production_Well = CapitalCostWell.cO2Baseline(params = params)
+capital_cost_system.CapitalCost_Injection_Well = CapitalCostWell.cO2Baseline(params = params)
+capital_cost_system.CapitalCost_Wellfield = CapitalCostWellField.cO2MonitoringBaseline(params = params)
+capital_cost_system.CapitalCost_Exploration = CapitalCostExploration.cO2Baseline(params = params)
+capital_cost_system.lcoe_model = LCOESimple(params = params)
 
 full_system = FullSystemCPG(params, fluid_system, capital_cost_system)
 

@@ -6,27 +6,49 @@ from src.capitalCostWell import CapitalCostWell
 class CapitalCostExploration(object):
     """CapitalCostExploration."""
     @staticmethod
-    def cO2Ideal(N, well_length, well_radius, success_rate, cost_year):
+    def cO2Ideal(params = None, well_cost_N = None, cost_year = None, well_length = None, well_radius = None, success_rate = None):
+        if params:
+            cost_year = params.cost_year
+            well_cost_N = params.well_cost_N
+            well_length = params.well_length
+            well_radius = params.well_radius
+            success_rate = params.success_rate
         A = cModeling(cost_year)
         B = dCCharacterizationWellsIdeal(cost_year, well_length, well_radius, success_rate)
-        C = dCModelingCO2(N, cost_year)
+        C = dCModelingCO2(well_cost_N, cost_year)
         return A + B + C
 
     @staticmethod
-    def cO2Baseline(N, well_length, well_radius, success_rate, cost_year):
+    def cO2Baseline(params = None, well_cost_N = None, cost_year = None, well_length = None, well_radius = None, success_rate = None):
+        if params:
+            cost_year = params.cost_year
+            well_cost_N = params.well_cost_N
+            well_length = params.well_length
+            well_radius = params.well_radius
+            success_rate = params.success_rate
         A = cModeling(cost_year)
         B = dCCharacterizationWellsBaseline(cost_year, well_length, well_radius, success_rate)
-        C = dCModelingCO2(N, cost_year)
+        C = dCModelingCO2(well_cost_N, cost_year)
         return A + B + C
 
     @staticmethod
-    def waterIdeal(well_length, well_radius, success_rate, cost_year):
+    def waterIdeal(params = None, cost_year = None, well_length = None, well_radius = None, success_rate = None):
+        if params:
+            cost_year = params.cost_year
+            well_length = params.well_length
+            well_radius = params.well_radius
+            success_rate = params.success_rate
         A = cModeling(cost_year)
         B = dCCharacterizationWellsIdeal(cost_year, well_length, well_radius, success_rate)
         return A + B
 
     @staticmethod
-    def waterBaseline(well_length, well_radius, success_rate, cost_year):
+    def waterBaseline(params = None, cost_year = None, well_length = None, well_radius = None, success_rate = None):
+        if params:
+            cost_year = params.cost_year
+            well_length = params.well_length
+            well_radius = params.well_radius
+            success_rate = params.success_rate
         A = cModeling(cost_year)
         B = dCCharacterizationWellsBaseline(cost_year, well_length, well_radius, success_rate)
         return A + B

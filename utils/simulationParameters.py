@@ -33,6 +33,8 @@ class SimulationParameters(object):
                 # cost model
                 cost_year = 2019,
                 success_rate = 0.95,
+                well_cost_N = 1,
+                pipe_cost_N = 0,
                 F_OM = 0.045,
                 discount_rate = 0.096,
                 lifetime = 25,
@@ -74,8 +76,11 @@ class SimulationParameters(object):
         self.eta_turbine_co2 = eta_turbine_co2
         self.cooling_mode = cooling_mode
         self.well_length = self.depth
+        self.monitoring_well_length = self.depth
         self.cost_year = cost_year
         self.success_rate = success_rate
+        self.well_cost_N = well_cost_N
+        self.pipe_cost_N = pipe_cost_N
         self.F_OM = F_OM
         self.discount_rate = discount_rate
         self.lifetime = lifetime
