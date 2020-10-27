@@ -18,17 +18,8 @@ class SemiAnalyticalWellResults(object):
         self.rho_kgm3       = np.zeros(N_dx+1)
         self.cp_JK          = np.zeros(N_dx+1)
 
-    def finalState(self):
-        return FluidStateFromPT(self.P_Pa[-1], self.T_C_f[-1], self.fluid)
-
-    def end_P_Pa(self):
-        return self.P_Pa[-1]
-
-    def end_T_C(self):
-        return self.T_C_f[-1]
-
-    def end_h_Jkg(self):
-        return self.h_Jkg[-1]
+    def createFinalState(self):
+        self.state = FluidStateFromPT(self.P_Pa[-1], self.T_C_f[-1], self.fluid)
 
     # # TODO: get units and change name. do we need this?
     def getHeat(self):

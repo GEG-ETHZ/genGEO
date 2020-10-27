@@ -52,12 +52,13 @@ full_system = FullSystemCPG(params, fluid_system, capital_cost_system)
 class FluidSystemCO2Test(unittest.TestCase):
 
     def testFluidSystemCO2Mdot10(self):
+        params.m_dot_IP = 10
         full_system.solve(m_dot = 10, time_years = 1)
 
         output = full_system.gatherOutput()
 
         self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 6.3943e6, 'test_dP_surface'))
-        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.end_T_C(), 60.4516, 'test_T_prod_surface_C'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 60.4516, 'test_T_prod_surface_C'))
         self.assertTrue(*testAssert(output.energy_results.W_net, 1.0283e5, 'test_W_net'))
         self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 1.5452e7, 'test_C_brownfield_N'))
         self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 3.8082e7, 'test_C_greenfield_N'))
@@ -65,24 +66,26 @@ class FluidSystemCO2Test(unittest.TestCase):
 
 
     def testFluidSystemCO2Mdot80(self):
+        params.m_dot_IP = 80
         full_system.solve(m_dot = 80, time_years = 1)
 
         output = full_system.gatherOutput()
 
         self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.65949586e6, 'test_dP_surface'))
-        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.end_T_C(), 59.0826, 'test_T_prod_surface_C'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 59.0826, 'test_T_prod_surface_C'))
         self.assertTrue(*testAssert(output.energy_results.W_net, 5.02286e+05, 'test_W_net'))
         self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 2.98408178e+07, 'test_C_brownfield_N'))
         self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 5.2470e7, 'test_C_greenfield_N'))
         self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.8596677e-04, 'test_LCOE_brownfield'))
 
     def testFluidSystemCO2Mdot200(self):
+        params.m_dot_IP = 200
         full_system.solve(m_dot = 200, time_years = 1)
 
         output = full_system.gatherOutput()
 
         self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 3.468765e+06, 'test_dP_surface'))
-        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.end_T_C(), 47.5801, 'test_T_prod_surface_C'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 47.5801, 'test_T_prod_surface_C'))
         self.assertTrue(*testAssert(output.energy_results.W_net, -1.3602e6, 'test_W_net'))
         self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 5.26260e7, 'test_C_brownfield_N'))
         self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 7.52561e7, 'test_C_greenfield_N'))

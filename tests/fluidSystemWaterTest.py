@@ -33,22 +33,17 @@ params.capacity_factor = 0.9
 
 fluid_system = FluidSystemWater()
 fluid_system.injection_well = SemiAnalyticalWell(params = params,
-                                    dz_total = -2500.,
+                                    dz_total = -params.depth,
                                     T_e_initial = params.T_ambient_C)
-
 fluid_system.reservoir = PorousReservoir(params = params)
-
 fluid_system.production_well1 = SemiAnalyticalWell(params = params,
-                                    dz_total = 2000.,
+                                    dz_total = params.depth - params.pump_depth,
                                     T_e_initial = params.T_ambient_C + params.dT_dz * params.depth)
-
 prod_well2 = SemiAnalyticalWell(params = params,
                                 dz_total = params.pump_depth,
                                 T_e_initial = params.T_ambient_C + params.dT_dz * params.pump_depth)
-
 fluid_system.pump = DownHolePump(well = prod_well2,
                                 params = params)
-
 fluid_system.pp = ORCCycleTboil(params = params)
 
 capital_cost_system = CapitalCostSystem(params = params)
@@ -65,13 +60,14 @@ class FluidSystemWaterTest(unittest.TestCase):
     def testFluidSystemWaterSolverMdot1(self):
         solver = FluidSystemWaterSolver(fluid_system)
 
+        params.m_dot_IP = 1
         full_system = FullSystemORC(params, solver, capital_cost_system)
         full_system.solve(m_dot = 1, time_years = 1)
 
         output = full_system.gatherOutput()
 
-        print(*testAssert(output.fluid_system_solver.production_well2.end_P_Pa(), 1.400500841642725e+06, 'test_subsurface_solver1_pressure'))
-        self.assertTrue(*testAssert(output.fluid_system_solver.production_well2.end_T_C(), 81.2595, 'test_subsurface_solver1_temp'))
+        print(*testAssert(output.fluid_system_solver.production_well2.state.P_Pa(), 1.400500841642725e+06, 'test_subsurface_solver1_pressure'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.production_well2.state.T_C(), 81.2595, 'test_subsurface_solver1_temp'))
         self.assertTrue(*testAssert(output.energy_results.W_net, 5.2775e3, 'test_subsurface_solver1_w_net'))
         self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 1.1379e7, 'test_solver1_C_brownfield_N'))
         self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 2.4491e7, 'test_solver1_C_greenfield_N'))
@@ -80,13 +76,14 @@ class FluidSystemWaterTest(unittest.TestCase):
     def testFluidSystemWaterSolverMdot40(self):
         solver = FluidSystemWaterSolver(fluid_system)
 
+        params.m_dot_IP = 40
         full_system = FullSystemORC(params, solver, capital_cost_system)
         full_system.solve(m_dot = 40, time_years = 1)
 
         output = full_system.gatherOutput()
 
-        print(*testAssert(output.fluid_system_solver.production_well2.end_P_Pa(), 8.1493e+06, 'test_subsurface_solver2_pressure'))
-        self.assertTrue(*testAssert(output.fluid_system_solver.production_well2.end_T_C(), 100.3125, 'test_subsurface_solver2_temp'))
+        print(*testAssert(output.fluid_system_solver.production_well2.state.P_Pa(), 8.1493e+06, 'test_subsurface_solver2_pressure'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.production_well2.state.T_C(), 100.3125, 'test_subsurface_solver2_temp'))
         self.assertTrue(*testAssert(output.energy_results.W_net, 1.4286e+05, 'test_subsurface_solver2_w_net'))
         self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 2.5470e7, 'test_solver2_C_brownfield_N'))
         self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 3.8582e7, 'test_solver2_C_greenfield_N'))

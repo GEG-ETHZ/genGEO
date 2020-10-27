@@ -53,9 +53,9 @@ class FluidSystemCO2(object):
 
             surface_injection_state = FluidStateFromPh(P_pump_outlet, h_pump_outlet, self.params.working_fluid)
 
-            injection_well_state    = self.injection_well.solve(surface_injection_state, m_dot)
+            injection_well_state    = self.injection_well.solve(surface_injection_state)
 
-            reservoir_state         = self.reservoir.solve(injection_well_state, m_dot)
+            reservoir_state         = self.reservoir.solve(injection_well_state.state, m_dot)
 
             # find downhole pressure difference (negative means
             # overpressure
@@ -76,13 +76,13 @@ class FluidSystemCO2(object):
             raise Exception('FluidSystemCO2:ExceedsMaxReservoirPressure - '
                         'Exceeds Max Reservoir Pressure of %.3f MPa!'%(self.reservoir.P_reservoir_max/1e6))
 
-        production_well_state  = self.production_well.solve(reservoir_state, m_dot)
+        production_well_state  = self.production_well.solve(reservoir_state)
 
         # Calculate Turbine Power
-        h_turbine_outS = FluidStateFromPT.getHFromPS(P_condensation, production_well_state.S_JK(), self.params.working_fluid)
-        h_turbine_out = production_well_state.h_Jkg() - self.params.eta_turbine_co2 * (production_well_state.h_Jkg() - h_turbine_outS)
+        h_turbine_outS = FluidStateFromPT.getHFromPS(P_condensation, production_well_state.state.S_JK(), self.params.working_fluid)
+        h_turbine_out = production_well_state.state.h_Jkg() - self.params.eta_turbine_co2 * (production_well_state.state.h_Jkg() - h_turbine_outS)
 
-        self.pp_output.w_turbine = production_well_state.h_Jkg() - h_turbine_out
+        self.pp_output.w_turbine = production_well_state.state.h_Jkg() - h_turbine_out
         if self.pp_output.w_turbine < 0:
             raise Exception('FluidSystemCO2:TurbinePowerNegative - Turbine Power is Negative')
 
@@ -107,7 +107,7 @@ class FluidSystemCO2(object):
 
         self.pp_output.w_net = self.pp_output.w_turbine + self.pp_output.w_pump + self.pp_output.w_cooler + self.pp_output.w_condenser
 
-        self.pp_output.dP_surface = production_well_state.P_Pa() - P_condensation
+        self.pp_output.dP_surface = production_well_state.state.P_Pa() - P_condensation
 
         self.pp_output.state_out = surface_injection_state
         return self.pp_output.state_out

@@ -5,6 +5,7 @@ class SimulationParameters(object):
     def __init__(self,
                 working_fluid = None,
                 orc_fluid = None,
+                m_dot_IP = 0.,
                 time_years = 1.,
                 # subsurface model
                 depth = 2500.,
@@ -52,6 +53,7 @@ class SimulationParameters(object):
 
         self.working_fluid = working_fluid
         self.orc_fluid = orc_fluid
+        self.m_dot_IP = m_dot_IP
         self.time_years = time_years
         self.depth = depth
         self.pump_depth = pump_depth

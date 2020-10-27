@@ -6,11 +6,12 @@ from utils.solver import Solver
 class DownHolePumpOutput(object):
     """DownHolePumpOutput."""
     w_pump = None
+    state = None
 
 class DownHolePump(object):
     """DownHolePump."""
 
-    def __init__(self, well, params):#pump_depth, max_pump_dP, eta_pump):
+    def __init__(self, well, params):
         self.well = well
         self.params = params
 
@@ -36,9 +37,9 @@ class DownHolePump(object):
                 temp_at_pump_depth = self.well.T_e_initial + self.params.dT_dz * self.params.pump_depth
 
                 state_in = FluidStateFromPT(P_prod_pump_out, T_prod_pump_out, self.params.working_fluid)
-                state = self.well.solve(state_in, m_dot)
+                well_state = self.well.solve(state_in)
 
-                dP_surface = (state.P_Pa() - self.P_inj_surface)
+                dP_surface = (well_state.state.P_Pa() - self.P_inj_surface)
                 if dP_pump == self.params.max_pump_dP:
                     break
 
@@ -61,20 +62,21 @@ class DownHolePump(object):
 
             except ValueError as error:
                 # Only catch problems of flashing fluid
-                if str(error).find('DownHolePump:BelowSaturationPressure') > -1:
+                if str(error).find('GenGeo::SemiAnalyticalWell:BelowSaturationPressure') > -1:
                     dP_pump = dP_pump + d_dP_pump
                 else:
                    raise error
         # if pump pressure greater than allowable, throw error
         if dP_pump >= self.params.max_pump_dP:
-            raise ValueError('DownHolePump:ExceedsMaxProductionPumpPressure ' \
+            raise Exception('DownHolePump:ExceedsMaxProductionPumpPressure - '
             'Exceeds Max Pump Pressure of %.3f MPa!' %(self.params.max_pump_dP/1e6))
+
         self.output = DownHolePumpOutput()
         self.output.w_pump = 0
         if dP_pump > 0:
             self.output.w_pump = (self.initial_state.h_Jkg() - state_in.h_Jkg()) / self.params.eta_pump
 
-        return state
+        return well_state
 
     def gatherOutput(self):
         return self.output
