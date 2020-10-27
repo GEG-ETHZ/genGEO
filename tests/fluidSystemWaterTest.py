@@ -31,7 +31,7 @@ params.orc_fluid = 'R245fa'
 params.capacity_factor = 0.9
 
 
-fluid_system = FluidSystemWater()
+fluid_system = FluidSystemWater(params = params)
 fluid_system.injection_well = SemiAnalyticalWell(params = params,
                                     dz_total = -params.depth,
                                     T_e_initial = params.T_ambient_C)

@@ -55,11 +55,11 @@ class FluidSystemCO2(object):
 
             injection_well_state    = self.injection_well.solve(surface_injection_state)
 
-            reservoir_state         = self.reservoir.solve(injection_well_state.state, m_dot)
+            reservoir_state         = self.reservoir.solve(injection_well_state.state)
 
             # find downhole pressure difference (negative means
             # overpressure
-            dP_downhole = self.reservoir.P_reservoir - reservoir_state.P_Pa()
+            dP_downhole = self.params.P_reservoir() - reservoir_state.state.P_Pa()
             dP_pump = dP_solver.addDataAndEstimate(dP_pump, dP_downhole)
             if np.isnan(dP_pump):
                 dP_pump = 0.5 * dP_downhole
@@ -72,11 +72,11 @@ class FluidSystemCO2(object):
             if dP_pump < 0 and dP_downhole > 0:
                 dP_pump = 0
 
-        if reservoir_state.P_Pa() >= self.reservoir.P_reservoir_max:
+        if reservoir_state.state.P_Pa() >= self.params.P_reservoir_max():
             raise Exception('FluidSystemCO2:ExceedsMaxReservoirPressure - '
-                        'Exceeds Max Reservoir Pressure of %.3f MPa!'%(self.reservoir.P_reservoir_max/1e6))
+                        'Exceeds Max Reservoir Pressure of %.3f MPa!'%(self.params.P_reservoir_max()/1e6))
 
-        production_well_state  = self.production_well.solve(reservoir_state)
+        production_well_state  = self.production_well.solve(reservoir_state.state)
 
         # Calculate Turbine Power
         h_turbine_outS = FluidStateFromPT.getHFromPS(P_condensation, production_well_state.state.S_JK(), self.params.working_fluid)

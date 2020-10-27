@@ -55,7 +55,8 @@ class FluidSystemWaterSolver(object):
 
     def solve(self, m_dot, time_years):
 
-        self.initial_P = 1e6
+        P_system_min = FluidStateFromPT.getPFromTQ(self.fluid_system.params.T_reservoir(), 0, self.fluid_system.fluid) + 1e5
+        self.initial_P = P_system_min + 1e6
 
         state_T = 60.
 
