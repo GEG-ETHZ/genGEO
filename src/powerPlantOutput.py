@@ -22,4 +22,4 @@ class PowerPlantOutput(PowerPlantEnergyOutput):
     dT_LMTD_preheater = np.nan
     dT_LMTD_recuperator = np.nan
     dT_LMTD_boiler = np.nan
-    state_out = np.nan
+    state = np.nan

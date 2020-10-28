@@ -74,6 +74,10 @@ class FluidState(object):
         return coolProp('HMASS', 'P', P_Pa, 'Q', Q, fluid)
 
     @staticmethod
+    def getSFromPQ(P_Pa, Q, fluid):
+        return coolProp('SMASS', 'P', P_Pa, 'Q', Q, fluid)
+
+    @staticmethod
     def getHFromPS(P_Pa, S_JK, fluid):
         return coolProp('HMASS', 'P', P_Pa, 'SMASS', S_JK, fluid)
 

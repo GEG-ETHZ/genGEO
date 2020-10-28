@@ -15,7 +15,7 @@ def parasiticPowerFractionCoolingTower(T_ambient_C, dT_approach_CT, dT_range_CT,
         elif process == 'condensing':
             return computeProcess(1.65, -6.24e-6, -5.03e-3, 0., T_ambient_C, dT_approach_CT, dT_range_CT)
         else:
-            raise ValueError('parasiticPowerFraction:UnknownProcess - Unknown Process - use "cooling" or "condensing"')
+            raise Exception('GenGeo::parasiticPowerFractionCoolingTower:UnknownProcess - Unknown Process - use "cooling" or "condensing"')
 
     def processDry(process):
         if process == 'cooling':
@@ -23,11 +23,11 @@ def parasiticPowerFractionCoolingTower(T_ambient_C, dT_approach_CT, dT_range_CT,
         elif process == 'condensing':
             return computeProcess(0.619, 0., 0., 0., T_ambient_C, dT_approach_CT, dT_range_CT)
         else:
-            raise ValueError('parasiticPowerFraction:UnknownProcess - Unknown Process - use "cooling" or "condensing"')
+            raise Exception('GenGeo::parasiticPowerFractionCoolingTower:UnknownProcess - Unknown Process - use "cooling" or "condensing"')
 
     if coolingMode == 'Wet':
         return processWet
     elif coolingMode == 'Dry':
         return processDry
     else:
-        raise ValueError('parasiticPowerFraction:UnknownCoolingMode - Unknown Cooling Mode')
+        raise Exception('GenGeo::parasiticPowerFractionCoolingTower:UnknownCoolingMode - Unknown Cooling Mode')

@@ -26,7 +26,9 @@ def testSuite(full=False):
     # ORC cycles
     suite.addTest(ORCCycleTboilTest('testParasiticPowerFraction'))
     suite.addTest(ORCCycleTboilTest('testORCCycleTboil'))
+    suite.addTest(ORCCycleTboilTest('testORCCycleTboilFail'))
     suite.addTest(ORCCycleSupercritPboilTest('testORCCycleSupercritPboil'))
+    # heat exchanger
     suite.addTest(HeatExchangerTest('testHeatExchanger'))
     suite.addTest(HeatExchangerTest('testHeatExchangerOptMdot'))
     # fluidsystem Water
