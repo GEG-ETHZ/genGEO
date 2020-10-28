@@ -24,5 +24,5 @@ class CapitalCostCoolingTower(object):
         # Reference case 1000 kWth (1e6 Wth)
         Q_Ref_BAC = 1e6
         F_cooling = abs(Q_cooler)/(abs(Q_cooler)+abs(Q_condenser))
-        C_Ref_BAC = readCostTable(cost_year, 'PPI_PE') * Q_Ref_BAC * TDC * (F_cooling*(c_cooling_wet/1e3) + (1-F_cooling)*(c_condensing_wet/1e3))
+        C_Ref_BAC = readCostTable('PPI_PE', cost_year = cost_year) * Q_Ref_BAC * TDC * (F_cooling*(c_cooling_wet/1e3) + (1-F_cooling)*(c_condensing_wet/1e3))
         return C_Ref_BAC * (abs(Q_cooler+Q_condenser)/Q_Ref_BAC)**0.8

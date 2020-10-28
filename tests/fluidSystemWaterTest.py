@@ -15,6 +15,7 @@ from src.capitalCostSurfacePipes import CapitalCostSurfacePipes
 from src.capitalCostWell import CapitalCostWell
 from src.capitalCostWellField import CapitalCostWellField
 from src.capitalCostExploration import CapitalCostExploration
+from src.capitalCostWellStimulation import CapitalCostWellStimulation
 from src.capitalCostSurfacePlantORC import CapitalCostSurfacePlantORC
 from src.fullSystemSolver import FullSystemSolverMinLCOEBrownfield
 
@@ -46,13 +47,14 @@ fluid_system.pump = DownHolePump(well = prod_well2,
                                 params = params)
 fluid_system.pp = ORCCycleTboil(params = params)
 
-capital_cost_system = CapitalCostSystem(params = params)
+capital_cost_system = CapitalCostSystem()
 capital_cost_system.CapitalCost_SurfacePlant = CapitalCostSurfacePlantORC(params = params)
-capital_cost_system.CapitalCost_SurfacePipe = CapitalCostSurfacePipes(params = params)
+capital_cost_system.CapitalCost_SurfacePipe = CapitalCostSurfacePipes.cost(params = params)
 capital_cost_system.CapitalCost_Production_Well = CapitalCostWell.waterBaseline(params = params)
 capital_cost_system.CapitalCost_Injection_Well = CapitalCostWell.waterBaseline(params = params)
 capital_cost_system.CapitalCost_Wellfield = CapitalCostWellField.water(params = params)
 capital_cost_system.CapitalCost_Exploration = CapitalCostExploration.waterBaseline(params = params)
+capital_cost_system.CapitalCost_Stimulation = CapitalCostWellStimulation.cost()
 capital_cost_system.lcoe_model = LCOESimple(params = params)
 
 class FluidSystemWaterTest(unittest.TestCase):

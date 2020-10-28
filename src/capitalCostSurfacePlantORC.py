@@ -12,12 +12,13 @@ class CapitalCostSurfacePlantORCResults(object):
 class CapitalCostSurfacePlantORC(object):
     """CapitalCostSurfacePlantORC."""
 
-    def __init__(self, params):
+    def __init__(self, params = None, **kwargs):
         self.params = params
-        self.cost_year = params.cost_year
-        self.ppi_T_G = readCostTable(params.cost_year, 'PPI_T-G')
-        self.ppi_pump = readCostTable(params.cost_year, 'PPI_Pump')
-        self.ppi_HX = readCostTable(params.cost_year, 'PPI_HX')
+        if self.params == None:
+            self.params = SimulationParameters(**kwargs)
+        self.ppi_T_G = readCostTable('PPI_T-G')
+        self.ppi_pump = readCostTable('PPI_Pump')
+        self.ppi_HX = readCostTable('PPI_HX')
 
     def solve(self, energy_results, fluid_system):
 
@@ -46,17 +47,17 @@ class CapitalCostSurfacePlantORC(object):
         # C_T_G
         #Regular fluid
         S_T_fluid = 1.00  #Not CO2
-        results.C_T_G = 0.67 * self.ppi_T_G * (S_T_fluid*2830*(W_turbine/1e3)**0.745 + 3680*(W_turbine/1e3)**0.617)
+        results.C_T_G = 0.67 * self.ppi_T_G[self.params.cost_year] * (S_T_fluid*2830*(W_turbine/1e3)**0.745 + 3680*(W_turbine/1e3)**0.617)
 
         # C_pump (ORC)
         C_pump_orc_surface = 1750 * (1.34*-1*(W_pump_orc/1e3))**0.7
         S_pump_orc = 1.00  #Water
-        results.C_pump_orc = self.ppi_pump * S_pump_orc * C_pump_orc_surface
+        results.C_pump_orc = self.ppi_pump[self.params.cost_year] * S_pump_orc * C_pump_orc_surface
 
         # C_coolingTowers
         TDC = 1
         results.C_coolingTowers = CapitalCostCoolingTower.cost(Q_desuperheater, Q_condenser, TDC,
-                                                    T_ambient_C, dT_approach_CT, dT_range_CT, self.cost_year)
+                                                    T_ambient_C, dT_approach_CT, dT_range_CT, self.params.cost_year)
 
         # C_heatExchanger
         #dT_LMTD_HX
@@ -69,7 +70,7 @@ class CapitalCostSurfacePlantORC(object):
 
         A_boiler = Q_boiler / U / dT_LMTD_boiler
         A_HX = A_preheater + A_boiler
-        results.C_heatExchanger = self.ppi_HX * (239*A_HX + 13400)
+        results.C_heatExchanger = self.ppi_HX[self.params.cost_year] * (239*A_HX + 13400)
 
         # C_recuperator
         if np.isnan(dT_LMTD_recuperator) or dT_LMTD_recuperator == 0:
@@ -77,12 +78,12 @@ class CapitalCostSurfacePlantORC(object):
         else:
             A_recuperator = Q_recuperator / U / dT_LMTD_recuperator
 
-        results.C_recuperator = self.ppi_HX * (239*A_recuperator + 13400)
+        results.C_recuperator = self.ppi_HX[self.params.cost_year] * (239*A_recuperator + 13400)
 
         # C_productionPump
         C_pump_prod_lineshaft = 1750 * (1.34*-1*(W_pump_prod/1e3))**0.7 + 5750 * (1.34*-1*(W_pump_prod/1e3))**0.2
         S_pump_prod = 1.00 #Water
-        results.C_pump_prod = self.ppi_pump * S_pump_prod * C_pump_prod_lineshaft
+        results.C_pump_prod = self.ppi_pump[self.params.cost_year] * S_pump_prod * C_pump_prod_lineshaft
 
         # THEN
         # C_primaryEquipment

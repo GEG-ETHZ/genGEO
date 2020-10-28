@@ -1,13 +1,13 @@
 import copy
+import numpy as np
 
 class CapitalCostSystemOutput(object):
-    """CapitalCostSystemWaterOutput."""
+    """CapitalCostSystemOutput."""
 
 class CapitalCostSystem(object):
-    """CapitalCostSystemWater."""
+    """CapitalCostSystem."""
 
-    def __init__(self, params):
-        self.cost_year = params.cost_year
+    def __init__(self):
         self.energy_results = None
         self.fluid_system = None
         self.CapitalCost_SurfacePlant = None
@@ -16,31 +16,35 @@ class CapitalCostSystem(object):
         self.CapitalCost_Injection_Well = None
         self.CapitalCost_Wellfield = None
         self.CapitalCost_Exploration = None
+        self.CapitalCost_Stimulation = None
         self.lcoe_model = None
 
     def solve(self):
 
-        self.lcoe_model_greenfield = copy.deepcopy(self.lcoe_model)
-        self.lcoe_model_brownfield = copy.deepcopy(self.lcoe_model)
+        results = CapitalCostSystemOutput()
 
-        C_surfacePlant = self.CapitalCost_SurfacePlant.solve(self.energy_results, self.fluid_system).C_plant
-        C_gatheringSystem = self.CapitalCost_SurfacePipe.solve(self.cost_year)
-        C_wells_production = self.CapitalCost_Production_Well
-        C_wells_injection = self.CapitalCost_Injection_Well
-        C_wellfield = self.CapitalCost_Wellfield
-        C_exploration = self.CapitalCost_Exploration
-        C_stimulation = 0.
+        lcoe_model_greenfield = copy.deepcopy(self.lcoe_model)
+        lcoe_model_brownfield = copy.deepcopy(self.lcoe_model)
 
-        self.capital_cost_greenfield = C_surfacePlant + C_gatheringSystem + C_wells_production + C_wells_injection + C_wellfield + C_exploration + C_stimulation
-        self.capital_cost_brownfield = C_surfacePlant + C_gatheringSystem + C_wells_production
+        results.C_surface_plant = self.CapitalCost_SurfacePlant.solve(self.energy_results, self.fluid_system)
+        results.C_gathering_system = self.CapitalCost_SurfacePipe
+        results.C_wells_production = self.CapitalCost_Production_Well
+        results.C_wells_injection = self.CapitalCost_Injection_Well
+        results.C_wellfield = self.CapitalCost_Wellfield
+        results.C_exploration = self.CapitalCost_Exploration
+        results.C_stimulation = self.CapitalCost_Stimulation
 
-        self.lcoe_model_greenfield.solve(self.capital_cost_greenfield, self.energy_results)
-        self.lcoe_model_brownfield.solve(self.capital_cost_brownfield, self.energy_results)
+        C_surface_plant_plant = results.C_surface_plant.C_plant
+
+        results.C_greenfield = np.sum([C_surface_plant_plant, results.C_gathering_system, results.C_wells_production, results.C_wells_injection, results.C_wellfield, results.C_exploration, results.C_stimulation])
+        results.C_brownfield = np.sum([C_surface_plant_plant, results.C_gathering_system, results.C_wells_production])
+
+        results.LCOE_greenfield = lcoe_model_greenfield.solve(results.C_greenfield, self.energy_results)
+        results.LCOE_brownfield = lcoe_model_brownfield.solve(results.C_brownfield, self.energy_results)
+
+        self.output = results
+
+        return results
 
     def gatherOutput(self):
-        output = CapitalCostSystemOutput()
-        output.C_greenfield = self.capital_cost_greenfield
-        output.C_brownfield = self.capital_cost_brownfield
-        output.LCOE_greenfield = self.lcoe_model_greenfield.gatherOutput()
-        output.LCOE_brownfield = self.lcoe_model_brownfield.gatherOutput()
-        return output
+        return self.output

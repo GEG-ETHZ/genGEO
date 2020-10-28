@@ -13,6 +13,8 @@ class SimulationParameters(object):
                 well_radius = 0.205,
                 well_multiplier = 1.,
                 well_spacing = 707.,
+                well_length = None,
+                monitoring_well_length = None,
                 monitoring_well_radius = 0.108,
                 dT_dz = 0.035,
                 # T_e_initial = 15.,
@@ -77,8 +79,14 @@ class SimulationParameters(object):
         self.eta_pump_co2 = eta_pump_co2
         self.eta_turbine_co2 = eta_turbine_co2
         self.cooling_mode = cooling_mode
-        self.well_length = self.depth
-        self.monitoring_well_length = self.depth
+        if well_length:
+            self.well_length = well_length
+        else:
+            self.well_length = self.depth
+        if monitoring_well_length:
+            self.monitoring_well_length = monitoring_well_length
+        else:
+            self.monitoring_well_length = self.depth
         self.cost_year = cost_year
         self.success_rate = success_rate
         self.well_cost_N = well_cost_N

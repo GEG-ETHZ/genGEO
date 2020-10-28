@@ -1,16 +1,15 @@
 
 from utils.readXlsxData import readCostTable
+from utils.simulationParameters import SimulationParameters
 
 class CapitalCostSurfacePipes(object):
     """CapitalCostSurfacePipes."""
 
-    def __init__(self, params = None, pipe_cost_N = None):
-        if params:
-            self.pipe_cost_N = params.pipe_cost_N
-        else:
-            self.pipe_cost_N = pipe_cost_N
+    @staticmethod
+    def cost(params = None, **kwargs):
+        if params == None:
+            params = SimulationParameters(**kwargs)
 
-    def solve(self, cost_year):
         X_PCs = 1.15
         X_ICs = 1.12
 
@@ -41,5 +40,5 @@ class CapitalCostSurfacePipes(object):
                         9: 1.09,
                         10: 1.13
                         }
-        c_surfacePipe = 2205. * D_surfacePipe[self.pipe_cost_N]**2 + 134.
-        return X_PCs * X_ICs * readCostTable(cost_year, 'PPI_Pipe') * c_surfacePipe * L_surfacePipe[self.pipe_cost_N]
+        c_surfacePipe = 2205. * D_surfacePipe[params.pipe_cost_N]**2 + 134.
+        return X_PCs * X_ICs * readCostTable('PPI_Pipe', cost_year = params.cost_year) * c_surfacePipe * L_surfacePipe[params.pipe_cost_N]
