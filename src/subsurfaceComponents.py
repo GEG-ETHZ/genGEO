@@ -6,21 +6,21 @@ from utils.solver import Solver
 class DownHolePumpOutput(object):
     """DownHolePumpOutput."""
     w_pump = None
-    state = None
 
 class DownHolePump(object):
     """DownHolePump."""
 
-    def __init__(self, well, params):
+    def __init__(self, well, params = None, **kwargs):
         self.well = well
         self.params = params
+        if self.params == None:
+            self.params = SimulationParameters(**kwargs)
 
-    def solve(self, initial_state, m_dot, time_years, P_inj_surface):
+    def solve(self, initial_state, P_inj_surface):
 
-        self.initial_state = initial_state
         self.P_inj_surface = P_inj_surface
 
-        # Now pumping and second well
+        # Pumping and second well
         d_dP_pump = 1e5
         dP_pump = 0
         dP_surface = np.nan
@@ -32,8 +32,8 @@ class DownHolePump(object):
                 if dP_pump > self.params.max_pump_dP:
                     dP_pump = self.params.max_pump_dP
 
-                P_prod_pump_out = self.initial_state.P_Pa() + dP_pump
-                T_prod_pump_out = self.initial_state.T_C()
+                P_prod_pump_out = initial_state.P_Pa() + dP_pump
+                T_prod_pump_out = initial_state.T_C()
                 temp_at_pump_depth = self.well.T_e_initial + self.params.dT_dz * self.params.pump_depth
 
                 state_in = FluidStateFromPT(P_prod_pump_out, T_prod_pump_out, self.params.working_fluid)
@@ -68,15 +68,18 @@ class DownHolePump(object):
                    raise error
         # if pump pressure greater than allowable, throw error
         if dP_pump >= self.params.max_pump_dP:
-            raise Exception('DownHolePump:ExceedsMaxProductionPumpPressure - '
+            raise Exception('GenGeo::DownHolePump:ExceedsMaxProductionPumpPressure - '
             'Exceeds Max Pump Pressure of %.3f MPa!' %(self.params.max_pump_dP/1e6))
 
-        self.output = DownHolePumpOutput()
-        self.output.w_pump = 0
+        results = DownHolePumpOutput()
+        results.w_pump = 0
         if dP_pump > 0:
-            self.output.w_pump = (self.initial_state.h_Jkg() - state_in.h_Jkg()) / self.params.eta_pump
+            results.w_pump = (initial_state.h_Jkg() - state_in.h_Jkg()) / self.params.eta_pump
 
-        return well_state
+        results.well = well_state
+
+        self.output = results
+        return results
 
     def gatherOutput(self):
         return self.output

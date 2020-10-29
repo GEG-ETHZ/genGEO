@@ -7,7 +7,7 @@ from src.oRCCycleTboil import ORCCycleTboil
 from src.fluidSystemCO2 import FluidSystemCO2
 from src.capitalCostSystem import CapitalCostSystem
 
-from src.fullSystem import FullSystemCPG
+from src.fullSystemCPG import FullSystemCPG
 from src.lCOESimple import LCOESimple
 from src.capitalCostSurfacePipes import CapitalCostSurfacePipes
 from src.capitalCostWell import CapitalCostWell

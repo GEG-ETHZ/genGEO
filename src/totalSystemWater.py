@@ -8,7 +8,7 @@ from src.fluidSystemWater import FluidSystemWater
 from src.fluidSystemWaterSolver import FluidSystemWaterSolver
 from src.capitalCostSystem import CapitalCostSystem
 
-from src.fullSystem import FullSystemORC
+from src.fullSystemORC import FullSystemORC
 from src.lCOESimple import LCOESimple
 from src.capitalCostSurfacePipes import CapitalCostSurfacePipes
 from src.capitalCostWell import CapitalCostWell

@@ -12,12 +12,12 @@ class FluidSystemWaterSolver(object):
     def __init__(self, system):
         self.fluid_system = system
 
-    def minimizeFunction(self, initialT, m_dot, time_years):
+    def minimizeFunction(self, initialT):
         # print('\n### new T ###')
         # print(initialT)
         # print(self.initial_P, initialT)
         initial_state = FluidStateFromPT(self.initial_P, initialT, self.fluid_system.fluid)
-        system_state = self.fluid_system.solve(initial_state, m_dot, time_years)
+        system_state = self.fluid_system.solve(initial_state)
         # self.initial_P =  self.fluid_system.pump.P_inj_surface
         # print(self.fluid_system.pump.P_inj_surface, system_state.T_C() - initialT, initialT)
         diff = (system_state.T_C() - initialT)
@@ -27,14 +27,14 @@ class FluidSystemWaterSolver(object):
         print('find T ', system_state.T_C())
         return diff
 
-    def minimizeFunctionOpt(self, initialT, m_dot, time_years):
+    def minimizeFunctionOpt(self, initialT):
 
         dT_inj = initialT
         solv = Solver()
-        while abs(dT_inj) > 0.5:# 1e-3:
+        while abs(dT_inj) >= 0.5:
 
-            initial_state = FluidStateFromPT(self.initial_P, initialT, self.fluid_system.fluid)
-            system_state = self.fluid_system.solve(initial_state, m_dot, time_years)
+            initial_state = FluidStateFromPT(self.initial_P, initialT, self.fluid_system.params.working_fluid)
+            system_state = self.fluid_system.solve(initial_state)
             self.initial_P =  self.fluid_system.pump.P_inj_surface
             dT_inj = initialT - system_state.T_C()
 
@@ -53,14 +53,13 @@ class FluidSystemWaterSolver(object):
                 initialT = T_prod_surface_C
 
 
-    def solve(self, m_dot, time_years):
+    def solve(self):
 
-        P_system_min = FluidStateFromPT.getPFromTQ(self.fluid_system.params.T_reservoir(), 0, self.fluid_system.fluid) + 1e5
-        self.initial_P = P_system_min + 1e6
+        self.initial_P = 1e6
 
         state_T = 60.
 
-        self.minimizeFunctionOpt(state_T, m_dot, time_years)
+        self.minimizeFunctionOpt(state_T)
 
         # sol = newton(self.minimizeFunction, state_T, args=(m_dot, time_years),
         # maxiter = 50, tol = 1.e-14, rtol = 1e-8)

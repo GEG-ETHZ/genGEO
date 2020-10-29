@@ -21,7 +21,7 @@ class FluidSystemWater(object):
         self.pump = None
         self.pp = None
 
-    def solve(self, initial_state, m_dot, time_years):
+    def solve(self, initial_state):
         P_system_min = FluidStateFromPT.getPFromTQ(self.params.T_reservoir(), 0, self.fluid) + 1e5
         initial_state.P_Pa_in = initial_state.P_Pa() + P_system_min
         injection_state = FluidStateFromPT(initial_state.P_Pa(), initial_state.T_C(), initial_state.fluid)
@@ -57,12 +57,12 @@ class FluidSystemWater(object):
                 stop = True
 
         if reservoir_state.state.P_Pa() >= self.params.P_reservoir_max():
-            raise Exception('FluidSystemWater:ExceedsMaxReservoirPressure - '
+            raise Exception('GenGeo::FluidSystemWater:ExceedsMaxReservoirPressure - '
                         'Exceeds Max Reservoir Pressure of %.3f MPa!'%(self.params.P_reservoir_max()/1e6))
 
         production_well1_state  = self.production_well1.solve(reservoir_state.state)
-        production_well2_state  = self.pump.solve(production_well1_state.state, m_dot, time_years, injection_state.P_Pa())
-        pp_state                = self.pp.solve(production_well2_state.state)
+        production_well2_state  = self.pump.solve(production_well1_state.state, injection_state.P_Pa())
+        pp_state                = self.pp.solve(production_well2_state.well.state)
         return pp_state.state
 
     def gatherOutput(self):

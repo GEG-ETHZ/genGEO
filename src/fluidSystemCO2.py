@@ -22,7 +22,7 @@ class FluidSystemCO2(object):
         self.reservoir = None
         self.production_well = None
 
-    def solve(self, m_dot, time_years):
+    def solve(self):
 
         self.pp_output = PowerPlantEnergyOutput()
 
