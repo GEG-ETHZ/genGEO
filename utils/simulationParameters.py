@@ -5,7 +5,7 @@ class SimulationParameters(object):
     def __init__(self,
                 working_fluid = None,
                 orc_fluid = None,
-                m_dot_IP = 0.,
+                m_dot_IP = 1.,
                 time_years = 1.,
                 # subsurface model
                 depth = 2500.,
@@ -23,6 +23,7 @@ class SimulationParameters(object):
                 reservoir_thickness = 100.,
                 permeability = 1.0e-15 * 15000 / 100., # permeability = transmissivity / thickness
                 reservoir_configuration = '5spot',
+                has_surface_gathering_system = True,
                 # power plant model
                 max_pump_dP = 10.e6,
                 eta_pump = 0.75,
@@ -42,7 +43,8 @@ class SimulationParameters(object):
                 discount_rate = 0.096,
                 lifetime = 25,
                 capacity_factor = 0.85,
-                # physicial properties
+                opt_mode = None,
+                # physical properties
                 g = 9.81,                       # m/s**2
                 rho_rock = 2650.,               # kg/m**3
                 c_rock = 1000.,                 # J/kg-K
@@ -70,6 +72,7 @@ class SimulationParameters(object):
         self.reservoir_thickness = reservoir_thickness
         self.permeability = permeability
         self.reservoir_configuration = reservoir_configuration
+        self.has_surface_gathering_system = has_surface_gathering_system
         self.max_pump_dP = max_pump_dP
         self.eta_pump = eta_pump
         self.dT_approach = dT_approach
@@ -95,6 +98,7 @@ class SimulationParameters(object):
         self.discount_rate = discount_rate
         self.lifetime = lifetime
         self.capacity_factor = capacity_factor
+        self.opt_mode = opt_mode
         self.g = g
         self.rho_rock = rho_rock
         self.c_rock = c_rock

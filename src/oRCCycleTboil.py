@@ -25,12 +25,15 @@ class ORCCycleTboil(object):
         self.orc_fluid =  self.params.orc_fluid
         self.T_boil_max = maxSubcritORCBoilTemp(self.orc_fluid)
 
-    def solve(self, initialState, T_boil_C = False):
+    def solve(self, initialState, T_boil_C = False, dT_pinch = False):
 
         T_in_C = initialState.T_C()
 
         if not T_boil_C:
-            T_boil_C = np.interp(T_in_C, self.data[self.params.orc_fluid][:,0], self.data[self.params.orc_fluid][:,1])
+            T_boil_C = np.interp(T_in_C, self.data[self.params.opt_mode][self.params.orc_fluid][:,0], self.data[self.params.opt_mode][self.params.orc_fluid][:,1])
+
+        if not dT_pinch:
+            dT_pinch = np.interp(T_in_C, self.data[self.params.opt_mode][self.params.orc_fluid][:,0], self.data[self.params.opt_mode][self.params.orc_fluid][:,2])
 
         # run some checks  if T_in_C and T_boil_C are valid
         if np.isnan(T_in_C):
@@ -42,12 +45,13 @@ class ORCCycleTboil(object):
         if T_boil_C > FluidState.getTcrit(self.params.orc_fluid):
             raise Exception('GenGeo::ORCCycleTboil:Tboil_Too_Large - Boiling temperature above critical point')
 
-        if self.params.dT_pinch <= 0:
+        if dT_pinch <= 0:
             raise Exception('GenGeo::ORCCycleTboil:dT_pinch_Negative - dT_pinch is negative!')
 
-        if T_in_C < T_boil_C + self.params.dT_pinch:
-            raise Exception('GenGeo::ORCCycleTboil:Tboil_Too_Large - Boiling temperature of %s is greater than input temp of %s less pinch dT of %s.'%(T_boil_C, T_in_C, self.params.dT_pinch))
+        if T_in_C < T_boil_C + dT_pinch:
+            raise Exception('GenGeo::ORCCycleTboil:Tboil_Too_Large - Boiling temperature of %s is greater than input temp of %s less pinch dT of %s.'%(T_boil_C, T_in_C, dT_pinch))
 
+        # only refresh T_boil_max if orc_fluid has changed from initial
         if self.params.orc_fluid != self.orc_fluid:
             self.T_boil_max = maxSubcritORCBoilTemp(self.params.orc_fluid)
             self.orc_fluid = self.params.orc_fluid
@@ -110,17 +114,17 @@ class ORCCycleTboil(object):
         P_sat = FluidState.getPFromTQ(T_in_C, 0, 'Water')
         cp = FluidState.getCpFromPT(P_sat + 100e3, T_in_C, 'Water')
         #Water state 11, inlet, 12, mid, 13 exit
-        T_C_11 = T_in_C;
-        T_C_12 = T_boil_C + self.params.dT_pinch;
+        T_C_11 = T_in_C
+        T_C_12 = T_boil_C + dT_pinch
         #mdot_ratio = mdot_orc / mdot_water
-        mdot_ratio = cp * (T_C_11 - T_C_12) / q_boiler_orc;
-        T_C_13 = T_C_12 - mdot_ratio * q_preheater_orc / cp;
+        mdot_ratio = cp * (T_C_11 - T_C_12) / q_boiler_orc
+        T_C_13 = T_C_12 - mdot_ratio * q_preheater_orc / cp
 
         # check that T_C(13) isn't below pinch constraint
-        if T_C_13 < (state[1].T_C() + self.params.dT_pinch):
+        if T_C_13 < (state[1].T_C() + dT_pinch):
             # pinch constraint is here, not at 12
             # outlet is pump temp plus pinch
-            T_C_13 = state[1].T_C() + self.params.dT_pinch
+            T_C_13 = state[1].T_C() + dT_pinch
             R = q_boiler_orc / (q_boiler_orc + q_preheater_orc)
             T_C_12 = T_C_11 - (T_C_11 - T_C_13) * R
             mdot_ratio = cp * (T_C_11 - T_C_12) / q_boiler_orc

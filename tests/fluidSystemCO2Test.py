@@ -27,7 +27,7 @@ from tests.testAssertion import testAssert
 
 # load simulaiton parameters
 params = SimulationParameters(working_fluid = 'co2')
-params.wellMultiplier = 4.
+params.well_multiplier = 4.
 params.capacity_factor = 0.9
 
 fluid_system = FluidSystemCO2(params = params)

@@ -13,10 +13,13 @@ def getPboilOptimum():
     return os.path.join(getProjectRoot(), 'data', 'ORC_Pboil_optimum.csv')
 
 def getTboilOptimum():
-    path = os.path.join(getProjectRoot(), 'data', 'ORC_Tboil_optimum_%s.csv')
-    R600a = np.genfromtxt(path%'R600a', delimiter=',')
-    R245fa = np.genfromtxt(path%'R245fa', delimiter=',')
-    return {'R600a': R600a, 'R245fa':R245fa}
+    path = os.path.join(getProjectRoot(), 'data', 'ORC_Tboil_optimum_%s_%s.csv')
+    data_dict = {}
+    for opt_mod in ['maxPower', 'minCost']:
+        data_dict[opt_mod] = {}
+        for orc_fluid in ['R600a', 'R245fa']:
+            data_dict[opt_mod][orc_fluid] = np.genfromtxt(path%(opt_mod, orc_fluid), delimiter=',')
+    return data_dict
 
 class ConversionConstants(object):
     """ConversionConstants carries global constants."""

@@ -27,9 +27,10 @@ from tests.testAssertion import testAssert
 
 # load simulaiton parameters
 params = SimulationParameters(working_fluid = 'water')
-params.wellMultiplier = 4.
+params.well_multiplier = 4.
 params.orc_fluid = 'R245fa'
 params.capacity_factor = 0.9
+params.opt_mode = 'minCost'
 
 
 fluid_system = FluidSystemWater(params = params)
