@@ -5,7 +5,7 @@ class FluidStateFromTQ(FluidStateProperties):
     """FluidStateFromTQ."""
 
     def __init__(self, T_C, Q, fluid):
-        super(FluidStateProperties, self)
+        super().__init__()
         self.Q_in = Q
         self.T_C_in = T_C
         self.fluid = fluid
