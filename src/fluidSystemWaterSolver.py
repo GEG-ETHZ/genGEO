@@ -12,72 +12,69 @@ class FluidSystemWaterSolver(object):
     def __init__(self, system):
         self.fluid_system = system
 
-    def minimizeFunction(self, initialT):
-        # print('\n### new T ###')
-        # print(initialT)
-        # print(self.initial_P, initialT)
-        initial_state = FluidStateFromPT(self.initial_P, initialT, self.fluid_system.fluid)
-        system_state = self.fluid_system.solve(initial_state)
-        # self.initial_P =  self.fluid_system.pump.P_inj_surface
-        # print(self.fluid_system.pump.P_inj_surface, system_state.T_C() - initialT, initialT)
-        diff = (system_state.T_C() - initialT)
-        # print(system_state.T_C())
-        # print(diff)
-        # print('### T done ###\n')
-        print('find T ', system_state.T_C())
-        return diff
-
-    def minimizeFunctionOpt(self, initialT):
-
-        dT_inj = initialT
-        solv = Solver()
-        while abs(dT_inj) >= 0.5:
-
-            initial_state = FluidStateFromPT(self.initial_P, initialT, self.fluid_system.params.working_fluid)
-            system_state = self.fluid_system.solve(initial_state)
-            self.initial_P =  self.fluid_system.pump.P_inj_surface
-            dT_inj = initialT - system_state.T_C()
-
-            initialT = solv.addDataAndEstimate(initialT, dT_inj)
-
-            if np.isnan(initialT):
-                initialT = system_state.T_C()
-
-            # add bounds
-            if initialT < 1:
-                initialT = 1
-
-            # add upper bounds that make sense
-            T_prod_surface_C = self.fluid_system.pump.well.results.T_C_f[-1]
-            if initialT > T_prod_surface_C and initialT > 50:
-                initialT = T_prod_surface_C
-
-
     def solve(self):
 
-        self.initial_P = 1e6
+        self.fluid_system.params.initial_P = 1e6 + self.fluid_system.params.P_system_min()
+        self.fluid_system.params.initial_T = 60.
+        initial_T = self.fluid_system.params.initial_T
 
-        state_T = 60.
+        dT_inj = np.nan
+        dT_loops = 1
+        solv = Solver()
+        while np.isnan(dT_inj) or abs(dT_inj) >= 0.5:
 
-        self.minimizeFunctionOpt(state_T)
+            initial_state = FluidStateFromPT(self.fluid_system.params.initial_P, initial_T, self.fluid_system.params.working_fluid)
+            system_state = self.fluid_system.solve(initial_state)
 
-        # sol = newton(self.minimizeFunction, state_T, args=(m_dot, time_years),
-        # maxiter = 50, tol = 1.e-14, rtol = 1e-8)
-        # print('final T ', sol)
-        # 1/0
+            dT_inj = initial_T - system_state.pp.state.T_C()
 
-        # try:
-        #     sol = newton(self.minimizeFunction, state_T, args=(m_dot, time_years),
-        #     maxiter = 50, tol = 1.e-14, rtol = 1e-8)
-        #     # print('P_Pa, ', self.initial_P)
-        #     # print('sol,  ', sol)
-        # except Exception as error:
-        #     if str(error).find('SemiAnalyticalWell:BelowSaturationPressure') > -1:
-        #         print(str(error))
-        #         sol = newton(self.minimizeFunction, 40., args=(m_dot, time_years),
-        #         maxiter = 50, tol = 1.e-14, rtol = 1e-8)
-        #     else:
-        #         raise(error)
+            initial_T = solv.addDataAndEstimate(initial_T, dT_inj)
+
+            if np.isnan(initial_T):
+                initial_T = system_state.pp.state.T_C()
+
+            # add lower bounds
+            if initial_T < 1:
+                initial_T = 1
+
+            # add upper bounds
+            T_prod_surface_C = system_state.production_well2.well.state.T_C()
+            if initial_T > T_prod_surface_C and initial_T > 50:
+                initial_T = T_prod_surface_C
+
+            if dT_loops >  10:
+                print('GenGeo::Warning:FluidSystemWaterSolver:dT_loops is large: %s'%dT_loops)
+            dT_loops += 1
+
+        # # TODO: add prevent silica
+        return system_state
+
+    def minimizeFunction(self, initial_T):
+
+        initial_state = FluidStateFromPT(self.initial_P, initial_T, self.fluid_system.fluid)
+        system_state = self.fluid_system.solve(initial_state)
+
+        diff = (system_state.pp.state.T_C() - initial_T)
+
+        print('find T ', system_state.pp.state.T_C())
+        return diff
+
+    def solveMinimize(self):
+
+        self.initial_P = 1e6 +  self.fluid_system.params.P_system_min()
+        initial_T = 60.
+
+        try:
+            sol = newton(self.minimizeFunction, initial_T,
+            maxiter = 50, tol = 1.e-14, rtol = 1e-8)
+
+        except Exception as ex:
+            if str(ex).find('BelowSaturationPressure') > -1:
+                print(str(ex))
+                sol = newton(self.minimizeFunction, 40.,
+                maxiter = 50, tol = 1.e-14, rtol = 1e-8)
+            else:
+                raise ex
 
 
         # state_T = 1.
@@ -103,11 +100,6 @@ class FluidSystemWaterSolver(object):
         #         if state_T <= 0.:
         #             raise(error)
 
-            # sol = brentq(self.minimizeFunction, 40., 1e-6, args=(m_dot, time_years),
-            # maxiter = 25, full_output = True, xtol = 1.e-4, rtol = 1e-8)
-
-            # sol = root(self.minimizeFunction, state_T, args=(m_dot, time_years),
-            # method ='lm', tol = 1.e-4, options = {'xtol' : 1e-3})
 
         # initial_state = FluidStateFromPT(self.initial_P, sol, self.fluid_system.fluid)
         # system_state = self.fluid_system.solve(initial_state, m_dot, time_years)
