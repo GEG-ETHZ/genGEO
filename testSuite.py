@@ -38,6 +38,7 @@ def testSuite(full=False):
     suite.addTest(FluidSystemCO2Test('testFluidSystemCO2Mdot10'))
     suite.addTest(FluidSystemCO2Test('testFluidSystemCO2Mdot80'))
     suite.addTest(FluidSystemCO2Test('testFluidSystemCO2Mdot200'))
+    suite.addTest(FluidSystemCO2Test('testFluidSystemCO2Mdot100'))
     # heavy tests only if full test is run
     if full:
         suite.addTest(FluidSystemWaterTest('testFluidSystemWaterSolverOptMdot'))

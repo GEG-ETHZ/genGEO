@@ -87,11 +87,21 @@ class FluidSystemCO2Test(unittest.TestCase):
         output = full_system.gatherOutput()
 
         print(*testAssert(output.fluid_system_solver.pp.dP_surface, 3.468765e+06, 'test_dP_surface'))
-        print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 47.5801, 'test_T_prod_surface_C'))
+        print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 47.6070, 'test_T_prod_surface_C'))
         print(*testAssert(output.energy_results.W_net, -1.3602e6, 'test_W_net'))
         print(*testAssert(output.capital_cost_model.C_brownfield, 5.26260e7, 'test_C_brownfield_N'))
         print(*testAssert(output.capital_cost_model.C_greenfield, 7.52561e7, 'test_C_greenfield_N'))
         print(np.isnan(output.capital_cost_model.LCOE_brownfield.LCOE), 'test_LCOE_brownfield')
+
+    def testFluidSystemCO2Mdot100(self):
+        params.m_dot_IP = 100
+        params.depth = 2400.
+        params.permeability = 1e-8 / 100.
+        full_system.solve()
+
+        output = full_system.gatherOutput()
+
+        print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 55.3144, 'test_T_prod_surface_C'))
 
     def testFluidSystemCO2SolverOptMdot(self):
 
