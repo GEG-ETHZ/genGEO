@@ -117,8 +117,5 @@ class PorousReservoir(PorousReservoirBase):
         end_T_C = gamma * dT_initial + initialState.T_C()
         results.state = FluidStateFromPT(end_P_Pa, end_T_C, self.params.working_fluid)
         results.heat = self.params.m_dot_IP * (results.state.h_Jkg() - initialState.h_Jkg())
-        self.output = results
-        return results
 
-    def gatherOutput(self):
-        return self.output
+        return results

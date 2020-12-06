@@ -9,7 +9,7 @@ class FullSystemOptMdotBase(object):
     def __init__(self, system):
         self.full_system = system
 
-    def getTargetVar(self):
+    def getTargetVar(self, system):
         raise Exception('GenGeo::no target variable provided to find Minimum '
                         ' or Maximum of!')
 
@@ -22,6 +22,3 @@ class FullSystemOptMdotBase(object):
     def solve(self):
         raise Exception('GenGeo::no algorithm provided to solve opt m_dot '
                         'for minimum or maximum of output variable!')
-
-    def gatherOutput(self):
-        return self.full_system.gatherOutput()

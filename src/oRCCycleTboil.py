@@ -161,8 +161,4 @@ class ORCCycleTboil(object):
         # return temperature
         results.state = FluidStateFromPT(initialState.P_Pa(), T_C_13, self.params.working_fluid)
 
-        self.output = results
         return results
-
-    def gatherOutput(self):
-        return self.output

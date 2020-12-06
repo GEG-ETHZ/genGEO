@@ -2,6 +2,8 @@ import numpy as np
 
 from src.fullSystemOptMdotBase import FullSystemOptMdotBase
 
+from utils.results import Results
+
 class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
     """
     FullSystemSolverPeakIterator implements a ...
@@ -10,7 +12,7 @@ class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
     def __init__(self, system):
         super().__init__(system)
 
-    def solve(self, time_years):
+    def solve(self):
 
         old_var = np.nan
         best_var = np.nan
@@ -43,8 +45,9 @@ class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
 
             print('Trying a mass flowrate of %s'%m_dot_IP)
             try:
-                system = self.full_system.solve(m_dot_IP, time_years)
-                var_out = self.getTargetVar()
+                self.full_system.params.m_dot_IP = m_dot_IP
+                system = self.full_system.solve()
+                var_out = self.getTargetVar(system)
 
                 # See if this mass flowrate is better than previous values
 
@@ -105,8 +108,8 @@ class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
             m_dot_IP = m_dot_IP + d_m_dot
 
         # one final solve with the optimum flowrate
-        system = self.full_system.solve(m_dot_IP, time_years)
+        self.full_system.params.m_dot_IP = m_dot_IP
+        results = self.full_system.solve()
+        results.optMdot = m_dot_IP
 
-        t_val = self.getTargetVar()
-
-        return m_dot_IP
+        return results

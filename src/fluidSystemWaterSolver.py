@@ -38,7 +38,7 @@ class FluidSystemWaterSolver(object):
                 initial_T = 1
 
             # add upper bounds
-            T_prod_surface_C = system_state.production_well2.well.state.T_C()
+            T_prod_surface_C = system_state.pump.well.state.T_C()
             if initial_T > T_prod_surface_C and initial_T > 50:
                 initial_T = T_prod_surface_C
 
@@ -116,7 +116,3 @@ class FluidSystemWaterSolver(object):
         # if diff > 1e-5:
         #     print('FluidSystemWater:NotConverged - '
         #     'Difference between injection and power plant output T is ', diff)
-
-
-    def gatherOutput(self):
-        return self.fluid_system.gatherOutput()

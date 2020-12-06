@@ -63,16 +63,7 @@ class FluidSystemWater(object):
                         'Exceeds Max Reservoir Pressure of %.3f MPa!'%(self.params.P_reservoir_max()/1e6))
 
         results.production_well1  = self.production_well1.solve(results.reservoir.state)
-        results.production_well2  = self.pump.solve(results.production_well1.state, injection_state.P_Pa())
-        results.pp                = self.pp.solve(results.production_well2.well.state)
-        return results
+        results.pump              = self.pump.solve(results.production_well1.state, injection_state.P_Pa())
+        results.pp                = self.pp.solve(results.pump.well.state)
 
-    def gatherOutput(self):
-        output = FluidSystemWaterOutput()
-        output.injection_well       = self.injection_well.gatherOutput()
-        output.reservoir            = self.reservoir.gatherOutput()
-        output.production_well1     = self.production_well1.gatherOutput()
-        output.pump                 = self.pump.gatherOutput()
-        output.production_well2     = self.pump.well.gatherOutput()
-        output.pp                   = self.pp.gatherOutput()
-        return output
+        return results

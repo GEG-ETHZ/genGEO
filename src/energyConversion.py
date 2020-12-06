@@ -4,9 +4,8 @@ class EnergyConversionORC(object):
     """EnergyConversionORC."""
 
     @staticmethod
-    def gatherOutput(params, input):
+    def compute(params, input):
         N_IP_multiplier = params.well_multiplier
-        input = input.gatherOutput()
         ec = EnergyConversionORC()
         ec.Q_preheater = params.m_dot_IP * input.pp.q_preheater
         ec.Q_recuperator = params.m_dot_IP * input.pp.q_recuperator
@@ -38,9 +37,8 @@ class EnergyConversionCPG(object):
     """EnergyConversionCPG."""
 
     @staticmethod
-    def gatherOutput(params, input):
+    def compute(params, input):
         N_IP_multiplier = params.well_multiplier
-        input = input.gatherOutput()
         ec = EnergyConversionCPG()
         ec.Q_preheater = params.m_dot_IP * input.pp.q_preheater
         ec.Q_recuperator = params.m_dot_IP * input.pp.q_recuperator

@@ -55,9 +55,7 @@ class FluidSystemCO2Test(unittest.TestCase):
 
     def testFluidSystemCO2Mdot10(self):
         params.m_dot_IP = 10
-        full_system.solve()
-
-        output = full_system.gatherOutput()
+        output = full_system.solve()
 
         print(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.9421e6, 'test_dP_surface'))
         print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 59.2802, 'test_T_prod_surface_C'))
@@ -69,9 +67,7 @@ class FluidSystemCO2Test(unittest.TestCase):
 
     def testFluidSystemCO2Mdot80(self):
         params.m_dot_IP = 80
-        full_system.solve()
-
-        output = full_system.gatherOutput()
+        output = full_system.solve()
 
         print(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.6501e6, 'test_dP_surface'))
         print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 59.0540, 'test_T_prod_surface_C'))
@@ -82,9 +78,7 @@ class FluidSystemCO2Test(unittest.TestCase):
 
     def testFluidSystemCO2Mdot200(self):
         params.m_dot_IP = 200
-        full_system.solve()
-
-        output = full_system.gatherOutput()
+        output = full_system.solve()
 
         print(*testAssert(output.fluid_system_solver.pp.dP_surface, 3.468765e+06, 'test_dP_surface'))
         print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 47.6070, 'test_T_prod_surface_C'))
@@ -97,9 +91,7 @@ class FluidSystemCO2Test(unittest.TestCase):
         params.m_dot_IP = 100
         params.depth = 2400.
         params.permeability = 1e-8 / 100.
-        full_system.solve()
-
-        output = full_system.gatherOutput()
+        output = full_system.solve()
 
         print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 55.3144, 'test_T_prod_surface_C'))
 
@@ -107,9 +99,8 @@ class FluidSystemCO2Test(unittest.TestCase):
 
         full_system_solver = FullSystemSolverMinLCOEBrownfield(full_system)
 
-        optMdot = full_system_solver.solve(time_years = 1)
+        output = full_system_solver.solve()
 
-        output = full_system.gatherOutput()
-        print(*testAssert(optMdot, 56.9487, 'test_optMdot_solver_optMdot'))
+        print(*testAssert(output.optMdot, 56.9487, 'test_optMdot_solver_optMdot'))
         print(*testAssert(output.energy_results.W_net, 4.6239e5, 'test_optMdot_solver_w_net'))
         print(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.6207-4, 'test_optMdot_solver_LCOE_brownfield'))

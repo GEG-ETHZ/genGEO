@@ -110,8 +110,5 @@ class SemiAnalyticalWell(object):
                 results.h_Jkg[i] = FluidStateFromPT.getHFromPT(results.P_Pa[i], results.T_C_f[i], self.params.working_fluid)
         # make sure state object is set
         results.createFinalState()
-        self.results = results
-        return results
 
-    def gatherOutput(self):
-        return self.results
+        return results

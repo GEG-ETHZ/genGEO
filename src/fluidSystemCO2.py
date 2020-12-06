@@ -111,9 +111,5 @@ class FluidSystemCO2(object):
         results.pp.dP_surface = results.production_well.state.P_Pa() - P_condensation
 
         results.pp.state_out = surface_injection_state
-        self.output = results
-        return results
 
-    def gatherOutput(self):
-        output = FluidSystemCO2Output()
-        return self.output
+        return results

@@ -8,9 +8,8 @@ class FullSystemSolverMinLCOEBrownfield(FullSystemSolverPeakIterator):
     def __init__(self, system):
         super().__init__(system)
 
-    def getTargetVar(self):
-        output = self.full_system.gatherOutput()
-        return output.capital_cost_model.LCOE_brownfield.LCOE
+    def getTargetVar(self, system):
+        return system.capital_cost_model.LCOE_brownfield.LCOE
 
     def getDirection(self):
         return -1
@@ -21,9 +20,8 @@ class FullSystemSolverMinLCOEGreenfield(FullSystemSolverPeakIterator):
     def __init__(self, system):
         super().__init__(system)
 
-    def getTargetVar(self):
-        output = self.full_system.gatherOutput()
-        return output.capital_cost_model.LCOE_greenfield.LCOE
+    def getTargetVar(self, system):
+        return self.full_system.capital_cost_model.LCOE_greenfield.LCOE
 
     def getDirection(self):
         return -1
@@ -34,9 +32,8 @@ class FullSystemSolverMaxPower(FullSystemSolverPeakIterator):
     def __init__(self, system):
         super().__init__(system)
 
-    def getTargetVar(self):
-        output = self.full_system.gatherOutput()
-        return output.energy_results.W_net
+    def getTargetVar(self, system):
+        return self.full_system.energy_results.W_net
 
     def getDirection(self):
         return 1

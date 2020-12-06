@@ -42,9 +42,4 @@ class CapitalCostSystem(object):
         results.LCOE_greenfield = lcoe_model_greenfield.solve(results.C_greenfield, self.energy_results)
         results.LCOE_brownfield = lcoe_model_brownfield.solve(results.C_brownfield, self.energy_results)
 
-        self.output = results
-
         return results
-
-    def gatherOutput(self):
-        return self.output

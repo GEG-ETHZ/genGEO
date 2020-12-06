@@ -32,6 +32,9 @@ class DownHolePump(object):
         if self.ff_m_dot != self.params.m_dot_IP:
             self.computeSurfacePipeFrictionFactor()
 
+        # initilize object with well output
+        results = DownHolePumpOutput()
+
         # Pumping and second well
         d_dP_pump = 1e5
         dP_pump = 0
@@ -49,16 +52,16 @@ class DownHolePump(object):
                 temp_at_pump_depth = self.well.T_e_initial + self.params.dT_dz * self.params.pump_depth
 
                 state_in = FluidStateFromPT(P_prod_pump_out, T_prod_pump_out, self.params.working_fluid)
-                well_state = self.well.solve(state_in)
+                results.well = self.well.solve(state_in)
 
                 # calculate surface pipe friction loss
                 if self.params.has_surface_gathering_system:
                     dP_surface_pipes = self.friction_factor * self.params.well_spacing / \
-                    (2 * self.params.well_radius)**5 * 8 * self.params.m_dot_IP**2 / well_state.state.rho_kgm3() / np.pi**2
+                    (2 * self.params.well_radius)**5 * 8 * self.params.m_dot_IP**2 / results.well.state.rho_kgm3() / np.pi**2
                 else:
                     dP_surface_pipes = 0.
 
-                dP_surface = (well_state.state.P_Pa() - P_inj_surface - dP_surface_pipes)
+                dP_surface = (results.well.state.P_Pa() - P_inj_surface - dP_surface_pipes)
                 if dP_pump == self.params.max_pump_dP:
                     break
 
@@ -90,16 +93,9 @@ class DownHolePump(object):
             raise Exception('GenGeo::DownHolePump:ExceedsMaxProductionPumpPressure - '
             'Exceeds Max Pump Pressure of %.3f MPa!' %(self.params.max_pump_dP/1e6))
 
-        results = DownHolePumpOutput()
         results.w_pump = 0
         results.dP_surface_pipes = dP_surface_pipes
         if dP_pump > 0:
             results.w_pump = (initial_state.h_Jkg() - state_in.h_Jkg()) / self.params.eta_pump
 
-        results.well = well_state
-
-        self.output = results
         return results
-
-    def gatherOutput(self):
-        return self.output

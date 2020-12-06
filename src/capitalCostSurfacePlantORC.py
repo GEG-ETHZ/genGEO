@@ -34,7 +34,7 @@ class CapitalCostSurfacePlantORC(object):
         T_ambient_C = self.params.T_ambient_C
         dT_approach_CT = self.params.dT_approach
 
-        orc_results = fluid_system.pp.gatherOutput()
+        orc_results = fluid_system.pp
         dT_range_CT = orc_results.dT_range_CT
         dT_LMTD_preheater = orc_results.dT_LMTD_preheater
         dT_LMTD_boiler = orc_results.dT_LMTD_boiler

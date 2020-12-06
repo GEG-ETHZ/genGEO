@@ -65,12 +65,10 @@ class FluidSystemWaterTest(unittest.TestCase):
 
         params.m_dot_IP = 1
         full_system = FullSystemORC(params, solver, capital_cost_system)
-        full_system.solve()
+        output = full_system.solve()
 
-        output = full_system.gatherOutput()
-
-        print(*testAssert(output.fluid_system_solver.production_well2.state.P_Pa(), 1.400500841642725e+06, 'test_subsurface_solver1_pressure'))
-        print(*testAssert(output.fluid_system_solver.production_well2.state.T_C(), 81.2595, 'test_subsurface_solver1_temp'))
+        print(*testAssert(output.fluid_system_solver.pump.well.state.P_Pa(), 1.400500841642725e+06, 'test_subsurface_solver1_pressure'))
+        print(*testAssert(output.fluid_system_solver.pump.well.state.T_C(), 81.2595, 'test_subsurface_solver1_temp'))
         print(*testAssert(output.energy_results.W_net, 5.2775e3, 'test_subsurface_solver1_w_net'))
         print(*testAssert(output.capital_cost_model.C_brownfield, 1.1379e7, 'test_solver1_C_brownfield_N'))
         print(*testAssert(output.capital_cost_model.C_greenfield, 2.4491e7, 'test_solver1_C_greenfield_N'))
@@ -81,12 +79,10 @@ class FluidSystemWaterTest(unittest.TestCase):
 
         params.m_dot_IP = 40
         full_system = FullSystemORC(params, solver, capital_cost_system)
-        full_system.solve()
+        output = full_system.solve()
 
-        output = full_system.gatherOutput()
-
-        print(*testAssert(output.fluid_system_solver.production_well2.state.P_Pa(), 8.1493e+06, 'test_subsurface_solver2_pressure'))
-        print(*testAssert(output.fluid_system_solver.production_well2.state.T_C(), 100.3125, 'test_subsurface_solver2_temp'))
+        print(*testAssert(output.fluid_system_solver.pump.well.state.P_Pa(), 8.1493e+06, 'test_subsurface_solver2_pressure'))
+        print(*testAssert(output.fluid_system_solver.pump.well.state.T_C(), 100.3125, 'test_subsurface_solver2_temp'))
         print(*testAssert(output.energy_results.W_net, 1.4286e+05, 'test_subsurface_solver2_w_net'))
         print(*testAssert(output.capital_cost_model.C_brownfield, 2.5470e7, 'test_solver2_C_brownfield_N'))
         print(*testAssert(output.capital_cost_model.C_greenfield, 3.8582e7, 'test_solver2_C_greenfield_N'))
@@ -99,9 +95,8 @@ class FluidSystemWaterTest(unittest.TestCase):
 
         full_system_solver = FullSystemSolverMinLCOEBrownfield(full_system)
 
-        optMdot = full_system_solver.solve(time_years = 1)
+        output = full_system_solver.solve()
 
-        output = full_system.gatherOutput()
-        print(*testAssert(optMdot, 22.8667, 'test_optMdot_solver_optMdot'))
+        print(*testAssert(output.optMdot, 22.8667, 'test_optMdot_solver_optMdot'))
         self.assertTrue(*testAssert(output.energy_results.W_net, 1.5464e5, 'test_optMdot_solver_w_net'))
         self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 6.1479e-4, 'test_optMdot_solver_brownfield'))
