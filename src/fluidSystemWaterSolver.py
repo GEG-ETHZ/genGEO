@@ -46,7 +46,16 @@ class FluidSystemWaterSolver(object):
                 print('GenGeo::Warning:FluidSystemWaterSolver:dT_loops is large: %s'%dT_loops)
             dT_loops += 1
 
-        # # TODO: add prevent silica
+        # check if silica precipitation is allowed
+        if self.fluid_system.params.silica_precipitation:
+            # prevent silica precipitation by DiPippo 1985
+            maxSurface_dT = 89
+            if (T_prod_surface_C - initial_T) > maxSurface_dT:
+                raise Exception('GenGeo::FluidSystemWaterSolver:ExceedsMaxTemperatureDecrease - '
+                            'Exceeds Max Temp Decrease of  %.3f C to prevent silica precipitation!'%(maxSurface_dT))
+        else:
+            maxSurface_dT = np.inf
+
         return system_state
 
     def minimizeFunction(self, initial_T):
