@@ -44,7 +44,7 @@ class SimulationParameters(object):
                 discount_rate = 0.096,
                 lifetime = 25,
                 capacity_factor = 0.85,
-                opt_mode = None,
+                opt_mode = 'minCost',
                 # physical properties
                 g = 9.81,                       # m/s**2
                 rho_rock = 2650.,               # kg/m**3

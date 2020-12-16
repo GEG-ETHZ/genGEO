@@ -15,6 +15,7 @@ from src.capitalCostWell import CapitalCostWell
 from src.capitalCostWellField import CapitalCostWellField
 from src.capitalCostExploration import CapitalCostExploration
 from src.capitalCostSurfacePlantORC import CapitalCostSurfacePlantORC
+from src.capitalCostWellStimulation import CapitalCostWellStimulation
 
 from src.totalSystemBase import TotalSystemBase
 
@@ -26,72 +27,38 @@ class TotalSystemWater(TotalSystemBase):
     def __init__(self, **kwargs):
 
         # define global methods to be used in this tests
-        gsp = SimulationParameters(working_fluid = 'water', **kwargs)
+        params = SimulationParameters(working_fluid = 'water', **kwargs)
 
-        fluid_system = FluidSystemWater()
-        fluid_system.injection_well = SemiAnalyticalWell(params = gsp,
-                                            dz_total = -1 * gsp.depth,
-                                            wellRadius = gsp.well_radius,
-                                            wellMultiplier = gsp.well_multiplier,
-                                            fluid = gsp.working_fluid,
-                                            epsilon = gsp.epsilon,
-                                            dT_dz = gsp.dT_dz,
-                                            T_e_initial = gsp.T_e_initial)
+        fluid_system = FluidSystemWater(params = params)
+        fluid_system.injection_well = SemiAnalyticalWell(params = params,
+                                            dz_total = -1 * params.depth,
+                                            T_e_initial = params.T_ambient_C)
 
-        fluid_system.reservoir = PorousReservoir(params = gsp)
+        fluid_system.reservoir = PorousReservoir(params = params)
 
-        fluid_system.production_well1 = SemiAnalyticalWell(params = gsp,
-                                            dz_total = gsp.depth - gsp.pump_depth,
-                                            wellRadius = gsp.well_radius,
-                                            wellMultiplier = gsp.well_multiplier,
-                                            fluid = gsp.working_fluid,
-                                            epsilon = gsp.epsilon,
-                                            dT_dz = gsp.dT_dz,
-                                            T_e_initial = gsp.T_e_initial + gsp.dT_dz * gsp.depth)
+        fluid_system.production_well1 = SemiAnalyticalWell(params = params,
+                                            dz_total = params.depth - params.pump_depth,
+                                            T_e_initial = params.T_ambient_C + params.dT_dz * params.depth)
 
-        prod_well2 = SemiAnalyticalWell(params = gsp,
-                                            dz_total = gsp.pump_depth,
-                                            wellRadius = gsp.well_radius,
-                                            wellMultiplier = gsp.well_multiplier,
-                                            fluid = gsp.working_fluid,
-                                            epsilon = gsp.epsilon,
-                                            dT_dz = gsp.dT_dz,
-                                            T_e_initial = gsp.T_e_initial + gsp.dT_dz * gsp.pump_depth)
+        prod_well2 = SemiAnalyticalWell(params = params,
+                                            dz_total = params.pump_depth,
+                                            T_e_initial = params.T_ambient_C + params.dT_dz * params.pump_depth)
 
         fluid_system.pump = DownHolePump(well = prod_well2,
-                            pump_depth = gsp.pump_depth,
-                            max_pump_dP = gsp.max_pump_dP,
-                            eta_pump = gsp.eta_pump)
+                                        params = params)
 
-        fluid_system.pp = ORCCycleTboil(T_ambient_C = gsp.T_ambient_C,
-                                dT_approach = gsp.dT_approach,
-                                dT_pinch = gsp.dT_pinch,
-                                eta_pump = gsp.eta_pump_orc,
-                                eta_turbine = gsp.eta_turbine_orc,
-                                coolingMode = gsp.cooling_mode,
-                                orcFluid = gsp.orc_fluid)
+        fluid_system.pp = ORCCycleTboil(params = params)
 
-        capital_cost_system = CapitalCostSystem(gsp.cost_year)
-        capital_cost_system.CapitalCost_SurfacePlant = CapitalCostSurfacePlantORC(gsp.cost_year)
-        capital_cost_system.CapitalCost_SurfacePipe = CapitalCostSurfacePipes(N = 0)
-        capital_cost_system.CapitalCost_Production_Well = CapitalCostWell.waterBaseline(well_length = gsp.depth,
-                                                                            well_diameter = gsp.well_radius * 2,
-                                                                            success_rate = gsp.well_success_rate,
-                                                                            cost_year = gsp.cost_year)
-        capital_cost_system.CapitalCost_Injection_Well = CapitalCostWell.waterBaseline(well_length = gsp.depth,
-                                                                            well_diameter = gsp.well_radius * 2,
-                                                                            success_rate = gsp.well_success_rate,
-                                                                            cost_year = gsp.cost_year)
-        capital_cost_system.CapitalCost_Wellfield = CapitalCostWellField.water(gsp.cost_year)
-        capital_cost_system.CapitalCost_Exploration = CapitalCostExploration.waterBaseline(well_length = gsp.depth,
-                                                                            well_diameter = gsp.well_radius * 2,
-                                                                            success_rate = gsp.well_success_rate,
-                                                                            cost_year = gsp.cost_year)
-        capital_cost_system.lcoe_model = LCOESimple(F_OM = gsp.F_OM,
-                                                    discountRate = gsp.discount_rate,
-                                                    Lifetime = gsp.lifetime,
-                                                    CapacityFactor = gsp.capacity_factor)
+        capital_cost_system = CapitalCostSystem()
+        capital_cost_system.CapitalCost_SurfacePlant = CapitalCostSurfacePlantORC(params = params)
+        capital_cost_system.CapitalCost_SurfacePipe = CapitalCostSurfacePipes.cost(params = params)
+        capital_cost_system.CapitalCost_Production_Well = CapitalCostWell.waterBaseline(params = params)
+        capital_cost_system.CapitalCost_Injection_Well = CapitalCostWell.waterBaseline(params = params)
+        capital_cost_system.CapitalCost_Wellfield = CapitalCostWellField.water(params = params)
+        capital_cost_system.CapitalCost_Exploration = CapitalCostExploration.waterBaseline(params = params)
+        capital_cost_system.CapitalCost_Stimulation = CapitalCostWellStimulation.cost()
+        capital_cost_system.lcoe_model = LCOESimple(params = params)
 
         solver = FluidSystemWaterSolver(fluid_system)
 
-        self.full_system = FullSystemORC(solver, capital_cost_system)
+        self.full_system = FullSystemORC(params, solver, capital_cost_system)
