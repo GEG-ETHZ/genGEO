@@ -138,6 +138,7 @@ class FluidSystemCO2(object):
         results.pp.w_net = results.pp.w_turbine + results.pp.w_pump + results.pp.w_cooler + results.pp.w_condenser
 
         results.pp.dP_surface = results.surface_plant_inlet.P_Pa() - P_condensation
+        results.pp.dP_pump = dP_pump
 
         results.pp.state_out = surface_injection_state
 

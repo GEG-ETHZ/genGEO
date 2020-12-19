@@ -12,7 +12,7 @@ class CapitalCostExploration(object):
         if params == None:
             params = SimulationParameters(**kwargs)
         A = cModeling(params.cost_year)
-        B = dCCharacterizationWellsIdeal(params.cost_year, params.well_length, params.well_radius, params.success_rate)
+        B = dCCharacterizationWellsIdeal(params.cost_year, params.depth, params.well_radius, params.success_rate)
         C = dCModelingCO2(params.well_cost_N, params.cost_year)
         return A + B + C
 
@@ -21,7 +21,7 @@ class CapitalCostExploration(object):
         if params == None:
             params = SimulationParameters(**kwargs)
         A = cModeling(params.cost_year)
-        B = dCCharacterizationWellsBaseline(params.cost_year, params.well_length, params.well_radius, params.success_rate)
+        B = dCCharacterizationWellsBaseline(params.cost_year, params.depth, params.well_radius, params.success_rate)
         C = dCModelingCO2(params.well_cost_N, params.cost_year)
         return A + B + C
 
@@ -30,7 +30,7 @@ class CapitalCostExploration(object):
         if params == None:
             params = SimulationParameters(**kwargs)
         A = cModeling(params.cost_year)
-        B = dCCharacterizationWellsIdeal(params.cost_year, params.well_length, params.well_radius, params.success_rate)
+        B = dCCharacterizationWellsIdeal(params.cost_year, params.depth, params.well_radius, params.success_rate)
         return A + B
 
     @staticmethod
@@ -38,7 +38,7 @@ class CapitalCostExploration(object):
         if params == None:
             params = SimulationParameters(**kwargs)
         A = cModeling(params.cost_year)
-        B = dCCharacterizationWellsBaseline(params.cost_year, params.well_length, params.well_radius, params.success_rate)
+        B = dCCharacterizationWellsBaseline(params.cost_year, params.depth, params.well_radius, params.success_rate)
         return A + B
 
 def aCO2AMA(N):
@@ -52,12 +52,12 @@ g_characterization_wells = 2
 def cModeling(cost_year):
     return X_IC_expl * X_PC_expl * readCostTable('PPI_O&G-s', cost_year = cost_year) * 508000
 
-def dCCharacterizationWellsIdeal(cost_year, well_length, well_radius, success_rate):
-    c_well = CapitalCostWell.waterIdeal(well_length = well_length, well_radius = well_radius, success_rate = 1., cost_year = cost_year)
+def dCCharacterizationWellsIdeal(cost_year, depth, well_radius, success_rate):
+    c_well = CapitalCostWell.waterIdeal(depth = depth, well_radius = well_radius, success_rate = 1., cost_year = cost_year)
     return 0.2 * c_well * g_characterization_wells / success_rate
 
-def dCCharacterizationWellsBaseline(cost_year, well_length, well_radius, success_rate):
-    c_well = CapitalCostWell.waterBaseline(well_length = well_length, well_radius = well_radius, success_rate = 1., cost_year = cost_year)
+def dCCharacterizationWellsBaseline(cost_year, depth, well_radius, success_rate):
+    c_well = CapitalCostWell.waterBaseline(depth = depth, well_radius = well_radius, success_rate = 1., cost_year = cost_year)
     return 0.2 * c_well * g_characterization_wells / success_rate
 
 def dCModelingCO2(N, cost_year):

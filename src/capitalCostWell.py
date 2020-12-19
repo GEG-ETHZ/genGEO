@@ -9,25 +9,25 @@ class CapitalCostWell(object):
     def cO2Baseline(params = None, **kwargs):
         if params == None:
             params = SimulationParameters(**kwargs)
-        return wellCO2(params.well_length, params.well_radius, baseLine(params.well_length), params.success_rate, params.cost_year)
+        return wellCO2(params.depth, params.well_radius, baseLine(params.depth), params.success_rate, params.cost_year)
 
     @staticmethod
     def cO2Ideal(params = None, **kwargs):
         if params == None:
             params = SimulationParameters(**kwargs)
-        return wellCO2(params.well_length, params.well_radius, ideal(params.well_length), params.success_rate, params.cost_year)
+        return wellCO2(params.depth, params.well_radius, ideal(params.depth), params.success_rate, params.cost_year)
 
     @staticmethod
     def waterBaseline(params = None, **kwargs):
         if params == None:
             params = SimulationParameters(**kwargs)
-        return well(params.well_length, params.well_radius, baseLine(params.well_length), params.success_rate, params.cost_year)
+        return well(params.depth, params.well_radius, baseLine(params.depth), params.success_rate, params.cost_year)
 
     @staticmethod
     def waterIdeal(params = None, **kwargs):
         if params == None:
             params = SimulationParameters(**kwargs)
-        return well(params.well_length, params.well_radius, ideal(params.well_length), params.success_rate, params.cost_year)
+        return well(params.depth, params.well_radius, ideal(params.depth), params.success_rate, params.cost_year)
 
 X_IC_well = 1.05
 X_PC_well = 1.15

@@ -43,7 +43,7 @@ class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
                 m_dot_IP = abs(d_m_dot)
                 print('mdot<=0; peak %s'%peaks)
 
-            print('Trying a mass flowrate of %s'%m_dot_IP)
+            print('Trying a mass flowrate of %.2f' %m_dot_IP)
             try:
                 self.full_system.params.m_dot_IP = m_dot_IP
                 system = self.full_system.solve()

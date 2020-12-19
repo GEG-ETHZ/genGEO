@@ -96,6 +96,6 @@ class FluidSystemWaterTest(unittest.TestCase):
 
         output = full_system_solver.solve()
 
-        print(*testAssert(output.optMdot, 22.8667, 'test_optMdot_solver_optMdot'))
-        self.assertTrue(*testAssert(output.energy_results.W_net, 1.5464e5, 'test_optMdot_solver_w_net'))
-        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 6.1479e-4, 'test_optMdot_solver_brownfield'))
+        print(*testAssert(output.optMdot, 21.9823, 'test_optMdot_solver_optMdot'))
+        self.assertTrue(*testAssert(output.energy_results.W_net, 1.5212e5, 'test_optMdot_solver_w_net'))
+        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 5.4633e-4, 'test_optMdot_solver_brownfield'))
