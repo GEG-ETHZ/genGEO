@@ -51,7 +51,7 @@ class SimulationParameters(object):
                 useWellboreHeatLoss = True,     # bool
                 N_dx = 100,                     # nb well segments
                 # Friction factor
-                epsilon = 55 * 1e-6             # um
+                well_relative_roughness = 55 * 1e-6             # um
                     ):
 
         self.working_fluid = working_fluid
@@ -97,4 +97,4 @@ class SimulationParameters(object):
         self.k_rock = k_rock
         self.useWellboreHeatLoss = useWellboreHeatLoss
         self.N_dx = N_dx
-        self.epsilon = epsilon
+        self.epsilon = well_relative_roughness

@@ -1,7 +1,10 @@
 import numpy as np
 
 from utils.fluidStateFromPT import FluidStateFromPT
+from utils.fluidStateFromPh import FluidStateFromPh
 from utils.solver import Solver
+
+from utils.frictionFactor import frictionFactor
 
 class FluidSystemWaterOutput(object):
     """FluidSystemWaterOutput."""
@@ -62,8 +65,24 @@ class FluidSystemWater(object):
             raise Exception('GenGeo::FluidSystemWater:ExceedsMaxReservoirPressure - '
                         'Exceeds Max Reservoir Pressure of %.3f MPa!'%(self.params.P_reservoir_max()/1e6))
 
+        # Production Well (Lower, to production pump)
         results.production_well1  = self.production_well1.solve(results.reservoir.state)
+        # Upper half of production well
         results.pump              = self.pump.solve(results.production_well1.state, injection_state.P_Pa())
-        results.pp                = self.pp.solve(results.pump.well.state)
+
+        # Subtract surface frictional losses between production wellhead and surface plant
+        ff = frictionFactor(self.params.well_radius, results.pump.well.state.P_Pa(), results.pump.well.state.h_Jkg(),
+            self.params.m_dot_IP, self.params.working_fluid, self.params.epsilon)
+        if self.params.has_surface_gathering_system == True:
+            dP_surfacePipes = ff * self.params.well_spacing / (self.params.well_radius*2)**5 * 8 * self.params.m_dot_IP**2 / results.pump.well.state.rho_kgm3() / 3.14159**2
+        else:
+            dP_surfacePipes = 0
+        
+        results.surface_plant_inlet = FluidStateFromPh(
+            results.pump.well.state.P_Pa() - dP_surfacePipes,
+            results.pump.well.state.h_Jkg(),
+            self.params.working_fluid)
+
+        results.pp                = self.pp.solve(results.surface_plant_inlet)
 
         return results

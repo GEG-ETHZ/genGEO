@@ -50,4 +50,4 @@ if __name__ == '__main__':
     if sys.argv[-1].lower() == 'full':
         runner.run(testSuite(full=True))
     else:
-        runner.run(testSuite())
+        runner.run(testSuite(full=True))
