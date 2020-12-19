@@ -42,10 +42,10 @@ class PorousReservoir(PorousReservoirBase):
         if self.params.well_spacing <= self.params.well_radius:
             RI = 0
         else:
-            if self.params.reservoir_configuration == '5spot':
+            if '5spot' in self.params.wellFieldType:
                 A_c_rock = np.log( (4 * self.params.well_spacing) / (2 * self.params.well_radius * np.pi ))
                 RI = mu_fluid/rho_fluid/self.params.transmissivity() * A_c_rock
-            elif self.params.reservoir_configuration == 'Doublet':
+            elif 'Doublet' in self.params.wellFieldType:
                 A_c_rock = np.log( (self.params.well_spacing) / (2*self.params.well_radius) )
                 RI = mu_fluid/rho_fluid/self.params.transmissivity()/np.pi * A_c_rock
             else:

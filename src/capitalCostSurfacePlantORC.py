@@ -1,6 +1,7 @@
 import numpy as np
 
 from src.capitalCostCoolingTower import CapitalCostCoolingTower
+from utils.simulationParameters import SimulationParameters
 
 from utils.readXlsxData import readCostTable
 
@@ -75,10 +76,10 @@ class CapitalCostSurfacePlantORC(object):
         # C_recuperator
         if np.isnan(dT_LMTD_recuperator) or dT_LMTD_recuperator == 0:
             A_recuperator = 0
+            results.C_recuperator = 0
         else:
             A_recuperator = Q_recuperator / U / dT_LMTD_recuperator
-
-        results.C_recuperator = self.ppi_HX[self.params.cost_year] * (239*A_recuperator + 13400)
+            results.C_recuperator = self.ppi_HX[self.params.cost_year] * (239*A_recuperator + 13400)
 
         # C_productionPump
         C_pump_prod_lineshaft = 1750 * (1.34*-1*(W_pump_prod/1e3))**0.7 + 5750 * (1.34*-1*(W_pump_prod/1e3))**0.2
@@ -101,7 +102,7 @@ class CapitalCostSurfacePlantORC(object):
         results.C_plant_otherEquipment = C_plant_TEC - C_primaryEquipment
 
         C_plant_BEC = C_plant_TEC * (1 + X_CL + X_CM + X_ST + X_F)
-        results.C_plant_otherEquipment = C_plant_BEC - C_plant_TEC
+        results.C_plant_installation = C_plant_BEC - C_plant_TEC
 
         results.C_plant = X_PC_sp * X_IC_sp * C_plant_BEC
         results.C_plant_indirectContingency = results.C_plant - C_plant_BEC
@@ -112,5 +113,9 @@ class CapitalCostSurfacePlantORC(object):
         results.f_coolingTowers = results.C_coolingTowers / C_primaryEquipment
         results.f_heatExchanger = results.C_heatExchanger / C_primaryEquipment
         results.f_pump_prod = results.C_pump_prod / C_primaryEquipment
+
+        # specific capital cost of ORC
+        results.c_plant_noProdPump = results.C_plant / (W_turbine + W_pump_orc)
+        results.c_plant_inclProdPump = results.C_plant / (W_turbine + W_pump_orc + W_pump_prod)
 
         return results

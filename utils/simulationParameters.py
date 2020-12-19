@@ -23,7 +23,8 @@ class SimulationParameters(object):
                 T_ambient_C = 15.,
                 reservoir_thickness = 100.,
                 permeability = 1.0e-15 * 15000 / 100., # permeability = transmissivity / thickness
-                reservoir_configuration = '5spot',
+                wellFieldType = '5spot_SharedNeighbor', #'Doublet','5spot',5spot_SharedNeighbor','5spot_ManyN'
+                N_5spot = 1,
                 has_surface_gathering_system = True,
                 # power plant model
                 max_pump_dP = 10.e6,
@@ -39,7 +40,6 @@ class SimulationParameters(object):
                 cost_year = 2019,
                 success_rate = 0.95,
                 well_cost_N = 1,
-                pipe_cost_N = 0,
                 F_OM = 0.045,
                 discount_rate = 0.096,
                 lifetime = 25,
@@ -73,7 +73,8 @@ class SimulationParameters(object):
         self.T_ambient_C = T_ambient_C
         self.reservoir_thickness = reservoir_thickness
         self.permeability = permeability
-        self.reservoir_configuration = reservoir_configuration
+        self.wellFieldType = wellFieldType
+        self.N_5spot = N_5spot
         self.has_surface_gathering_system = has_surface_gathering_system
         self.max_pump_dP = max_pump_dP
         self.eta_pump = eta_pump
@@ -95,7 +96,6 @@ class SimulationParameters(object):
         self.cost_year = cost_year
         self.success_rate = success_rate
         self.well_cost_N = well_cost_N
-        self.pipe_cost_N = pipe_cost_N
         self.F_OM = F_OM
         self.discount_rate = discount_rate
         self.lifetime = lifetime
