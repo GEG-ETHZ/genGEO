@@ -7,6 +7,8 @@ from utils.fluidStateFromPT import FluidStateFromPT
 from utils.fluidStateFromPh import FluidStateFromPh
 from utils.solver import Solver
 
+from utils.frictionFactor import frictionFactor
+
 class FluidSystemCO2Output(object):
     """FluidSystemCO2Output."""
     pass
@@ -36,19 +38,25 @@ class FluidSystemCO2(object):
         dP_downhole = np.nan
         dP_loops = 1
         dP_solver = Solver()
-        while np.isnan(dP_downhole) or dP_downhole >= dP_downhole_threshold:
+        while np.isnan(dP_downhole) or np.abs(dP_downhole) >= dP_downhole_threshold:
 
             # Find Injection Conditions
             P_pump_inlet = P_condensation
-            P_pump_outlet = P_pump_inlet + dP_pump
+
+            # Only add pump differential if positive. If negative, add as a throttle at the bottom of the injection well
+            if (dP_pump > 0):
+                P_pump_outlet = P_pump_inlet + dP_pump
+            else:
+                P_pump_outlet = P_pump_inlet
 
             T_pump_inlet = T_condensation
             pump_inlet_state = FluidStateFromPT(P_pump_inlet, T_pump_inlet, self.params.working_fluid)
 
-            h_pump_outlet = pump_inlet_state.h_Jkg()
             if dP_pump > 0:
                 h_pump_outletS = FluidStateFromPT.getHFromPS(P_pump_outlet, pump_inlet_state.S_JK(), self.params.working_fluid)
                 h_pump_outlet = pump_inlet_state.h_Jkg() + (h_pump_outletS - pump_inlet_state.h_Jkg()) / self.params.eta_pump_co2
+            else:
+                h_pump_outlet = pump_inlet_state.h_Jkg()
 
             results.pp.w_pump = -1 * (h_pump_outlet - pump_inlet_state.h_Jkg())
 
@@ -56,7 +64,19 @@ class FluidSystemCO2(object):
 
             results.injection_well    = self.injection_well.solve(surface_injection_state)
 
-            results.reservoir         = self.reservoir.solve(results.injection_well.state)
+            # if dP_pump is negative, this is a throttle after the injection well
+            if (dP_pump < 0):
+                results.injection_well_downhole_throttle = FluidStateFromPh(
+                    results.injection_well.state.P_Pa() + dP_pump, 
+                    results.injection_well.state.h_Jkg(), 
+                    self.params.working_fluid)
+            else:
+                results.injection_well_downhole_throttle = FluidStateFromPh(
+                    results.injection_well.state.P_Pa(), 
+                    results.injection_well.state.h_Jkg(), 
+                    self.params.working_fluid)
+
+            results.reservoir = self.reservoir.solve(results.injection_well_downhole_throttle)
 
             # find downhole pressure difference (negative means
             # overpressure
@@ -69,21 +89,30 @@ class FluidSystemCO2(object):
                 print('GenGeo::Warning::FluidSystemCO2:dP_loops is large: %s'%dP_loops)
             dP_loops += 1
 
-            # dP_pump can't be negative
-            if dP_pump < 0 and dP_downhole > 0:
-                dP_pump = 0
-
         if results.reservoir.state.P_Pa() >= self.params.P_reservoir_max():
             raise Exception('GenGeo::FluidSystemCO2:ExceedsMaxReservoirPressure - '
                         'Exceeds Max Reservoir Pressure of %.3f MPa!'%(self.params.P_reservoir_max()/1e6))
 
         results.production_well  = self.production_well.solve(results.reservoir.state)
 
-        # Calculate Turbine Power
-        h_turbine_outS = FluidStateFromPT.getHFromPS(P_condensation, results.production_well.state.S_JK(), self.params.working_fluid)
-        h_turbine_out = results.production_well.state.h_Jkg() - self.params.eta_turbine_co2 * (results.production_well.state.h_Jkg() - h_turbine_outS)
+        # Subtract surface frictional losses between production wellhead and surface plant
+        ff = frictionFactor(self.params.well_radius, results.production_well.state.P_Pa(), results.production_well.state.h_Jkg(),
+            self.params.m_dot_IP, self.params.working_fluid, self.params.epsilon)
+        if self.params.has_surface_gathering_system == True:
+            dP_surfacePipes = ff * self.params.well_spacing / (self.params.well_radius*2)**5 * 8 * self.params.m_dot_IP**2 / results.production_well.state.rho_kgm3() / 3.14159**2
+        else:
+            dP_surfacePipes = 0
+        
+        results.surface_plant_inlet = FluidStateFromPh(
+            results.production_well.state.P_Pa() - dP_surfacePipes,
+            results.production_well.state.h_Jkg(),
+            self.params.working_fluid)
 
-        results.pp.w_turbine = results.production_well.state.h_Jkg() - h_turbine_out
+        # Calculate Turbine Power
+        h_turbine_outS = FluidStateFromPT.getHFromPS(P_condensation, results.surface_plant_inlet.S_JK(), self.params.working_fluid)
+        h_turbine_out = results.surface_plant_inlet.h_Jkg() - self.params.eta_turbine_co2 * (results.surface_plant_inlet.h_Jkg() - h_turbine_outS)
+
+        results.pp.w_turbine = results.surface_plant_inlet.h_Jkg() - h_turbine_out
         if results.pp.w_turbine < 0:
             raise Exception('GenGeo::FluidSystemCO2:TurbinePowerNegative - Turbine Power is Negative')
 
@@ -108,7 +137,7 @@ class FluidSystemCO2(object):
 
         results.pp.w_net = results.pp.w_turbine + results.pp.w_pump + results.pp.w_cooler + results.pp.w_condenser
 
-        results.pp.dP_surface = results.production_well.state.P_Pa() - P_condensation
+        results.pp.dP_surface = results.surface_plant_inlet.P_Pa() - P_condensation
 
         results.pp.state_out = surface_injection_state
 

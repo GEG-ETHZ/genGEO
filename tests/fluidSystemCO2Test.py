@@ -60,9 +60,9 @@ class FluidSystemCO2Test(unittest.TestCase):
         print(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.9421e6, 'test_dP_surface'))
         print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 59.2802, 'test_T_prod_surface_C'))
         print(*testAssert(output.energy_results.W_net, 9.7662e4, 'test_W_net'))
-        print(*testAssert(output.capital_cost_model.C_brownfield, 1.5454e7, 'test_C_brownfield_N'))
-        print(*testAssert(output.capital_cost_model.C_greenfield, 3.8084e7, 'test_C_greenfield_N'))
-        print(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 7.6167e-4, 'test_LCOE_brownfield'))
+        print(*testAssert(output.capital_cost_model.C_brownfield, 1.3271e7, 'test_C_brownfield_N'))
+        print(*testAssert(output.capital_cost_model.C_greenfield, 3.5901e7, 'test_C_greenfield_N'))
+        print(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 6.5410e-4, 'test_LCOE_brownfield'))
 
 
     def testFluidSystemCO2Mdot80(self):
@@ -72,19 +72,19 @@ class FluidSystemCO2Test(unittest.TestCase):
         print(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.6501e6, 'test_dP_surface'))
         print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 59.0540, 'test_T_prod_surface_C'))
         print(*testAssert(output.energy_results.W_net, 4.9940e+05, 'test_W_net'))
-        print(*testAssert(output.capital_cost_model.C_brownfield, 2.9832e+07, 'test_C_brownfield_N'))
-        print(*testAssert(output.capital_cost_model.C_greenfield, 5.2462e7, 'test_C_greenfield_N'))
-        print(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.8754e-4, 'test_LCOE_brownfield'))
+        print(*testAssert(output.capital_cost_model.C_brownfield, 2.7650e7, 'test_C_brownfield_N'))
+        print(*testAssert(output.capital_cost_model.C_greenfield, 5.0280e7, 'test_C_greenfield_N'))
+        print(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.6650e-4, 'test_LCOE_brownfield'))
 
     def testFluidSystemCO2Mdot200(self):
         params.m_dot_IP = 200
         output = full_system.solve()
 
         print(*testAssert(output.fluid_system_solver.pp.dP_surface, 3.468765e+06, 'test_dP_surface'))
-        print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 47.6070, 'test_T_prod_surface_C'))
+        print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 47.5801, 'test_T_prod_surface_C'))
         print(*testAssert(output.energy_results.W_net, -1.3602e6, 'test_W_net'))
-        print(*testAssert(output.capital_cost_model.C_brownfield, 5.26260e7, 'test_C_brownfield_N'))
-        print(*testAssert(output.capital_cost_model.C_greenfield, 7.52561e7, 'test_C_greenfield_N'))
+        print(*testAssert(output.capital_cost_model.C_brownfield, 5.0443e7, 'test_C_brownfield_N'))
+        print(*testAssert(output.capital_cost_model.C_greenfield, 7.3073e7, 'test_C_greenfield_N'))
         print(np.isnan(output.capital_cost_model.LCOE_brownfield.LCOE), 'test_LCOE_brownfield')
 
     def testFluidSystemCO2Mdot100(self):
