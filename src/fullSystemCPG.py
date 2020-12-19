@@ -4,8 +4,6 @@ from src.fullSystem import FullSystemOutput
 
 from src.semiAnalyticalWell import SemiAnalyticalWell
 from src.porousReservoir import PorousReservoir
-from src.subsurfaceComponents import DownHolePump
-from src.oRCCycleTboil import ORCCycleTboil
 
 from src.fluidSystemCO2 import FluidSystemCO2
 from src.capitalCostSystem import CapitalCostSystem
@@ -17,10 +15,11 @@ from src.capitalCostWellField import CapitalCostWellField
 from src.capitalCostExploration import CapitalCostExploration
 from src.capitalCostWellStimulation import CapitalCostWellStimulation
 from src.capitalCostSurfacePlantCPG import CapitalCostSurfacePlantCPG
-from src.fullSystemSolver import FullSystemSolverMinLCOEBrownfield
 
 from utils.simulationParameters import SimulationParameters
-from utils.fluidStateFromPT import FluidStateFromPT
+
+
+
 
 class FullSystemCPG(object):
     """FullSystemCPG."""

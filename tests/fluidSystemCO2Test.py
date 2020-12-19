@@ -1,26 +1,10 @@
 import unittest
 import numpy as np
 
-from src.semiAnalyticalWell import SemiAnalyticalWell
-from src.porousReservoir import PorousReservoir
-from src.subsurfaceComponents import DownHolePump
-from src.oRCCycleTboil import ORCCycleTboil
-
-from src.fluidSystemCO2 import FluidSystemCO2
-from src.capitalCostSystem import CapitalCostSystem
-
 from src.fullSystemCPG import FullSystemCPG
-from src.lCOESimple import LCOESimple
-from src.capitalCostSurfacePipes import CapitalCostSurfacePipes
-from src.capitalCostWell import CapitalCostWell
-from src.capitalCostWellField import CapitalCostWellField
-from src.capitalCostExploration import CapitalCostExploration
-from src.capitalCostWellStimulation import CapitalCostWellStimulation
-from src.capitalCostSurfacePlantCPG import CapitalCostSurfacePlantCPG
 from src.fullSystemSolver import FullSystemSolverMinLCOEBrownfield
 
 from utils.simulationParameters import SimulationParameters
-from utils.fluidStateFromPT import FluidStateFromPT
 
 from tests.testAssertion import testAssert
 
@@ -82,14 +66,12 @@ class FluidSystemCO2Test(unittest.TestCase):
 
     def testFluidSystemCO2SolverOptMdot(self):
         params = SimulationParameters(working_fluid = 'co2', well_multiplier = 4., capacity_factor = 0.9)
-        params.depth = 2500.
-        params.permeability = 1.0e-15 * 15000 / 100.
         
         full_system = FullSystemCPG.getDefaultCPGSystem(params)
         full_system_solver = FullSystemSolverMinLCOEBrownfield(full_system)
 
         output = full_system_solver.solve()
 
-        print(*testAssert(output.optMdot, 54.8493, 'test_optMdot_solver_optMdot'))
-        print(*testAssert(output.energy_results.W_net, 4.5411e5, 'test_optMdot_solver_w_net'))
-        print(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.3915-4, 'test_optMdot_solver_LCOE_brownfield'))
+        print(*testAssert(output.optMdot, 54.8493, 'test_optMdot_solver_optMdot', 1e-3))
+        print(*testAssert(output.energy_results.W_net, 4.5411e5, 'test_optMdot_solver_w_net', 1e-3))
+        print(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.3915e-4, 'test_optMdot_solver_LCOE_brownfield', 1e-3))
