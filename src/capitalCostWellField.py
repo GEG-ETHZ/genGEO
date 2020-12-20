@@ -10,13 +10,13 @@ class CapitalCostWellField(object):
     def cO2MonitoringBaseline(params = None, **kwargs):
         if params == None:
             params = SimulationParameters(**kwargs)
-        return cPermitting(params.cost_year) + dCPermittingCO2(params.well_cost_N, params.cost_year) + dCMonitoringCO2Baseline(params.well_cost_N, params.cost_year, params.depth, params.monitoring_well_radius)
+        return cPermitting(params.cost_year) + dCPermittingCO2(params.N_5spot, params.cost_year) + dCMonitoringCO2Baseline(params.N_5spot, params.cost_year, params.depth, params.monitoring_well_radius)
 
     @staticmethod
     def cO2MonitoringIdeal(params = None, **kwargs):
         if params == None:
             params = SimulationParameters(**kwargs)
-        return cPermitting(params.cost_year) + dCPermittingCO2(params.well_cost_N, params.cost_year) + dCMonitoringCO2Ideal(params.well_cost_N, params.cost_year, params.depth, params.monitoring_well_radius)
+        return cPermitting(params.cost_year) + dCPermittingCO2(params.N_5spot, params.cost_year) + dCMonitoringCO2Ideal(params.N_5spot, params.cost_year, params.depth, params.monitoring_well_radius)
 
     @staticmethod
     def cO2(params = None, **kwargs):

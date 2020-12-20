@@ -13,7 +13,7 @@ class CapitalCostExploration(object):
             params = SimulationParameters(**kwargs)
         A = cModeling(params.cost_year)
         B = dCCharacterizationWellsIdeal(params.cost_year, params.depth, params.well_radius, params.success_rate)
-        C = dCModelingCO2(params.well_cost_N, params.cost_year)
+        C = dCModelingCO2(params.N_5spot, params.cost_year)
         return A + B + C
 
     @staticmethod
@@ -22,7 +22,7 @@ class CapitalCostExploration(object):
             params = SimulationParameters(**kwargs)
         A = cModeling(params.cost_year)
         B = dCCharacterizationWellsBaseline(params.cost_year, params.depth, params.well_radius, params.success_rate)
-        C = dCModelingCO2(params.well_cost_N, params.cost_year)
+        C = dCModelingCO2(params.N_5spot, params.cost_year)
         return A + B + C
 
     @staticmethod

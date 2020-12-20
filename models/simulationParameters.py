@@ -25,7 +25,7 @@ class SimulationParameters(object):
                 reservoir_thickness = 100.,
                 permeability = 1.0e-15 * 15000 / 100., # permeability = transmissivity / thickness
                 wellFieldType = WellFieldType._5Spot_SharedNeighbor,
-                N_5spot = 1,
+                N_5spot = 1, #Square-root of numbe of 5spots which share a central plant in a Many_N configuration. e.g. N=2 is 4 5spots.
                 has_surface_gathering_system = True,
                 # power plant model
                 max_pump_dP = 10.e6,
@@ -40,7 +40,6 @@ class SimulationParameters(object):
                 # cost model
                 cost_year = 2019,
                 success_rate = 0.95,
-                well_cost_N = 1,
                 F_OM = 0.045,
                 discount_rate = 0.096,
                 lifetime = 25,
@@ -88,7 +87,6 @@ class SimulationParameters(object):
         self.cooling_mode = cooling_mode
         self.cost_year = cost_year
         self.success_rate = success_rate
-        self.well_cost_N = well_cost_N
         self.F_OM = F_OM
         self.discount_rate = discount_rate
         self.lifetime = lifetime
