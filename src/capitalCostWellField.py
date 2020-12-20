@@ -2,7 +2,7 @@ import numpy as np
 
 from utils.readXlsxData import readCostTable
 from src.capitalCostWell import CapitalCostWell
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 
 class CapitalCostWellField(object):
     """CapitalCostWellField."""

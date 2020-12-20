@@ -2,7 +2,7 @@ import numpy as np
 
 from src.coolingCondensingTower import CoolingCondensingTower
 
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 from utils.readXlsxData import readCostTable
 
 class CapitalCostSurfacePlantCPGResults(object):

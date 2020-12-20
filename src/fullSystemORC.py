@@ -18,7 +18,7 @@ from src.capitalCostExploration import CapitalCostExploration
 from src.capitalCostWellStimulation import CapitalCostWellStimulation
 from src.capitalCostSurfacePlantORC import CapitalCostSurfacePlantORC
 
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 
 class FullSystemORC(object):
     """FullSystemORC."""

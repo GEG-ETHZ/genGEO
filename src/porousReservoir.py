@@ -7,7 +7,7 @@ from src.porousReservoirResults import PorousReservoirResults
 from utils.fluidStateFromPT import FluidStateFromPT
 from utils.depletionCurve import depletionCurve
 from utils.constantsAndPaths import ConversionConstants
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 
 class PorousReservoir(PorousReservoirBase):
     """PorousReservoir holds methods to compute reservoir heat extraction.

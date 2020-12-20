@@ -3,7 +3,7 @@ import unittest
 from src.oRCCycleSupercritPboil import ORCCycleSupercritPboil
 
 from utils.fluidStateFromPT import FluidStateFromPT
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 
 from tests.testAssertion import testAssert
 

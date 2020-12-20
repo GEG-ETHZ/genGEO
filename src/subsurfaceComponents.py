@@ -2,7 +2,7 @@ import numpy as np
 
 from utils.fluidStateFromPT import FluidStateFromPT
 from utils.solver import Solver
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 from utils.frictionFactor import frictionFactor
 
 class DownHolePumpOutput(object):

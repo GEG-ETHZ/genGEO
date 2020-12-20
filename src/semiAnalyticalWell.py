@@ -6,7 +6,7 @@ from src.semiAnalyticalWellResults import SemiAnalyticalWellResults
 from utils.constantsAndPaths import ConversionConstants
 from utils.fluidStateFromPT import FluidStateFromPT
 from utils.frictionFactor import frictionFactor
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 
 class SemiAnalyticalWell(object):
     """SemiAnalyticalWell to compute heat transport with fluid flow in a well

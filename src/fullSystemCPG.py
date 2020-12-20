@@ -16,7 +16,7 @@ from src.capitalCostExploration import CapitalCostExploration
 from src.capitalCostWellStimulation import CapitalCostWellStimulation
 from src.capitalCostSurfacePlantCPG import CapitalCostSurfacePlantCPG
 
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 
 
 

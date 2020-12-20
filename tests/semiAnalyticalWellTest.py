@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 
 from src.semiAnalyticalWell import SemiAnalyticalWell
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 from utils.fluidStateFromPT import FluidStateFromPT
 from tests.testAssertion import testAssert
 

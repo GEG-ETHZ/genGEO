@@ -1,6 +1,6 @@
 
 from utils.readXlsxData import readCostTable
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 
 
 class CapitalCostWell(object):

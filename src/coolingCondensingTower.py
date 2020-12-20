@@ -2,7 +2,7 @@
 from utils.constantsAndPaths import ConversionConstants
 import numpy as np
 
-from enum import Enum
+from models.coolingCondensingTowerMode import CoolingCondensingTowerMode
 
 from utils.readXlsxData import readCostTable
 
@@ -36,10 +36,10 @@ class CoolingCondensingTower(object):
             else:
                 raise Exception('GenGeo::coolingCondensingTower:UnknownProcess - Unknown Process - use "cooling" or "condensing"')
 
-        if coolingMode == CoolingTowerMode.WET:
+        if coolingMode == CoolingCondensingTowerMode.WET:
             c_cooling = processWet('cooling')
             c_condensing = processWet('condensing')
-        elif coolingMode == CoolingTowerMode.Dry:
+        elif coolingMode == CoolingCondensingTowerMode.Dry:
             c_cooling = processDry('cooling')
             c_condensing = processDry('condensing')
         else:
@@ -71,13 +71,9 @@ class CoolingCondensingTower(object):
             else:
                 raise Exception('GenGeo::coolingCondensingTower:UnknownProcess - Unknown Process - use "cooling" or "condensing"')
 
-        if coolingMode == CoolingTowerMode.WET:
+        if coolingMode == CoolingCondensingTowerMode.WET:
             return processWet
-        elif coolingMode == CoolingTowerMode.DRY:
+        elif coolingMode == CoolingCondensingTowerMode.DRY:
             return processDry
         else:
             raise Exception('GenGeo::coolingCondensingTower:UnknownCoolingMode - Unknown Cooling Mode')
-
-class CoolingTowerMode(Enum):
-    WET = 1
-    DRY = 2

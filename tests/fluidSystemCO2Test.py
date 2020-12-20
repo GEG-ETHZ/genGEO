@@ -4,7 +4,7 @@ import numpy as np
 from src.fullSystemCPG import FullSystemCPG
 from src.fullSystemSolver import FullSystemSolverMinLCOEBrownfield
 
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 
 from tests.testAssertion import testAssert
 

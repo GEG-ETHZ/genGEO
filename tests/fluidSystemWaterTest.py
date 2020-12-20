@@ -4,7 +4,7 @@ from src.fullSystemORC import FullSystemORC
 
 from src.fullSystemSolver import FullSystemSolverMinLCOEBrownfield
 
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 
 from tests.testAssertion import testAssert
 

@@ -10,7 +10,7 @@ from utils.fluidStateFromTQ import FluidStateFromTQ
 from utils.fluidStateFromPh import FluidStateFromPh
 from utils.fluidStateFromPT import FluidStateFromPT
 from utils.maxSubcritORCBoilTemp import maxSubcritORCBoilTemp
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 
 class ORCCycleTboil(object):
     """ ORCCycleTboil.
