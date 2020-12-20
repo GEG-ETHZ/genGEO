@@ -1,3 +1,4 @@
+from models.optimizationType import OptimizationType
 from models.coolingCondensingTowerMode import CoolingCondensingTowerMode
 from models.wellFieldType import WellFieldType
 
@@ -23,7 +24,7 @@ class SimulationParameters(object):
                 T_ambient_C = 15.,
                 reservoir_thickness = 100.,
                 permeability = 1.0e-15 * 15000 / 100., # permeability = transmissivity / thickness
-                wellFieldType = WellFieldType._5SPOT_SHAREDNEIGHBOR,
+                wellFieldType = WellFieldType._5Spot_SharedNeighbor,
                 N_5spot = 1,
                 has_surface_gathering_system = True,
                 # power plant model
@@ -35,7 +36,7 @@ class SimulationParameters(object):
                 eta_turbine_orc = 0.8,
                 eta_pump_co2 = 0.9,
                 eta_turbine_co2 = 0.78,
-                cooling_mode = CoolingCondensingTowerMode.WET,
+                cooling_mode = CoolingCondensingTowerMode.Wet,
                 # cost model
                 cost_year = 2019,
                 success_rate = 0.95,
@@ -44,7 +45,7 @@ class SimulationParameters(object):
                 discount_rate = 0.096,
                 lifetime = 25,
                 capacity_factor = 0.85,
-                opt_mode = 'minCost',
+                opt_mode = OptimizationType.MinimizeCost,
                 # physical properties
                 g = 9.81,                       # m/s**2
                 rho_rock = 2650.,               # kg/m**3

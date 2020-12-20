@@ -1,8 +1,7 @@
 import unittest
 
 from src.fullSystemORC import FullSystemORC
-
-from src.fullSystemSolver import FullSystemSolverMinLCOEBrownfield
+from src.fullSystemSolver import FullSystemSolver
 
 from models.simulationParameters import SimulationParameters
 
@@ -43,7 +42,7 @@ class FluidSystemWaterTest(unittest.TestCase):
         params = SimulationParameters(working_fluid = 'water', well_multiplier = 4., orc_fluid = 'R245fa', capacity_factor = 0.9)
         
         full_system = FullSystemORC.getDefaultWaterSystem(params)
-        full_system_solver = FullSystemSolverMinLCOEBrownfield(full_system)
+        full_system_solver = FullSystemSolver(full_system)
 
         output = full_system_solver.solve()
 

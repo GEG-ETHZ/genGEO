@@ -3,7 +3,7 @@ from src.fullSystem import FullSystemOutput
 
 from src.semiAnalyticalWell import SemiAnalyticalWell
 from src.porousReservoir import PorousReservoir
-from src.subsurfaceComponents import DownHolePump
+from src.downholePump import DownHolePump
 from src.oRCCycleTboil import ORCCycleTboil
 
 from src.fluidSystemWater import FluidSystemWater

@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 
 from src.fullSystemCPG import FullSystemCPG
-from src.fullSystemSolver import FullSystemSolverMinLCOEBrownfield
+from src.fullSystemSolver import FullSystemSolver
 
 from models.simulationParameters import SimulationParameters
 
@@ -68,7 +68,7 @@ class FluidSystemCO2Test(unittest.TestCase):
         params = SimulationParameters(working_fluid = 'co2', well_multiplier = 4., capacity_factor = 0.9)
         
         full_system = FullSystemCPG.getDefaultCPGSystem(params)
-        full_system_solver = FullSystemSolverMinLCOEBrownfield(full_system)
+        full_system_solver = FullSystemSolver(full_system)
 
         output = full_system_solver.solve()
 

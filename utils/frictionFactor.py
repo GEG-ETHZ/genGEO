@@ -4,6 +4,9 @@ from  utils.fluidStates import FluidState
 
 def frictionFactor(well_radius, P, h, m_dot, fluid, epsilon):
 
+    if well_radius == None or P == None or h == None or m_dot == None or fluid == None or epsilon == None:
+        return 0
+
     rho_fluid = FluidState.getRhoFromPh(P, h, fluid)
     mu = FluidState.getMuFromPh(P, h, fluid)
 

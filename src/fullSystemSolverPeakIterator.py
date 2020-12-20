@@ -2,7 +2,7 @@ import numpy as np
 
 from src.fullSystemOptMdotBase import FullSystemOptMdotBase
 
-from utils.results import Results
+from enum import Enum
 
 class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
     """
@@ -12,11 +12,16 @@ class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
     def __init__(self, system):
         super().__init__(system)
 
-    def solve(self):
+    def getDirection(self):
+        return SolverOptimizationType.Maximize
 
+    def getTargetVar(self):
+        return None
+
+    def solve(self):
         old_var = np.nan
         best_var = np.nan
-        best_m_dot = np.nan
+        #best_m_dot = np.nan
 
         #Starting Massflow Guess (add 10)
         m_dot_IP = 10
@@ -31,7 +36,7 @@ class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
         # reversingFraction is the change past minimum to reverse
         reversing_fraction = 3e-2
 
-        opt_dir = np.sign(self.getDirection())
+        opt_dir = np.sign(self.getDirection().value)
         opt_dir_dict = {-1: 'Minimize',
                          1: 'Maximize'}
 
@@ -46,8 +51,8 @@ class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
             print('Trying a mass flowrate of %.2f' %m_dot_IP)
             try:
                 self.full_system.params.m_dot_IP = m_dot_IP
-                system = self.full_system.solve()
-                var_out = self.getTargetVar(system)
+                solveResult = self.full_system.solve()
+                var_out = self.getTargetVar(solveResult)
 
                 # See if this mass flowrate is better than previous values
 
@@ -113,3 +118,8 @@ class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
         results.optMdot = m_dot_IP
 
         return results
+
+
+class SolverOptimizationType(Enum):
+    Minimize = -1
+    Maximize = 1

@@ -1,5 +1,5 @@
 from enum import Enum
 
 class CoolingCondensingTowerMode(Enum):
-    WET = 1
-    DRY = 2
+    Wet = 1
+    Dry = 2

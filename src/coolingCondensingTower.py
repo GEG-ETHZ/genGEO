@@ -36,7 +36,7 @@ class CoolingCondensingTower(object):
             else:
                 raise Exception('GenGeo::coolingCondensingTower:UnknownProcess - Unknown Process - use "cooling" or "condensing"')
 
-        if coolingMode == CoolingCondensingTowerMode.WET:
+        if coolingMode == CoolingCondensingTowerMode.Wet:
             c_cooling = processWet('cooling')
             c_condensing = processWet('condensing')
         elif coolingMode == CoolingCondensingTowerMode.Dry:
@@ -71,9 +71,9 @@ class CoolingCondensingTower(object):
             else:
                 raise Exception('GenGeo::coolingCondensingTower:UnknownProcess - Unknown Process - use "cooling" or "condensing"')
 
-        if coolingMode == CoolingCondensingTowerMode.WET:
+        if coolingMode == CoolingCondensingTowerMode.Wet:
             return processWet
-        elif coolingMode == CoolingCondensingTowerMode.DRY:
+        elif coolingMode == CoolingCondensingTowerMode.Dry:
             return processDry
         else:
             raise Exception('GenGeo::coolingCondensingTower:UnknownCoolingMode - Unknown Cooling Mode')

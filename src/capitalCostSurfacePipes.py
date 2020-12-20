@@ -15,16 +15,16 @@ class CapitalCostSurfacePipes(object):
         X_PCs = 1.15
         X_ICs = 1.12
 
-        if params.wellFieldType == WellFieldType.DOUBLET:
+        if params.wellFieldType == WellFieldType.Doublet:
             L_surfacePipe = 707
             D_surfacePipe = 0.41
-        elif params.wellFieldType == WellFieldType._5SPOT:
+        elif params.wellFieldType == WellFieldType._5Spot:
             L_surfacePipe = 3000
             D_surfacePipe = 0.41
-        elif params.wellFieldType == WellFieldType._5SPOT_SHAREDNEIGHBOR:
+        elif params.wellFieldType == WellFieldType._5Spot_SharedNeighbor:
             L_surfacePipe = 707
             D_surfacePipe = 0.41
-        elif params.wellFieldType == WellFieldType._5SPOT_MANY:
+        elif params.wellFieldType == WellFieldType._5Spot_Many:
             L_surfacePipe_manyN = {
                 1: 3000,
                 2: 12000,

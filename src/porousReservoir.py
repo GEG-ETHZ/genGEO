@@ -44,12 +44,12 @@ class PorousReservoir(PorousReservoirBase):
         if self.params.well_spacing <= self.params.well_radius:
             RI = 0
         else:
-            if self.params.wellFieldType == WellFieldType._5SPOT_SHAREDNEIGHBOR \
-                    or self.params.wellFieldType == WellFieldType._5SPOT \
-                    or self.params.wellFieldType == WellFieldType._5SPOT_MANY:
+            if self.params.wellFieldType == WellFieldType._5Spot_SharedNeighbor \
+                    or self.params.wellFieldType == WellFieldType._5Spot \
+                    or self.params.wellFieldType == WellFieldType._5Spot_Many:
                 A_c_rock = np.log( (4 * self.params.well_spacing) / (2 * self.params.well_radius * np.pi ))
                 RI = mu_fluid/rho_fluid/self.params.transmissivity() * A_c_rock
-            elif self.params.wellFieldType == WellFieldType.DOUBLET:
+            elif self.params.wellFieldType == WellFieldType.Doublet:
                 A_c_rock = np.log( (self.params.well_spacing) / (2*self.params.well_radius) )
                 RI = mu_fluid/rho_fluid/self.params.transmissivity()/np.pi * A_c_rock
             else:

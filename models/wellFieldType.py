@@ -1,7 +1,7 @@
 from enum import Enum
 
 class WellFieldType(Enum):
-    DOUBLET = 1
-    _5SPOT = 2
-    _5SPOT_SHAREDNEIGHBOR = 3
-    _5SPOT_MANY = 4
+    Doublet = 1
+    _5Spot = 2
+    _5Spot_SharedNeighbor = 3
+    _5Spot_Many = 4
