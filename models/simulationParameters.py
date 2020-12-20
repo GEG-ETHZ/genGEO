@@ -1,4 +1,5 @@
 from models.coolingCondensingTowerMode import CoolingCondensingTowerMode
+from models.wellFieldType import WellFieldType
 
 class SimulationParameters(object):
     """SimulationParameters provides physical properties of the system."""
@@ -22,7 +23,7 @@ class SimulationParameters(object):
                 T_ambient_C = 15.,
                 reservoir_thickness = 100.,
                 permeability = 1.0e-15 * 15000 / 100., # permeability = transmissivity / thickness
-                wellFieldType = '5spot_SharedNeighbor', #'Doublet','5spot',5spot_SharedNeighbor','5spot_ManyN'
+                wellFieldType = WellFieldType._5SPOT_SHAREDNEIGHBOR,
                 N_5spot = 1,
                 has_surface_gathering_system = True,
                 # power plant model

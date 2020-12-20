@@ -1,6 +1,8 @@
 
 from utils.readXlsxData import readCostTable
+
 from models.simulationParameters import SimulationParameters
+from models.wellFieldType import WellFieldType
 
 class CapitalCostSurfacePipes(object):
     """CapitalCostSurfacePipes."""
@@ -13,16 +15,16 @@ class CapitalCostSurfacePipes(object):
         X_PCs = 1.15
         X_ICs = 1.12
 
-        if params.wellFieldType == 'Doublet':
+        if params.wellFieldType == WellFieldType.DOUBLET:
             L_surfacePipe = 707
             D_surfacePipe = 0.41
-        elif params.wellFieldType == '5spot':
+        elif params.wellFieldType == WellFieldType._5SPOT:
             L_surfacePipe = 3000
             D_surfacePipe = 0.41
-        elif params.wellFieldType == '5spot_SharedNeighbor':
+        elif params.wellFieldType == WellFieldType._5SPOT_SHAREDNEIGHBOR:
             L_surfacePipe = 707
             D_surfacePipe = 0.41
-        elif params.wellFieldType == '5spot_ManyN':
+        elif params.wellFieldType == WellFieldType._5SPOT_MANY:
             L_surfacePipe_manyN = {
                 1: 3000,
                 2: 12000,

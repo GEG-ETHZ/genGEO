@@ -7,7 +7,9 @@ from src.porousReservoirResults import PorousReservoirResults
 from utils.fluidStateFromPT import FluidStateFromPT
 from utils.depletionCurve import depletionCurve
 from utils.constantsAndPaths import ConversionConstants
+
 from models.simulationParameters import SimulationParameters
+from models.wellFieldType import WellFieldType
 
 class PorousReservoir(PorousReservoirBase):
     """PorousReservoir holds methods to compute reservoir heat extraction.
@@ -42,10 +44,12 @@ class PorousReservoir(PorousReservoirBase):
         if self.params.well_spacing <= self.params.well_radius:
             RI = 0
         else:
-            if '5spot' in self.params.wellFieldType:
+            if self.params.wellFieldType == WellFieldType._5SPOT_SHAREDNEIGHBOR \
+                    or self.params.wellFieldType == WellFieldType._5SPOT \
+                    or self.params.wellFieldType == WellFieldType._5SPOT_MANY:
                 A_c_rock = np.log( (4 * self.params.well_spacing) / (2 * self.params.well_radius * np.pi ))
                 RI = mu_fluid/rho_fluid/self.params.transmissivity() * A_c_rock
-            elif 'Doublet' in self.params.wellFieldType:
+            elif self.params.wellFieldType == WellFieldType.DOUBLET:
                 A_c_rock = np.log( (self.params.well_spacing) / (2*self.params.well_radius) )
                 RI = mu_fluid/rho_fluid/self.params.transmissivity()/np.pi * A_c_rock
             else:
