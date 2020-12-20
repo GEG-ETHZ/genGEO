@@ -48,10 +48,10 @@ class PorousReservoir(PorousReservoirBase):
                     or self.params.wellFieldType == WellFieldType._5Spot \
                     or self.params.wellFieldType == WellFieldType._5Spot_Many:
                 A_c_rock = np.log( (4 * self.params.well_spacing) / (2 * self.params.well_radius * np.pi ))
-                RI = mu_fluid/rho_fluid/self.params.transmissivity() * A_c_rock
+                RI = mu_fluid/rho_fluid/self.params.transmissivity * A_c_rock
             elif self.params.wellFieldType == WellFieldType.Doublet:
                 A_c_rock = np.log( (self.params.well_spacing) / (2*self.params.well_radius) )
-                RI = mu_fluid/rho_fluid/self.params.transmissivity()/np.pi * A_c_rock
+                RI = mu_fluid/rho_fluid/self.params.transmissivity/np.pi * A_c_rock
             else:
                 raise Exception('GenGeo::PorousReservoir:unknownReservoirConfiguration - '
                 'Unknown Reservoir Configuration')

@@ -19,7 +19,6 @@ class SimulationParameters(object):
                 monitoring_well_radius = 0.108,
                 dT_dz = 0.035,
                 silica_precipitation = False,
-                # T_e_initial = 15.,
                 T_surface_rock = 15,
                 T_ambient_C = 15.,
                 reservoir_thickness = 100.,
@@ -68,7 +67,6 @@ class SimulationParameters(object):
         self.monitoring_well_radius = monitoring_well_radius
         self.dT_dz = dT_dz
         self.silica_precipitation = silica_precipitation
-        # self.T_e_initial = T_e_initial
         self.T_surface_rock = T_surface_rock
         self.T_ambient_C = T_ambient_C
         self.reservoir_thickness = reservoir_thickness
@@ -99,3 +97,8 @@ class SimulationParameters(object):
         self.useWellboreHeatLoss = useWellboreHeatLoss
         self.well_segments = well_segments
         self.epsilon = well_relative_roughness
+
+    @property
+    def transmissivity(self):
+        return self.permeability * self.reservoir_thickness
+
