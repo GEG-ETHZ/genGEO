@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.parasiticPowerFractionCoolingTower import parasiticPowerFractionCoolingTower
+from src.coolingCondensingTower import CoolingCondensingTower
 from src.powerPlantOutput import PowerPlantEnergyOutput
 
 from utils.fluidStateFromPT import FluidStateFromPT
@@ -131,7 +131,7 @@ class FluidSystemCO2(object):
             results.pp.q_condenser = h_condensed - h_turbine_out
             dT_range = 0
 
-        parasiticPowerFraction = parasiticPowerFractionCoolingTower(self.params.T_ambient_C, self.params.dT_approach, dT_range, self.params.cooling_mode)
+        parasiticPowerFraction = CoolingCondensingTower.parasiticPowerFraction(self.params.T_ambient_C, self.params.dT_approach, dT_range, self.params.cooling_mode)
         results.pp.w_cooler = results.pp.q_cooler * parasiticPowerFraction('cooling')
         results.pp.w_condenser = results.pp.q_condenser * parasiticPowerFraction('condensing')
 

@@ -1,6 +1,7 @@
+from src import coolingCondensingTower
 import numpy as np
 
-from src.capitalCostCoolingTower import CapitalCostCoolingTower
+from src.coolingCondensingTower import CoolingCondensingTower
 from utils.simulationParameters import SimulationParameters
 
 from utils.readXlsxData import readCostTable
@@ -57,8 +58,8 @@ class CapitalCostSurfacePlantORC(object):
 
         # C_coolingTowers
         TDC = 1
-        results.C_coolingTowers = CapitalCostCoolingTower.cost(Q_desuperheater, Q_condenser, TDC,
-                                                    T_ambient_C, dT_approach_CT, dT_range_CT, self.params.cost_year)
+        results.C_coolingTowers = CoolingCondensingTower.specificCaptitalCost(Q_desuperheater, Q_condenser, TDC,
+                                                    T_ambient_C, dT_approach_CT, dT_range_CT, self.params.cost_year, self.params.cooling_mode)
 
         # C_heatExchanger
         #dT_LMTD_HX

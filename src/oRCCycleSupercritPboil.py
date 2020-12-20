@@ -1,10 +1,12 @@
 import os, math
 import numpy as np
 
-from src.parasiticPowerFractionCoolingTower import parasiticPowerFractionCoolingTower
+from src.coolingCondensingTower import CoolingCondensingTower
 from src.heatExchanger import heatExchanger
 from src.heatExchangerOptMdot import heatExchangerOptMdot
 from src.powerPlantOutput import PowerPlantOutput
+
+from utils.simulationParameters import SimulationParameters
 
 from utils.constantsAndPaths import getPboilOptimum
 from utils.fluidStates import FluidState
@@ -17,7 +19,7 @@ class ORCCycleSupercritPboil(object):
     Heat/power is output as specific heat and specific work. To find the
     actual power, multiply by the flowrate of geofluid through the system.
     """
-    def __init__(self, params = None):
+    def __init__(self, params = None, **kwargs):
         self.params = params
         if self.params == None:
             self.params = SimulationParameters(**kwargs)
@@ -116,7 +118,7 @@ class ORCCycleSupercritPboil(object):
 
         # Cooling Tower Parasitic load
         results.dT_range_CT = state[5].T_C() - state[6].T_C()
-        parasiticPowerFraction = parasiticPowerFractionCoolingTower(self.params.T_ambient_C, self.params.dT_approach, results.dT_range_CT, self.params.cooling_mode)
+        parasiticPowerFraction = CoolingCondensingTower.parasiticPowerFraction(self.params.T_ambient_C, self.params.dT_approach, results.dT_range_CT, self.params.cooling_mode)
         w_cooler_orc = q_desuperheater_orc * parasiticPowerFraction('cooling')
         w_condenser_orc = q_condenser_orc * parasiticPowerFraction('condensing')
 
