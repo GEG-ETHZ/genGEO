@@ -27,7 +27,7 @@ class SemiAnalyticalWell(object):
 
     def solve(self, initial_state):
         # results
-        results = SemiAnalyticalWellResults(self.params.N_dx, self.params.working_fluid)
+        results = SemiAnalyticalWellResults(self.params.well_segments, self.params.working_fluid)
 
         m_dot = self.params.m_dot_IP * self.params.well_multiplier
 
@@ -36,8 +36,8 @@ class SemiAnalyticalWell(object):
         time_seconds = self.params.time_years * ConversionConstants.secPerYear
 
         # set geometry
-        dz = self.dz_total/self.params.N_dx             # m
-        dr = self.dr_total/self.params.N_dx             # m
+        dz = self.dz_total/self.params.well_segments             # m
+        dr = self.dr_total/self.params.well_segments             # m
         dL = (dz**2 + dr**2)**0.5                       # m
         A_c = np.pi * self.params.well_radius**2        # m**2
         P_c = np.pi * 2 * self.params.well_radius       # m
@@ -64,7 +64,7 @@ class SemiAnalyticalWell(object):
             beta = (2/(np.log(4*t_d)-2*0.58) - 2*0.58/(np.log(4*t_d)-2*0.58)**2)
 
         # loop over all well segments
-        for i in range(1, self.params.N_dx+1):
+        for i in range(1, self.params.well_segments+1):
             results.z_m[i] = results.z_m[i-1] + dz
 
             # far-field rock temp
