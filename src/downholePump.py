@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils.fluidStateFromPT import FluidStateFromPT
+from utils.fluidState import FluidState
 from utils.solver import Solver
 from models.simulationParameters import SimulationParameters
 from utils.frictionFactor import frictionFactor
@@ -23,7 +23,7 @@ class DownHolePump(object):
         self.ff_m_dot = self.params.m_dot_IP
         initial_P = 1e6 +  self.params.P_system_min()
         initial_T = 60.
-        initial_h = FluidStateFromPT.getHFromPT(initial_P, initial_T, self.params.working_fluid)
+        initial_h = FluidState.getStateFromPT(initial_P, initial_T, self.params.working_fluid).h_Jkg
         self.friction_factor = frictionFactor(self.params.well_radius, initial_P, initial_h, \
                             self.params.m_dot_IP, self.params.working_fluid, self.params.epsilon)
 
@@ -47,21 +47,21 @@ class DownHolePump(object):
                 if dP_pump > self.params.max_pump_dP:
                     dP_pump = self.params.max_pump_dP
 
-                P_prod_pump_out = initial_state.P_Pa() + dP_pump
-                T_prod_pump_out = initial_state.T_C()
+                P_prod_pump_out = initial_state.P_Pa + dP_pump
+                T_prod_pump_out = initial_state.T_C
                 temp_at_pump_depth = self.well.T_e_initial + self.params.dT_dz * self.params.pump_depth
 
-                state_in = FluidStateFromPT(P_prod_pump_out, T_prod_pump_out, self.params.working_fluid)
+                state_in = FluidState.getStateFromPT(P_prod_pump_out, T_prod_pump_out, self.params.working_fluid)
                 results.well = self.well.solve(state_in)
 
                 # calculate surface pipe friction loss
                 if self.params.has_surface_gathering_system:
                     dP_surface_pipes = self.friction_factor * self.params.well_spacing / \
-                    (2 * self.params.well_radius)**5 * 8 * self.params.m_dot_IP**2 / results.well.state.rho_kgm3() / np.pi**2
+                    (2 * self.params.well_radius)**5 * 8 * self.params.m_dot_IP**2 / results.well.state.rho_kgm3 / np.pi**2
                 else:
                     dP_surface_pipes = 0.
 
-                dP_surface = (results.well.state.P_Pa() - P_inj_surface - dP_surface_pipes)
+                dP_surface = (results.well.state.P_Pa - P_inj_surface - dP_surface_pipes)
                 if dP_pump == self.params.max_pump_dP:
                     break
 
@@ -96,6 +96,6 @@ class DownHolePump(object):
         results.w_pump = 0
         results.dP_surface_pipes = dP_surface_pipes
         if dP_pump > 0:
-            results.w_pump = (initial_state.h_Jkg() - state_in.h_Jkg()) / self.params.eta_pump
+            results.w_pump = (initial_state.h_Jkg - state_in.h_Jkg) / self.params.eta_pump
 
         return results

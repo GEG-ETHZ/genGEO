@@ -4,7 +4,7 @@ import numpy as np
 from src.semiAnalyticalWellResults import SemiAnalyticalWellResults
 
 from utils.constantsAndPaths import ConversionConstants
-from utils.fluidStateFromPT import FluidStateFromPT
+from utils.fluidState import FluidState
 from utils.frictionFactor import frictionFactor
 from models.simulationParameters import SimulationParameters
 
@@ -31,8 +31,8 @@ class SemiAnalyticalWell(object):
 
         m_dot = self.params.m_dot_IP * self.params.well_multiplier
 
-        P_f_initial = initial_state.P_Pa()
-        T_f_initial = initial_state.T_C()
+        P_f_initial = initial_state.P_Pa
+        T_f_initial = initial_state.T_C
         time_seconds = self.params.time_years * ConversionConstants.secPerYear
 
         # set geometry
@@ -46,8 +46,8 @@ class SemiAnalyticalWell(object):
         results.T_C_f[0] = T_f_initial             # C
         results.T_C_e[0] = self.T_e_initial        # C
         results.P_Pa[0] = P_f_initial              # Pa
-        results.h_Jkg[0] = FluidStateFromPT.getHFromPT(results.P_Pa[0], results.T_C_f[0], self.params.working_fluid)
-        results.rho_kgm3[0] = FluidStateFromPT.getRhoFromPT(results.P_Pa[0], results.T_C_f[0], self.params.working_fluid)
+        results.h_Jkg[0] = FluidState.getStateFromPT(results.P_Pa[0], results.T_C_f[0], self.params.working_fluid).h_Jkg
+        results.rho_kgm3[0] = FluidState.getStateFromPT(results.P_Pa[0], results.T_C_f[0], self.params.working_fluid).rho_kgm3
         results.v_ms[0] = m_dot / A_c / results.rho_kgm3[0]  #m/s
 
         # Calculate the Friction Factor
@@ -76,20 +76,20 @@ class SemiAnalyticalWell(object):
             results.delta_P_loss[i] = ff * dL / ( 2 * self.params.well_radius) * \
                                             results.rho_kgm3[i-1] * \
                                             results.v_ms[i]**2. / 2.  #Pa
-            results.rho_kgm3[i] = FluidStateFromPT.getRhoFromPh(results.P_Pa[i-1], results.h_Jkg[i-1], self.params.working_fluid)
+            results.rho_kgm3[i] = FluidState.getStateFromPh(results.P_Pa[i-1], results.h_Jkg[i-1], self.params.working_fluid).rho_kgm3
             results.P_Pa[i]     = results.P_Pa[i-1] - results.rho_kgm3[i] * \
                                         self.params.g * dz - results.delta_P_loss[i]
 
             # Throw exception if below saturation pressure of water at previous temperature
             if self.params.working_fluid.lower() == 'water':
-                P_sat = FluidStateFromPT.getPFromTQ(results.T_C_f[i-1], 0, self.params.working_fluid)
+                P_sat = FluidState.getStateFromTQ(results.T_C_f[i-1], 0, self.params.working_fluid).P_Pa
                 if results.P_Pa[i] < P_sat:
                     raise Exception('GenGeoSemiAnalyticalWell:BelowSaturationPressure - '
                     'Below saturation pressure of water at %s m !' %(results.z_m[i]))
 
             h_noHX = results.h_Jkg[i-1] - self.params.g * dz
-            T_noHX = FluidStateFromPT.getTFromPh(results.P_Pa[i], h_noHX, self.params.working_fluid)
-            results.cp_JK[i] = FluidStateFromPT.getCpFromPh(results.P_Pa[i], h_noHX, self.params.working_fluid)
+            T_noHX = FluidState.getStateFromPh(results.P_Pa[i], h_noHX, self.params.working_fluid).T_C
+            results.cp_JK[i] = FluidState.getStateFromPh(results.P_Pa[i], h_noHX, self.params.working_fluid).cp_JK
 
             #Find Fluid Temp
             if not self.params.useWellboreHeatLoss:
@@ -107,7 +107,7 @@ class SemiAnalyticalWell(object):
                 else:
                     results.T_C_f[i] = (y * T_noHX + x *results. T_C_e[i]) / (x + y)
                 results.q[i] = y * (T_noHX - results.T_C_f[i])
-                results.h_Jkg[i] = FluidStateFromPT.getHFromPT(results.P_Pa[i], results.T_C_f[i], self.params.working_fluid)
+                results.h_Jkg[i] = FluidState.getStateFromPT(results.P_Pa[i], results.T_C_f[i], self.params.working_fluid).h_Jkg
         # make sure state object is set
         results.createFinalState()
 

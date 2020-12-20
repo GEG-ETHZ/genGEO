@@ -18,7 +18,7 @@ class FluidSystemCO2Test(unittest.TestCase):
         output = FullSystemCPG.getDefaultCPGSystem(params).solve()
 
         print(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.9421e6, 'test_dP_surface'))
-        print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 59.2802, 'test_T_prod_surface_C'))
+        print(*testAssert(output.fluid_system_solver.production_well.state.T_C, 59.2802, 'test_T_prod_surface_C'))
         print(*testAssert(output.energy_results.W_net, 9.7662e4, 'test_W_net'))
         print(*testAssert(output.capital_cost_model.C_brownfield, 1.3271e7, 'test_C_brownfield_N'))
         print(*testAssert(output.capital_cost_model.C_greenfield, 3.5901e7, 'test_C_greenfield_N'))
@@ -31,7 +31,7 @@ class FluidSystemCO2Test(unittest.TestCase):
         output = FullSystemCPG.getDefaultCPGSystem(params).solve()
 
         print(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.6501e6, 'test_dP_surface'))
-        print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 59.0540, 'test_T_prod_surface_C'))
+        print(*testAssert(output.fluid_system_solver.production_well.state.T_C, 59.0540, 'test_T_prod_surface_C'))
         print(*testAssert(output.energy_results.W_net, 4.9940e+05, 'test_W_net'))
         print(*testAssert(output.capital_cost_model.C_brownfield, 2.7650e7, 'test_C_brownfield_N'))
         print(*testAssert(output.capital_cost_model.C_greenfield, 5.0280e7, 'test_C_greenfield_N'))
@@ -43,7 +43,7 @@ class FluidSystemCO2Test(unittest.TestCase):
         output = FullSystemCPG.getDefaultCPGSystem(params).solve()
 
         print(*testAssert(output.fluid_system_solver.pp.dP_surface, 3.468765e+06, 'test_dP_surface'))
-        print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 47.6070, 'test_T_prod_surface_C'))
+        print(*testAssert(output.fluid_system_solver.production_well.state.T_C, 47.6070, 'test_T_prod_surface_C'))
         print(*testAssert(output.energy_results.W_net, -1.3875e6, 'test_W_net'))
         print(*testAssert(output.capital_cost_model.C_brownfield, 5.0443e7, 'test_C_brownfield_N'))
         print(*testAssert(output.capital_cost_model.C_greenfield, 7.3073e7, 'test_C_greenfield_N'))
@@ -57,7 +57,7 @@ class FluidSystemCO2Test(unittest.TestCase):
         output = FullSystemCPG.getDefaultCPGSystem(params).solve()
 
         print(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.0019e6, 'test_dP_surface'))
-        print(*testAssert(output.fluid_system_solver.production_well.state.T_C(), 55.3144, 'test_T_prod_surface_C'))
+        print(*testAssert(output.fluid_system_solver.production_well.state.T_C, 55.3144, 'test_T_prod_surface_C'))
         print(*testAssert(output.fluid_system_solver.pp.dP_pump, -1.0756e6, 'test_dP_pump'))
         print(*testAssert(output.energy_results.W_net, 8.2656e5, 'test_W_net'))
         print(*testAssert(output.capital_cost_model.C_brownfield, 2.6182e7, 'test_C_brownfield_N'))

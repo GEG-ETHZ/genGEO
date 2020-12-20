@@ -4,7 +4,7 @@ from src.oRCCycleTboil import ORCCycleTboil
 from src.coolingCondensingTower import CoolingCondensingTower
 from models.coolingCondensingTowerMode import CoolingCondensingTowerMode
 
-from utils.fluidStateFromPT import FluidStateFromPT
+from utils.fluidState import FluidState
 from models.simulationParameters import SimulationParameters
 
 from tests.testAssertion import testAssert
@@ -27,10 +27,10 @@ class ORCCycleTboilTest(unittest.TestCase):
 
     def testORCCycleTboil(self):
 
-        initialState = FluidStateFromPT(1.e6, 150., 'water')
+        initialState = FluidState.getStateFromPT(1.e6, 150., 'water')
         results = cycle.solve(initialState, T_boil_C = 100., dT_pinch = 5.)
 
-        self.assertTrue(*testAssert(results.state.T_C(), 68.36, 'test1_temp'))
+        self.assertTrue(*testAssert(results.state.T_C, 68.36, 'test1_temp'))
         self.assertTrue(*testAssert(results.w_net, 3.8559e4, 'test1_w_net'))
         self.assertTrue(*testAssert(results.w_turbine, 4.7773e4, 'test1_w_turbine'))
         self.assertTrue(*testAssert(results.q_preheater, 1.5778e5, 'test1_q_preheater'))
@@ -38,7 +38,7 @@ class ORCCycleTboilTest(unittest.TestCase):
 
     def testORCCycleTboilFail(self):
 
-        initialState = FluidStateFromPT(1.e6, 15., 'water')
+        initialState = FluidState.getStateFromPT(1.e6, 15., 'water')
         try:
             results = cycle.solve(initialState, T_boil_C = 100., dT_pinch = 5.)
         except Exception as ex:

@@ -1,14 +1,14 @@
 import numpy as np
 
-from  utils.fluidStates import FluidState
+from  utils.fluidState import FluidState
 
 def frictionFactor(well_radius, P, h, m_dot, fluid, epsilon):
 
     if well_radius == None or P == None or h == None or m_dot == None or fluid == None or epsilon == None:
         return 0
 
-    rho_fluid = FluidState.getRhoFromPh(P, h, fluid)
-    mu = FluidState.getMuFromPh(P, h, fluid)
+    rho_fluid = FluidState.getStateFromPh(P, h, fluid).rho_kgm3
+    mu = FluidState.getStateFromPh(P, h, fluid).mu_Pas
 
     A_c = np.pi * well_radius**2
     V = m_dot / A_c / rho_fluid

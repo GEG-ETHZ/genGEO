@@ -2,7 +2,7 @@ import numpy as np
 
 from scipy.optimize import root, minimize, newton, brentq
 
-from utils.fluidStateFromPT import FluidStateFromPT
+from utils.fluidState import FluidState
 from utils.solver import Solver
 
 
@@ -23,22 +23,22 @@ class FluidSystemWaterSolver(object):
         solv = Solver()
         while np.isnan(dT_inj) or abs(dT_inj) >= 0.5:
 
-            initial_state = FluidStateFromPT(self.fluid_system.params.initial_P, initial_T, self.fluid_system.params.working_fluid)
+            initial_state = FluidState.getStateFromPT(self.fluid_system.params.initial_P, initial_T, self.fluid_system.params.working_fluid)
             system_state = self.fluid_system.solve(initial_state)
 
-            dT_inj = initial_T - system_state.pp.state.T_C()
+            dT_inj = initial_T - system_state.pp.state.T_C
 
             initial_T = solv.addDataAndEstimate(initial_T, dT_inj)
 
             if np.isnan(initial_T):
-                initial_T = system_state.pp.state.T_C()
+                initial_T = system_state.pp.state.T_C
 
             # add lower bounds
             if initial_T < 1:
                 initial_T = 1
 
             # add upper bounds
-            T_prod_surface_C = system_state.pump.well.state.T_C()
+            T_prod_surface_C = system_state.pump.well.state.T_C
             if initial_T > T_prod_surface_C and initial_T > 50:
                 initial_T = T_prod_surface_C
 
@@ -60,12 +60,12 @@ class FluidSystemWaterSolver(object):
 
     def minimizeFunction(self, initial_T):
 
-        initial_state = FluidStateFromPT(self.initial_P, initial_T, self.fluid_system.fluid)
+        initial_state = FluidState.getStateFromPT(self.initial_P, initial_T, self.fluid_system.fluid)
         system_state = self.fluid_system.solve(initial_state)
 
-        diff = (system_state.pp.state.T_C() - initial_T)
+        diff = (system_state.pp.state.T_C - initial_T)
 
-        print('find T ', system_state.pp.state.T_C())
+        print('find T ', system_state.pp.state.T_C)
         return diff
 
     def solveMinimize(self):

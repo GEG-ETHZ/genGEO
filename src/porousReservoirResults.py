@@ -1,7 +1,5 @@
 import numpy as np
 
-from utils.fluidStateFromPT import FluidStateFromPT
-
 class PorousReservoirResults(object):
     """PorousReservoirResults."""
     def __init__(self):

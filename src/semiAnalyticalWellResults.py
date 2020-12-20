@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils.fluidStateFromPT import FluidStateFromPT
+from utils.fluidState import FluidState
 
 class SemiAnalyticalWellResults(object):
     """docstring for SemiAnalyticalWellResults."""
@@ -19,7 +19,7 @@ class SemiAnalyticalWellResults(object):
         self.cp_JK          = np.zeros(N_dx+1)
 
     def createFinalState(self):
-        self.state = FluidStateFromPT(self.P_Pa[-1], self.T_C_f[-1], self.fluid)
+        self.state = FluidState.getStateFromPT(self.P_Pa[-1], self.T_C_f[-1], self.fluid)
 
     # # TODO: get units and change name. do we need this?
     def getHeat(self):

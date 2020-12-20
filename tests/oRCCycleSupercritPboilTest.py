@@ -2,7 +2,7 @@ import unittest
 
 from src.oRCCycleSupercritPboil import ORCCycleSupercritPboil
 
-from utils.fluidStateFromPT import FluidStateFromPT
+from utils.fluidState import FluidState
 from models.simulationParameters import SimulationParameters
 
 from tests.testAssertion import testAssert
@@ -15,7 +15,7 @@ class ORCCycleSupercritPboilTest(unittest.TestCase):
 
         cycle = ORCCycleSupercritPboil(params = params)
 
-        initialState = FluidStateFromPT(1.e6, 190., 'water')
+        initialState = FluidState.getStateFromPT(1.e6, 190., 'water')
         results = cycle.solve(initialState = initialState,
                                 P_boil_Pa = 5e6)
 
@@ -29,6 +29,6 @@ class ORCCycleSupercritPboilTest(unittest.TestCase):
         self.assertTrue(*testAssert(results.w_cooler, -51.2720, 'test1_w_cooler'))
         self.assertTrue(*testAssert(results.w_condenser, -2.5484e+03, 'test1_w_condenser'))
         self.assertTrue(*testAssert(results.w_net, 1.9786e+04, 'test1_w_net'))
-        self.assertTrue(*testAssert(results.state.T_C(), 73.7974, 'test1_end_T_C'))
+        self.assertTrue(*testAssert(results.state.T_C, 73.7974, 'test1_end_T_C'))
         self.assertTrue(*testAssert(results.dT_LMTD_boiler, 9.6698, 'test1_dT_LMTD_boiler'))
         self.assertTrue(*testAssert(results.dT_LMTD_recuperator, 7.4340, 'test1_dT_LMTD_recuperator'))

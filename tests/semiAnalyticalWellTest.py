@@ -3,7 +3,7 @@ import numpy as np
 
 from src.semiAnalyticalWell import SemiAnalyticalWell
 from models.simulationParameters import SimulationParameters
-from utils.fluidStateFromPT import FluidStateFromPT
+from utils.fluidState import FluidState
 from tests.testAssertion import testAssert
 
 class SemiAnalyticalWellTest(unittest.TestCase):
@@ -25,14 +25,14 @@ class SemiAnalyticalWellTest(unittest.TestCase):
                                 m_dot_IP = 136.)
 
         # initial state
-        initial_state = FluidStateFromPT(25.e6, 97., well.params.working_fluid)
+        initial_state = FluidState.getStateFromPT(25.e6, 97., well.params.working_fluid)
 
         wellresult = well.solve(initial_state)
 
         self.assertMessages(well.params.working_fluid,
-                        (wellresult.state.P_Pa(), 1.2372e6),
-                        (wellresult.state.T_C(), 95.0133),
-                        (wellresult.state.h_Jkg(), 3.9902e5))
+                        (wellresult.state.P_Pa, 1.2372e6),
+                        (wellresult.state.T_C, 95.0133),
+                        (wellresult.state.h_Jkg, 3.9902e5))
 
         # CO2
         well.params.working_fluid = 'CO2'
@@ -40,9 +40,9 @@ class SemiAnalyticalWellTest(unittest.TestCase):
         wellresult = well.solve(initial_state)
 
         self.assertMessages(well.params.working_fluid,
-                        (wellresult.state.P_Pa(), 1.1674e7),
-                        (wellresult.state.T_C(), 55.9783),
-                        (wellresult.state.h_Jkg(), 3.7225e5))
+                        (wellresult.state.P_Pa, 1.1674e7),
+                        (wellresult.state.T_C, 55.9783),
+                        (wellresult.state.h_Jkg, 3.7225e5))
 
     def testInjectionWellWater(self):
         ###
@@ -60,26 +60,26 @@ class SemiAnalyticalWellTest(unittest.TestCase):
                                         T_e_initial = 15.)
 
         # initial state
-        initial_state = FluidStateFromPT(1.e6, 25., gpp.working_fluid)
+        initial_state = FluidState.getStateFromPT(1.e6, 25., gpp.working_fluid)
         vertical_well_results = vertical_well.solve(initial_state = initial_state)
 
         self.assertMessages(gpp.working_fluid,
-                        (vertical_well_results.state.P_Pa(), 3.533e7),
-                        (vertical_well_results.state.T_C(), 67.03),
-                        (vertical_well_results.state.h_Jkg(), 3.0963e5))
+                        (vertical_well_results.state.P_Pa, 3.533e7),
+                        (vertical_well_results.state.T_C, 67.03),
+                        (vertical_well_results.state.h_Jkg, 3.0963e5))
 
         horizontal_well = SemiAnalyticalWell(params = gpp,
                                         dr_total = 3000.,
                                         T_e_initial = vertical_well.T_e_initial + gpp.dT_dz * abs(vertical_well.dz_total))
 
         # initial state
-        initial_state = FluidStateFromPT(vertical_well_results.state.P_Pa(), vertical_well_results.state.T_C(), gpp.working_fluid)
+        initial_state = FluidState.getStateFromPT(vertical_well_results.state.P_Pa, vertical_well_results.state.T_C, gpp.working_fluid)
         horizontal_well_results = horizontal_well.solve(initial_state = initial_state)
 
         self.assertMessages(gpp.working_fluid,
-                        (horizontal_well_results.state.P_Pa(), 3.533e7),
-                        (horizontal_well_results.state.T_C(), 121.99),
-                        (horizontal_well_results.state.h_Jkg(), 5.3712e5))
+                        (horizontal_well_results.state.P_Pa, 3.533e7),
+                        (horizontal_well_results.state.T_C, 121.99),
+                        (horizontal_well_results.state.h_Jkg, 5.3712e5))
 
     def testInjectionWellCO2(self):
         ###
@@ -97,26 +97,26 @@ class SemiAnalyticalWellTest(unittest.TestCase):
                                             T_e_initial = 15.)
 
         # initial state
-        initial_state = FluidStateFromPT(1.e6, 25., gpp.working_fluid)
+        initial_state = FluidState.getStateFromPT(1.e6, 25., gpp.working_fluid)
         vertical_well_results = vertical_well.solve(initial_state = initial_state)
 
         self.assertMessages(gpp.working_fluid,
-                        (vertical_well_results.state.P_Pa(), 1.7245e6),
-                        (vertical_well_results.state.T_C(), 156.08),
-                        (vertical_well_results.state.h_Jkg(), 6.1802e5))
+                        (vertical_well_results.state.P_Pa, 1.7245e6),
+                        (vertical_well_results.state.T_C, 156.08),
+                        (vertical_well_results.state.h_Jkg, 6.1802e5))
 
         horizontal_well = SemiAnalyticalWell(params = gpp,
                                             dr_total = 3000.,
                                             T_e_initial = vertical_well.T_e_initial + gpp.dT_dz * abs(vertical_well.dz_total))
 
         # initial state
-        initial_state = FluidStateFromPT(vertical_well_results.state.P_Pa(), vertical_well_results.state.T_C(), gpp.working_fluid)
+        initial_state = FluidState.getStateFromPT(vertical_well_results.state.P_Pa, vertical_well_results.state.T_C, gpp.working_fluid)
         horizontal_well_results = horizontal_well.solve(initial_state = initial_state)
 
         self.assertMessages(gpp.working_fluid,
-                        (horizontal_well_results.state.P_Pa(), 1.7235e6),
-                        (horizontal_well_results.state.T_C(), 212.746),
-                        (horizontal_well_results.state.h_Jkg(), 6.755e5))
+                        (horizontal_well_results.state.P_Pa, 1.7235e6),
+                        (horizontal_well_results.state.T_C, 212.746),
+                        (horizontal_well_results.state.h_Jkg, 6.755e5))
 
     def testInjectionWellCO2HighQ(self):
         ###
@@ -134,13 +134,13 @@ class SemiAnalyticalWellTest(unittest.TestCase):
                                             T_e_initial = 15.)
 
         # initial state
-        initial_state = FluidStateFromPT(1.e6, 25., gpp.working_fluid)
+        initial_state = FluidState.getStateFromPT(1.e6, 25., gpp.working_fluid)
         vertical_well_results = vertical_well.solve(initial_state = initial_state)
 
         self.assertMessages(gpp.working_fluid,
-                        (vertical_well_results.state.P_Pa(), 5.1170e5),
-                        (vertical_well_results.state.T_C(), 63.9786),
-                        (vertical_well_results.state.h_Jkg(), 5.3677e5))
+                        (vertical_well_results.state.P_Pa, 5.1170e5),
+                        (vertical_well_results.state.T_C, 63.9786),
+                        (vertical_well_results.state.h_Jkg, 5.3677e5))
 
     def testInjectionWellCO2SmallWellR(self):
         ###
@@ -158,10 +158,10 @@ class SemiAnalyticalWellTest(unittest.TestCase):
                                             T_e_initial = 15.)
 
         # initial state
-        initial_state = FluidStateFromPT(1.e6, 25., gpp.working_fluid)
+        initial_state = FluidState.getStateFromPT(1.e6, 25., gpp.working_fluid)
         vertical_well_results = vertical_well.solve(initial_state = initial_state)
 
         self.assertMessages(gpp.working_fluid,
-                        (vertical_well_results.state.P_Pa(), 1.1431e6),
-                        (vertical_well_results.state.T_C(), 222.2246),
-                        (vertical_well_results.state.h_Jkg(), 6.8717e5))
+                        (vertical_well_results.state.P_Pa, 1.1431e6),
+                        (vertical_well_results.state.T_C, 222.2246),
+                        (vertical_well_results.state.h_Jkg, 6.8717e5))

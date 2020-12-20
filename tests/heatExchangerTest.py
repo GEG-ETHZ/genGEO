@@ -3,7 +3,7 @@ import unittest
 from src.heatExchanger import heatExchanger
 from src.heatExchangerOptMdot import heatExchangerOptMdot
 
-from utils.fluidStates import FluidState
+from utils.fluidState import FluidState
 
 from tests.testAssertion import testAssert
 
@@ -19,7 +19,7 @@ class HeatExchangerTest(unittest.TestCase):
         T_2_in = 170.
         m_dot_2 = 1.
         fluid_2 = 'Water'
-        P_2 = FluidState.getPFromTQ(T_2_in, 0, fluid_2) + 100e3
+        P_2 = FluidState.getStateFromTQ(T_2_in, 0, fluid_2).P_Pa + 100e3
         dT_pinch = 5.
 
         results = heatExchanger(T_1_in, P_1, m_dot_1, fluid_1, T_2_in, P_2, m_dot_2, fluid_2, dT_pinch)
@@ -39,7 +39,7 @@ class HeatExchangerTest(unittest.TestCase):
         fluid_1 = 'R245fa'
         T_2_in = 170.
         fluid_2 = 'Water'
-        P_2 = FluidState.getPFromTQ(T_2_in, 0, fluid_2) + 100e3
+        P_2 = FluidState.getStateFromTQ(T_2_in, 0, fluid_2).P_Pa + 100e3
         dT_pinch = 5.
         T_min = 165.
         maximizeHeatFromStream = '2'

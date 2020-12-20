@@ -17,8 +17,8 @@ class FluidSystemWaterTest(unittest.TestCase):
         
         output = FullSystemORC.getDefaultWaterSystem(params).solve()
 
-        print(*testAssert(output.fluid_system_solver.pump.well.state.P_Pa(), 7.84791e5, 'test_subsurface_solver1_pressure'))
-        print(*testAssert(output.fluid_system_solver.pump.well.state.T_C(), 81.2595, 'test_subsurface_solver1_temp'))
+        print(*testAssert(output.fluid_system_solver.pump.well.state.P_Pa, 7.84791e5, 'test_subsurface_solver1_pressure'))
+        print(*testAssert(output.fluid_system_solver.pump.well.state.T_C, 81.2595, 'test_subsurface_solver1_temp'))
         print(*testAssert(output.energy_results.W_net, 5.2775e3, 'test_subsurface_solver1_w_net'))
         print(*testAssert(output.capital_cost_model.C_brownfield, 9.1965e6, 'test_solver1_C_brownfield_N'))
         print(*testAssert(output.capital_cost_model.C_greenfield, 2.2308e7, 'test_solver1_C_greenfield_N'))
@@ -30,8 +30,8 @@ class FluidSystemWaterTest(unittest.TestCase):
         
         output = FullSystemORC.getDefaultWaterSystem(params).solve()
 
-        print(*testAssert(output.fluid_system_solver.pump.well.state.P_Pa(), 7.9610e6, 'test_subsurface_solver2_pressure'))
-        print(*testAssert(output.fluid_system_solver.pump.well.state.T_C(), 100.3125, 'test_subsurface_solver2_temp'))
+        print(*testAssert(output.fluid_system_solver.pump.well.state.P_Pa, 7.9610e6, 'test_subsurface_solver2_pressure'))
+        print(*testAssert(output.fluid_system_solver.pump.well.state.T_C, 100.3125, 'test_subsurface_solver2_temp'))
         print(*testAssert(output.energy_results.W_net, 1.4286e+05, 'test_subsurface_solver2_w_net'))
         print(*testAssert(output.capital_cost_model.C_brownfield, 2.3287e7, 'test_solver2_C_brownfield_N'))
         print(*testAssert(output.capital_cost_model.C_greenfield, 3.6399062e7, 'test_solver2_C_greenfield_N'))
