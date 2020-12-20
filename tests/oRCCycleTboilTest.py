@@ -2,6 +2,7 @@ import unittest
 
 from src.oRCCycleTboil import ORCCycleTboil
 from src.coolingCondensingTower import CoolingCondensingTower
+from src.coolingCondensingTower import CoolingTowerMode
 
 from utils.fluidStateFromPT import FluidStateFromPT
 from utils.simulationParameters import SimulationParameters
@@ -14,11 +15,11 @@ cycle = ORCCycleTboil(params = params)
 class ORCCycleTboilTest(unittest.TestCase):
 
     def testParasiticPowerFraction(self):
-        parasiticPowerFraction = CoolingCondensingTower.parasiticPowerFraction(15. , 7. , 25., 'Wet')
+        parasiticPowerFraction = CoolingCondensingTower.parasiticPowerFraction(15. , 7. , 25., CoolingTowerMode.WET)
         self.assertTrue(*testAssert(parasiticPowerFraction('cooling'), 0.016025303571428565, 'Wet - cooling'))
         self.assertTrue(*testAssert(parasiticPowerFraction('condensing'), 0.02685987257142855, 'Wet - condensing'))
         self.assertRaises(Exception, parasiticPowerFraction, 'heating')
-        parasiticPowerFraction = CoolingCondensingTower.parasiticPowerFraction(15. , 7. , 25., 'Dry')
+        parasiticPowerFraction = CoolingCondensingTower.parasiticPowerFraction(15. , 7. , 25., CoolingTowerMode.DRY)
         self.assertTrue(*testAssert(parasiticPowerFraction('cooling'), 0.11328571428571428, 'Dry - cooling'))
         self.assertTrue(*testAssert(parasiticPowerFraction('condensing'), 0.08842857142857143, 'Dry - condensing'))
         self.assertRaises(Exception, parasiticPowerFraction, 'heating')

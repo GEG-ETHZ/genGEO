@@ -1,3 +1,4 @@
+from src.coolingCondensingTower import CoolingTowerMode
 
 class SimulationParameters(object):
     """SimulationParameters provides physical properties of the system."""
@@ -33,7 +34,7 @@ class SimulationParameters(object):
                 eta_turbine_orc = 0.8,
                 eta_pump_co2 = 0.9,
                 eta_turbine_co2 = 0.78,
-                cooling_mode = 'Wet',
+                cooling_mode = CoolingTowerMode.WET,
                 # cost model
                 cost_year = 2019,
                 success_rate = 0.95,
