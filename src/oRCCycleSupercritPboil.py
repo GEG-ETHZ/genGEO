@@ -31,14 +31,14 @@ class ORCCycleSupercritPboil(object):
         # Critical point of R245fa
         # if Pboil is below critical, throw error
         if P_boil_Pa < FluidState.getPcrit(self.params.orc_fluid):
-            raise ValueError('GenGeo::ORCCycleSupercritPboil:lowBoilingPressure - Boiling Pressure Below Critical Pressure')
+            raise Exception('GenGeo::ORCCycleSupercritPboil:lowBoilingPressure - Boiling Pressure Below Critical Pressure')
         # The line of minimum entropy to keep the fluid vapor in turbine is
         # entropy at saturated vapor at 125C. So inlet temp must provide this
         # minimum entropy.
         s_min = FluidState.getStateFromTQ(125., 1, self.params.orc_fluid).s_JK
         T_min = FluidState.getStateFromPS(P_boil_Pa, s_min, self.params.orc_fluid).T_C
         if (T_in_C - self.params.dT_pinch) < T_min:
-            raise ValueError('GenGeo::ORCCycleSupercritPboil:lowInletTemp - Inlet Temp below %.1f C for Supercritical Fluid'%(T_min+self.params.dT_pinch))
+            raise Exception('GenGeo::ORCCycleSupercritPboil:lowInletTemp - Inlet Temp below %.1f C for Supercritical Fluid'%(T_min+self.params.dT_pinch))
 
         T_condense_C = self.params.T_ambient_C + self.params.dT_approach
 

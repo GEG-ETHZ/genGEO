@@ -88,7 +88,7 @@ class SemiAnalyticalWell(object):
             if self.params.working_fluid.lower() == 'water':
                 P_sat = FluidState.getStateFromTQ(results.T_C_f[i-1], 0, self.params.working_fluid).P_Pa
                 if results.P_Pa[i] < P_sat:
-                    raise Exception('GenGeoSemiAnalyticalWell:BelowSaturationPressure - '
+                    raise Exception('GenGeo::SemiAnalyticalWell:BelowSaturationPressure - '
                     'Below saturation pressure of water at %s m !' %(results.z_m[i]))
 
             h_noHX = results.h_Jkg[i-1] - self.params.g * dz
