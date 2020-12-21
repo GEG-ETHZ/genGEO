@@ -1,0 +1,17 @@
+# genGeo.yml
+#
+# genGeo anaconda environment
+#
+# install: conda env create -f genGeo.yml 
+# update:  conda env update -f genGeo.yml 
+name: genGeo
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.7
+  - pip
+  - pandas
+  - scipy
+  - coolprop
+  - xlrd
