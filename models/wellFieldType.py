@@ -6,7 +6,15 @@ class WellFieldType(Enum):
     _5Spot_SharedNeighbor = 3
     _5Spot_Many = 4
 
-    def getWellMdotMultiplier(self):
+    def getInjWellMdotMultiplier(self):
+        if self == WellFieldType.Doublet:
+            return 1
+        elif self == WellFieldType._5Spot:
+            return 4
+        else:
+            return 4
+
+    def getProdWellMdotMultiplier(self):
         if self == WellFieldType.Doublet:
             return 1
         elif self == WellFieldType._5Spot:

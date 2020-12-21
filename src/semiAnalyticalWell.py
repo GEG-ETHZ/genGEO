@@ -12,7 +12,7 @@ class SemiAnalyticalWell(object):
     """SemiAnalyticalWell to compute heat transport with fluid flow in a well
         and analytical conduction in the surrounding rock."""
 
-    def __init__(self, params = None, T_e_initial = 15., dz_total = 0., dr_total = 0., **kwargs):
+    def __init__(self, params = None, T_e_initial = 15., dz_total = 0., dr_total = 0., m_dot_multiplier = 1, **kwargs):
         self.params = params
         if self.params == None:
             self.params = SimulationParameters(**kwargs)
@@ -24,10 +24,13 @@ class SemiAnalyticalWell(object):
         # T_e_initial is the beginning rock temp
         # default is set to be 15 C
         self.T_e_initial = T_e_initial
+        # m_dot_multiplier is the multiplier applied to the mass flowrate within the wells
+        # default is 1
+        self.m_dot_multiplier = m_dot_multiplier
 
-    def solve(self, initial_state, m_dot_multiplier = 1):
+    def solve(self, initial_state):
 
-        m_dot = self.params.m_dot_IP * m_dot_multiplier
+        m_dot = self.params.m_dot_IP * self.m_dot_multiplier
 
         # results
         results = SemiAnalyticalWellResults(self.params.well_segments, self.params.working_fluid)

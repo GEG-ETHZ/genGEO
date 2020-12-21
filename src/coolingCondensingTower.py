@@ -46,6 +46,10 @@ class CoolingCondensingTower(object):
             raise Exception('GenGeo::coolingCondensingTower:UnknownCoolingMode - Unknown Cooling Mode')
 
         # c_cooling and c_condensing are both in units of $/kWth
+        if np.isnan(Q_cooler):
+            Q_cooler = 0
+        if np.isnan(Q_condenser):
+            Q_condenser = 0
 
         # Reference case 1000 kWth (1e6 Wth)
         Q_Ref_BAC = 1e6

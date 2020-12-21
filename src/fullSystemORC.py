@@ -45,16 +45,21 @@ class FullSystemORC(object):
             params = SimulationParameters(**kwargs)
 
         fluid_system = FluidSystemWater(params = params)
+        injWell_m_dot_multiplier = params.wellFieldType.getInjWellMdotMultiplier()
         fluid_system.injection_well = SemiAnalyticalWell(params = params,
                                             dz_total = -params.depth,
-                                            T_e_initial = params.T_ambient_C)
+                                            T_e_initial = params.T_ambient_C,
+                                            m_dot_multiplier = injWell_m_dot_multiplier)
         fluid_system.reservoir = PorousReservoir(params = params)
+        prodWell_m_dot_multiplier = params.wellFieldType.getProdWellMdotMultiplier()
         fluid_system.production_well1 = SemiAnalyticalWell(params = params,
                                             dz_total = params.depth - params.pump_depth,
-                                            T_e_initial = params.T_ambient_C + params.dT_dz * params.depth)
+                                            T_e_initial = params.T_ambient_C + params.dT_dz * params.depth,
+                                            m_dot_multiplier = prodWell_m_dot_multiplier)
         prod_well2 = SemiAnalyticalWell(params = params,
                                         dz_total = params.pump_depth,
-                                        T_e_initial = params.T_ambient_C + params.dT_dz * params.pump_depth)
+                                        T_e_initial = params.T_ambient_C + params.dT_dz * params.pump_depth,
+                                        m_dot_multiplier = prodWell_m_dot_multiplier)
         fluid_system.pump = DownHolePump(well = prod_well2,
                                         params = params)
         fluid_system.pp = ORCCycleTboil(params = params)

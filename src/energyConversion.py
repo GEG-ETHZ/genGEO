@@ -5,7 +5,7 @@ class EnergyConversionORC(object):
 
     @staticmethod
     def compute(params, input):
-        N_IP_multiplier = params.wellFieldType.getWellMdotMultiplier() * params.N_5spot
+        N_IP_multiplier = params.wellFieldType.getInjWellMdotMultiplier() * params.N_5spot
         ec = EnergyConversionORC()
         ec.Q_preheater = params.m_dot_IP * input.pp.q_preheater
         ec.Q_recuperator = params.m_dot_IP * input.pp.q_recuperator
@@ -38,12 +38,12 @@ class EnergyConversionCPG(object):
 
     @staticmethod
     def compute(params, input):
-        N_IP_multiplier = params.wellFieldType.getWellMdotMultiplier() * params.N_5spot
+        N_IP_multiplier = params.wellFieldType.getInjWellMdotMultiplier() * params.N_5spot
         ec = EnergyConversionCPG()
         ec.Q_preheater = params.m_dot_IP * input.pp.q_preheater
         ec.Q_recuperator = params.m_dot_IP * input.pp.q_recuperator
         ec.Q_boiler = params.m_dot_IP * input.pp.q_boiler
-        ec.Q_desuperheater = 0. # params.m_dot_IP * input.pp.q_desuperheater
+        ec.Q_desuperheater = params.m_dot_IP * input.pp.q_desuperheater
         ec.Q_condenser = params.m_dot_IP * input.pp.q_condenser
         ec.W_turbine = params.m_dot_IP * input.pp.w_turbine
         ec.W_pump = params.m_dot_IP * input.pp.w_pump

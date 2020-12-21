@@ -48,13 +48,17 @@ class FullSystemCPG(object):
             params = SimulationParameters(**kwargs)
 
         fluid_system = FluidSystemCO2(params = params)
+        injWell_m_dot_multiplier = params.wellFieldType.getInjWellMdotMultiplier()
         fluid_system.injection_well = SemiAnalyticalWell(params = params,
                                             dz_total = -params.depth,
-                                            T_e_initial = params.T_ambient_C)
+                                            T_e_initial = params.T_ambient_C,
+                                            m_dot_multiplier = injWell_m_dot_multiplier)
         fluid_system.reservoir = PorousReservoir(params = params)
+        prodWell_m_dot_multiplier = params.wellFieldType.getProdWellMdotMultiplier()
         fluid_system.production_well = SemiAnalyticalWell(params = params,
                                             dz_total = params.depth,
-                                            T_e_initial = params.T_ambient_C + params.dT_dz * params.depth)
+                                            T_e_initial = params.T_ambient_C + params.dT_dz * params.depth,
+                                            m_dot_multiplier = prodWell_m_dot_multiplier)
 
         capital_cost_system = CapitalCostSystem()
         capital_cost_system.CapitalCost_SurfacePlant = CapitalCostSurfacePlantCPG(params = params)
