@@ -1,6 +1,21 @@
+# Licensed under LGPL 2.1, please see LICENSE for details
+# https://www.gnu.org/licenses/lgpl-2.1.html
+#
+# The work on this project has been performed at the GEG Group at ETH Zurich:
+# --> https://geg.ethz.ch
+#
+# The initial version of this file has been implemented by:
+#
+#     Philipp Schaedle (https://github.com/philippschaedle)
+#     Benjamin M. Adams
+#
+# Further changes are done by:
+#
+
+############################
 import numpy as np
 
-from utils.fluidStates import FluidState
+from utils.fluidState import FluidState
 
 class HeatExchangerResults(object):
     """HeatExchangerResults contains all results information of a heat exchanger."""
@@ -27,7 +42,7 @@ def heatExchanger(T_1_in, P_1, m_dot_1, fluid_1, T_2_in, P_2, m_dot_2, fluid_2, 
         return results
 
     if m_dot_1 <= 0 or m_dot_2 <= 0:
-        raise ValueError('HeatExchanger:NegativeMassFlow - Negative Massflow in Heat Exchanger')
+        raise Exception('GenGeo::HeatExchanger:NegativeMassFlow - Negative Massflow in Heat Exchanger')
 
     increments = 20
     direction = np.sign(T_1_in - T_2_in)
@@ -35,26 +50,26 @@ def heatExchanger(T_1_in, P_1, m_dot_1, fluid_1, T_2_in, P_2, m_dot_2, fluid_2, 
     # Check the phase on incoming fluid
     P_crit_1 = FluidState.getPcrit(fluid_1)
     if P_1 < P_crit_1:
-        T_sat_1 = FluidState.getTFromPQ(P_1, 1, fluid_1)
+        T_sat_1 = FluidState.getStateFromPQ(P_1, 1, fluid_1).T_C
         if T_sat_1 == T_1_in or T_sat_1 == T_2_in:
-            raise ValueError('HeatExchanger:TwoPhaseFluid - Fluid 1 enters or leaves two-phase!')
+            raise Exception('GenGeo::HeatExchanger:TwoPhaseFluid - Fluid 1 enters or leaves two-phase!')
 
     P_crit_2 = FluidState.getPcrit(fluid_2)
     if P_2 < P_crit_2:
-        T_sat_2 = FluidState.getTFromPQ(P_2, 1, fluid_2)
+        T_sat_2 = FluidState.getStateFromPQ(P_2, 1, fluid_2).T_C
         if T_sat_2 == T_1_in or T_sat_2 == T_2_in:
-            raise ValueError('HeatExchanger:TwoPhaseFluid - Fluid 2 enters or leaves two-phase!')
+            raise Exception('GenGeo::HeatExchanger:TwoPhaseFluid - Fluid 2 enters or leaves two-phase!')
 
-    h_1_in = FluidState.getHFromPT(P_1, T_1_in, fluid_1)
+    h_1_in = FluidState.getStateFromPT(P_1, T_1_in, fluid_1).h_Jkg
     T_1_max = T_2_in
-    h_1_max = FluidState.getHFromPT(P_1, T_1_max, fluid_1)
+    h_1_max = FluidState.getStateFromPT(P_1, T_1_max, fluid_1).h_Jkg
     T_1_max_practical = T_2_in + direction * dT_pinch
-    h_1_max_practical = FluidState.getHFromPT(P_1, T_1_max_practical, fluid_1)
-    h_2_in = FluidState.getHFromPT(P_2, T_2_in, fluid_2)
+    h_1_max_practical = FluidState.getStateFromPT(P_1, T_1_max_practical, fluid_1).h_Jkg
+    h_2_in = FluidState.getStateFromPT(P_2, T_2_in, fluid_2).h_Jkg
     T_2_max = T_1_in;
-    h_2_max = FluidState.getHFromPT(P_2, T_2_max, fluid_2)
+    h_2_max = FluidState.getStateFromPT(P_2, T_2_max, fluid_2).h_Jkg
     T_2_max_practical = T_1_in - direction*dT_pinch;
-    h_2_max_practical = FluidState.getHFromPT(P_2, T_2_max_practical, fluid_2)
+    h_2_max_practical = FluidState.getStateFromPT(P_2, T_2_max_practical, fluid_2).h_Jkg
 
     Q_1_max = abs( m_dot_1 * (h_1_in - h_1_max) )
     Q_2_max = abs( m_dot_2 * (h_2_in - h_2_max) )
@@ -90,7 +105,7 @@ def heatExchanger(T_1_in, P_1, m_dot_1, fluid_1, T_2_in, P_2, m_dot_2, fluid_2, 
         h_1[0] = h_1_in
         results.T_1[0] = T_1_in
         h_2[0] = (Q_2_max - results.Q_exchanged) / m_dot_2 + h_2_max
-        results.T_2[0] = FluidState.getTFromPh(P_2, h_2[0], fluid_2)
+        results.T_2[0] = FluidState.getStateFromPh(P_2, h_2[0], fluid_2).T_C
         dT[0] = direction * (results.T_1[0] - results.T_2[0])
         UA[0] = dQ / dT[0]
 
@@ -98,8 +113,8 @@ def heatExchanger(T_1_in, P_1, m_dot_1, fluid_1, T_2_in, P_2, m_dot_2, fluid_2, 
             results.Q[i] = results.Q[i-1] + dQ
             h_1[i] = h_1[i-1] + dQ / m_dot_1
             h_2[i] = h_2[i-1] + dQ / m_dot_2
-            results.T_1[i] = FluidState.getTFromPh(P_1, h_1[i], fluid_1)
-            results.T_2[i] = FluidState.getTFromPh(P_2, h_2[i], fluid_2)
+            results.T_1[i] = FluidState.getStateFromPh(P_1, h_1[i], fluid_1).T_C
+            results.T_2[i] = FluidState.getStateFromPh(P_2, h_2[i], fluid_2).T_C
             dT[i] = direction * (results.T_1[i] - results.T_2[i])
             UA[i] = dQ / dT[i]
 
@@ -118,17 +133,17 @@ def heatExchanger(T_1_in, P_1, m_dot_1, fluid_1, T_2_in, P_2, m_dot_2, fluid_2, 
 
     # Check the phase on leaving fluid
     if P_1 < P_crit_1:
-        T_sat_1 = FluidState.getTFromPQ(P_1, 1, fluid_1)
+        T_sat_1 = FluidState.getStateFromPQ(P_1, 1, fluid_1).T_C
         if T_sat_1 > T_1_in and T_sat_1 < results.T_1_out:
             print('Caution: Fluid 1 is phase changing in heat exchanger')
         if T_sat_1 == results.T_1_out:
-            raise ValueError('HeatExchanger:TwoPhaseFluid - Fluid 1 leaves two-phase!')
+            raise Exception('GenGeo::HeatExchanger:TwoPhaseFluid - Fluid 1 leaves two-phase!')
 
     if P_2 < P_crit_2:
-        T_sat_2 = FluidState.getTFromPQ(P_2, 1, fluid_2)
+        T_sat_2 = FluidState.getStateFromPQ(P_2, 1, fluid_2).T_C
         if T_sat_2 > T_2_in and T_sat_2 < results.T_2_out:
             print('Caution: Fluid 2 is phase changing in heat exchanger')
         if T_sat_2 == results.T_2_out:
-            raise ValueError('HeatExchanger:TwoPhaseFluid - Fluid 2 leaves two-phase!')
+            raise Exception('GenGeo::HeatExchanger:TwoPhaseFluid - Fluid 2 leaves two-phase!')
 
     return results

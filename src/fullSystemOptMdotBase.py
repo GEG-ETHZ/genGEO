@@ -1,3 +1,18 @@
+# Licensed under LGPL 2.1, please see LICENSE for details
+# https://www.gnu.org/licenses/lgpl-2.1.html
+#
+# The work on this project has been performed at the GEG Group at ETH Zurich:
+# --> https://geg.ethz.ch
+#
+# The initial version of this file has been implemented by:
+#
+#     Philipp Schaedle (https://github.com/philippschaedle)
+#     Benjamin M. Adams
+#
+# Further changes are done by:
+#
+
+############################
 
 
 class FullSystemOptMdotBase(object):
@@ -9,7 +24,7 @@ class FullSystemOptMdotBase(object):
     def __init__(self, system):
         self.full_system = system
 
-    def getTargetVar(self):
+    def getTargetVar(self, system):
         raise Exception('GenGeo::no target variable provided to find Minimum '
                         ' or Maximum of!')
 
@@ -22,6 +37,3 @@ class FullSystemOptMdotBase(object):
     def solve(self):
         raise Exception('GenGeo::no algorithm provided to solve opt m_dot '
                         'for minimum or maximum of output variable!')
-
-    def gatherOutput(self):
-        return self.full_system.gatherOutput()

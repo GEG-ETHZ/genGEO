@@ -1,3 +1,18 @@
+# Licensed under LGPL 2.1, please see LICENSE for details
+# https://www.gnu.org/licenses/lgpl-2.1.html
+#
+# The work on this project has been performed at the GEG Group at ETH Zurich:
+# --> https://geg.ethz.ch
+#
+# The initial version of this file has been implemented by:
+#
+#     Philipp Schaedle (https://github.com/philippschaedle)
+#     Benjamin M. Adams
+#
+# Further changes are done by:
+#
+
+############################
 import numpy as np
 import re
 
@@ -29,7 +44,7 @@ class FullSystemSolverBase(FullSystemOptMdotBase):
 
         try:
             system = self.full_system.solve(initial_m_dot, self.time_years)
-            output_val = self.getTargetVar()
+            output_val = self.getTargetVar(system)
 
             # if not np.isnan(output_val):
             #     self.test = np.array([initial_m_dot, output_val])
@@ -51,7 +66,7 @@ class FullSystemSolverBase(FullSystemOptMdotBase):
             #             diff = initial_m_dot[0] - self.test[0]
             #             tmp_m_dot = self.test[0] + n * diff
             #             system = self.full_system.solve(tmp_m_dot, self.time_years)
-            #             output_val_tmp = self.getTargetVar()
+            #             output_val_tmp = self.getTargetVar(system)
             #             output_val = np.interp(initial_m_dot, [self.test[0], tmp_m_dot], [self.test[1], output_val_tmp])[0]
             #             n = 11
             #         except:

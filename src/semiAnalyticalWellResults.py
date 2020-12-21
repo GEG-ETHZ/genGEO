@@ -1,6 +1,21 @@
+# Licensed under LGPL 2.1, please see LICENSE for details
+# https://www.gnu.org/licenses/lgpl-2.1.html
+#
+# The work on this project has been performed at the GEG Group at ETH Zurich:
+# --> https://geg.ethz.ch
+#
+# The initial version of this file has been implemented by:
+#
+#     Philipp Schaedle (https://github.com/philippschaedle)
+#     Benjamin M. Adams
+#
+# Further changes are done by:
+#
+
+############################
 import numpy as np
 
-from utils.fluidStateFromPT import FluidStateFromPT
+from utils.fluidState import FluidState
 
 class SemiAnalyticalWellResults(object):
     """docstring for SemiAnalyticalWellResults."""
@@ -18,17 +33,8 @@ class SemiAnalyticalWellResults(object):
         self.rho_kgm3       = np.zeros(N_dx+1)
         self.cp_JK          = np.zeros(N_dx+1)
 
-    def finalState(self):
-        return FluidStateFromPT(self.P_Pa[-1], self.T_C_f[-1], self.fluid)
-
-    def end_P_Pa(self):
-        return self.P_Pa[-1]
-
-    def end_T_C(self):
-        return self.T_C_f[-1]
-
-    def end_h_Jkg(self):
-        return self.h_Jkg[-1]
+    def createFinalState(self):
+        self.state = FluidState.getStateFromPT(self.P_Pa[-1], self.T_C_f[-1], self.fluid)
 
     # # TODO: get units and change name. do we need this?
     def getHeat(self):

@@ -1,3 +1,18 @@
+# Licensed under LGPL 2.1, please see LICENSE for details
+# https://www.gnu.org/licenses/lgpl-2.1.html
+#
+# The work on this project has been performed at the GEG Group at ETH Zurich:
+# --> https://geg.ethz.ch
+#
+# The initial version of this file has been implemented by:
+#
+#     Philipp Schaedle (https://github.com/philippschaedle)
+#     Benjamin M. Adams
+#
+# Further changes are done by:
+#
+
+############################
 import sys
 import unittest
 
@@ -26,18 +41,19 @@ def testSuite(full=False):
     # ORC cycles
     suite.addTest(ORCCycleTboilTest('testParasiticPowerFraction'))
     suite.addTest(ORCCycleTboilTest('testORCCycleTboil'))
+    suite.addTest(ORCCycleTboilTest('testORCCycleTboilFail'))
     suite.addTest(ORCCycleSupercritPboilTest('testORCCycleSupercritPboil'))
+    # heat exchanger
     suite.addTest(HeatExchangerTest('testHeatExchanger'))
     suite.addTest(HeatExchangerTest('testHeatExchangerOptMdot'))
     # fluidsystem Water
-    suite.addTest(FluidSystemWaterTest('testFluidSystemWaterMdot1'))
     suite.addTest(FluidSystemWaterTest('testFluidSystemWaterSolverMdot1'))
-    suite.addTest(FluidSystemWaterTest('testFluidSystemWaterMdot40'))
     suite.addTest(FluidSystemWaterTest('testFluidSystemWaterSolverMdot40'))
     # fluidsystem CO2
     suite.addTest(FluidSystemCO2Test('testFluidSystemCO2Mdot10'))
     suite.addTest(FluidSystemCO2Test('testFluidSystemCO2Mdot80'))
     suite.addTest(FluidSystemCO2Test('testFluidSystemCO2Mdot200'))
+    suite.addTest(FluidSystemCO2Test('testFluidSystemCO2Mdot100'))
     # heavy tests only if full test is run
     if full:
         suite.addTest(FluidSystemWaterTest('testFluidSystemWaterSolverOptMdot'))

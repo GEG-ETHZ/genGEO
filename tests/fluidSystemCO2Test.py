@@ -1,138 +1,92 @@
+# Licensed under LGPL 2.1, please see LICENSE for details
+# https://www.gnu.org/licenses/lgpl-2.1.html
+#
+# The work on this project has been performed at the GEG Group at ETH Zurich:
+# --> https://geg.ethz.ch
+#
+# The initial version of this file has been implemented by:
+#
+#     Philipp Schaedle (https://github.com/philippschaedle)
+#     Benjamin M. Adams
+#
+# Further changes are done by:
+#
+
+############################
 import unittest
 import numpy as np
 
-from src.semiAnalyticalWell import SemiAnalyticalWell
-from src.porousReservoir import PorousReservoir
-from src.subsurfaceComponents import DownHolePump
-from src.oRCCycleTboil import ORCCycleTboil
+from src.fullSystemCPG import FullSystemCPG
+from src.fullSystemSolver import FullSystemSolver
 
-from src.fluidSystemCO2 import FluidSystemCO2
-from src.capitalCostSystem import CapitalCostSystem
-
-from src.fullSystem import FullSystemCPG
-from src.lCOESimple import LCOESimple
-from src.capitalCostSurfacePipes import CapitalCostSurfacePipes
-from src.capitalCostWell import CapitalCostWell
-from src.capitalCostWellField import CapitalCostWellField
-from src.capitalCostExploration import CapitalCostExploration
-from src.capitalCostSurfacePlantCPG import CapitalCostSurfacePlantCPG
-from src.fullSystemSolver import FullSystemSolverMinLCOEBrownfield
-
-from utils.simulationParameters import SimulationParameters
-from utils.fluidStateFromPT import FluidStateFromPT
+from models.simulationParameters import SimulationParameters
 
 from tests.testAssertion import testAssert
 
 
-# define global methods to be used in this tests
-gsp = SimulationParameters()
-# alternative simulation properties for porous reservoir
-gsp2 = SimulationParameters()
-gsp2.k_rock = 2.1        #W/m/C
-gsp2.rho_rock = 2300     #kg/m^3
-gsp2.c_rock = 920.       #J/kg/C
-gsp2.working_fluid = 'co2'
-
-fluid_system = FluidSystemCO2(T_ambient_C = 15.,
-                        dT_approach = 7.,
-                        eta_pump = 0.9,
-                        eta_turbine = 0.78,
-                        coolingMode = 'Wet')
-
-fluid_system.injection_well = SemiAnalyticalWell(params = gsp,
-                                    dz_total = -2500.,
-                                    wellRadius = 0.205,
-                                    wellMultiplier = 4.,
-                                    fluid = 'CO2',
-                                    epsilon = 55 * 1e-6,
-                                    dT_dz = 0.035,
-                                    T_e_initial = 15.)
-
-fluid_system.reservoir = PorousReservoir(params = gsp2)
-
-fluid_system.production_well = SemiAnalyticalWell(params = gsp,
-                                    dz_total = 2500.,
-                                    wellRadius = 0.205,
-                                    wellMultiplier = 4.,
-                                    fluid = 'CO2',
-                                    epsilon = 55 * 1e-6,
-                                    dT_dz = 0.035,
-                                    T_e_initial = 15. + 0.035 * 2500.)
-
-
-capital_cost_system = CapitalCostSystem(2019)
-capital_cost_system.CapitalCost_SurfacePlant = CapitalCostSurfacePlantCPG(2019)
-capital_cost_system.CapitalCost_SurfacePipe = CapitalCostSurfacePipes(N = 0)
-capital_cost_system.CapitalCost_Production_Well = CapitalCostWell.cO2Baseline(well_length = 2500,
-                                                                    well_diameter = 0.205 * 2,
-                                                                    success_rate = 0.95,
-                                                                    cost_year = 2019)
-capital_cost_system.CapitalCost_Injection_Well = CapitalCostWell.cO2Baseline(well_length = 2500,
-                                                                    well_diameter = 0.205 * 2,
-                                                                    success_rate = 0.95,
-                                                                    cost_year = 2019)
-capital_cost_system.CapitalCost_Wellfield = CapitalCostWellField.cO2MonitoringBaseline(N=1,
-                                                                    monitoring_well_length=2500,
-                                                                    monitoring_well_diameter=0.216,
-                                                                    cost_year=2019)
-capital_cost_system.CapitalCost_Exploration = CapitalCostExploration.cO2Baseline(N=1,
-                                                                    well_length = 2500,
-                                                                    well_diameter = 0.205 * 2,
-                                                                    success_rate = 0.95,
-                                                                    cost_year = 2019)
-capital_cost_system.lcoe_model = LCOESimple(F_OM = 0.045,
-                                            discountRate = 0.096,
-                                            Lifetime = 25,
-                                            CapacityFactor = 0.9)
-
-full_system = FullSystemCPG(fluid_system, capital_cost_system)
 
 class FluidSystemCO2Test(unittest.TestCase):
 
     def testFluidSystemCO2Mdot10(self):
-        full_system.solve(m_dot = 10, time_years = 1)
+        params = SimulationParameters(working_fluid = 'co2', capacity_factor = 0.9)
+        params.m_dot_IP = 10
+        output = FullSystemCPG.getDefaultCPGSystem(params).solve()
 
-        output = full_system.gatherOutput()
-
-        self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 6.3943e6, 'test_dP_surface'))
-        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.end_T_C(), 60.4516, 'test_T_prod_surface_C'))
-        self.assertTrue(*testAssert(output.energy_results.W_net, 1.0283e5, 'test_W_net'))
-        self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 1.5452e7, 'test_C_brownfield_N'))
-        self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 3.8082e7, 'test_C_greenfield_N'))
-        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 7.2330e-4, 'test_LCOE_brownfield'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.9421e6, 'test_dP_surface'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.state.T_C, 59.2802, 'test_T_prod_surface_C'))
+        self.assertTrue(*testAssert(output.energy_results.W_net, 9.7662e4, 'test_W_net'))
+        self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 1.3271e7, 'test_C_brownfield_N'))
+        self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 3.5901e7, 'test_C_greenfield_N'))
+        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 6.5410e-4, 'test_LCOE_brownfield'))
 
 
     def testFluidSystemCO2Mdot80(self):
-        full_system.solve(m_dot = 80, time_years = 1)
+        params = SimulationParameters(working_fluid = 'co2', capacity_factor = 0.9)
+        params.m_dot_IP = 80
+        output = FullSystemCPG.getDefaultCPGSystem(params).solve()
 
-        output = full_system.gatherOutput()
-
-        self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.65949586e6, 'test_dP_surface'))
-        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.end_T_C(), 59.0826, 'test_T_prod_surface_C'))
-        self.assertTrue(*testAssert(output.energy_results.W_net, 5.02286e+05, 'test_W_net'))
-        self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 2.98408178e+07, 'test_C_brownfield_N'))
-        self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 5.2470e7, 'test_C_greenfield_N'))
-        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.8596677e-04, 'test_LCOE_brownfield'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.6501e6, 'test_dP_surface'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.state.T_C, 59.0540, 'test_T_prod_surface_C'))
+        self.assertTrue(*testAssert(output.energy_results.W_net, 4.9940e+05, 'test_W_net'))
+        self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 2.7650e7, 'test_C_brownfield_N'))
+        self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 5.0280e7, 'test_C_greenfield_N'))
+        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.6650e-4, 'test_LCOE_brownfield'))
 
     def testFluidSystemCO2Mdot200(self):
-        full_system.solve(m_dot = 200, time_years = 1)
+        params = SimulationParameters(working_fluid = 'co2', capacity_factor = 0.9)
+        params.m_dot_IP = 200
+        output = FullSystemCPG.getDefaultCPGSystem(params).solve()
 
-        output = full_system.gatherOutput()
-
-        self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 3.53347e+06, 'test_dP_surface'))
-        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.end_T_C(), 47.603999, 'test_T_prod_surface_C'))
-        self.assertTrue(*testAssert(output.energy_results.W_net, -1.3588e6, 'test_W_net'))
-        self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 5.2721e7, 'test_C_brownfield_N'))
-        self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 7.5351e7, 'test_C_greenfield_N'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 3.468765e+06, 'test_dP_surface'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.state.T_C, 47.6070, 'test_T_prod_surface_C'))
+        self.assertTrue(*testAssert(output.energy_results.W_net, -1.3875e6, 'test_W_net'))
+        self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 5.0443e7, 'test_C_brownfield_N'))
+        self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 7.3073e7, 'test_C_greenfield_N'))
         self.assertTrue(np.isnan(output.capital_cost_model.LCOE_brownfield.LCOE), 'test_LCOE_brownfield')
 
+    def testFluidSystemCO2Mdot100(self):
+        params = SimulationParameters(working_fluid = 'co2', capacity_factor = 0.9)
+        params.m_dot_IP = 100
+        params.depth = 2400.
+        params.permeability = 1e-8 / 100.
+        output = FullSystemCPG.getDefaultCPGSystem(params).solve()
+
+        self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_surface, 5.0019e6, 'test_dP_surface'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.production_well.state.T_C, 55.3144, 'test_T_prod_surface_C'))
+        self.assertTrue(*testAssert(output.fluid_system_solver.pp.dP_pump, -1.0756e6, 'test_dP_pump'))
+        self.assertTrue(*testAssert(output.energy_results.W_net, 8.2656e5, 'test_W_net'))
+        self.assertTrue(*testAssert(output.capital_cost_model.C_brownfield, 2.6182e7, 'test_C_brownfield_N'))
+        self.assertTrue(*testAssert(output.capital_cost_model.C_greenfield, 4.8021e7, 'test_C_greenfield_N'))
+        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 1.5247e-4, 'test_LCOE_brownfield'))
+
     def testFluidSystemCO2SolverOptMdot(self):
+        params = SimulationParameters(working_fluid = 'co2', capacity_factor = 0.9)
 
-        full_system_solver = FullSystemSolverMinLCOEBrownfield(full_system)
+        full_system = FullSystemCPG.getDefaultCPGSystem(params)
+        full_system_solver = FullSystemSolver(full_system)
 
-        optMdot = full_system_solver.solve(time_years = 1)
+        output = full_system_solver.solve()
 
-        output = full_system.gatherOutput()
-        print(*testAssert(optMdot, 55.56, 'test_optMdot_solver_optMdot'))
-        print(*testAssert(output.energy_results.W_net, 4.5795e5, 'test_optMdot_solver_w_net'))
-        print(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.6158e-4, 'test_optMdot_solver_LCOE_brownfield'))
+        self.assertTrue(*testAssert(output.optMdot, 54.8493, 'test_optMdot_solver_optMdot', 1e-3))
+        self.assertTrue(*testAssert(output.energy_results.W_net, 4.5411e5, 'test_optMdot_solver_w_net', 1e-3))
+        self.assertTrue(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.3915e-4, 'test_optMdot_solver_LCOE_brownfield', 1e-3))

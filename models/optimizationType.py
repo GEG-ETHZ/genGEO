@@ -13,11 +13,8 @@
 #
 
 ############################
+from enum import Enum
 
-
-class CapitalCostWellStimulation(object):
-    """CapitalCostWellStimulation."""
-
-    @staticmethod
-    def cost():
-        return 0.
+class OptimizationType(Enum):
+    MinimizeCost = 1
+    MaximizePower = 2

@@ -1,26 +1,35 @@
+# Licensed under LGPL 2.1, please see LICENSE for details
+# https://www.gnu.org/licenses/lgpl-2.1.html
+#
+# The work on this project has been performed at the GEG Group at ETH Zurich:
+# --> https://geg.ethz.ch
+#
+# The initial version of this file has been implemented by:
+#
+#     Philipp Schaedle (https://github.com/philippschaedle)
+#     Benjamin M. Adams
+#
+# Further changes are done by:
+#
+
+############################
 import unittest
 import numpy as np
 
 from src.porousReservoir import PorousReservoir
 from utils.depletionCurve import depletionCurve
-from utils.simulationParameters import SimulationParameters
+from models.simulationParameters import SimulationParameters
 from tests.testAssertion import testAssert
-from utils.fluidStateFromPT import FluidStateFromPT
+from utils.fluidState import FluidState
 
 
-# define global methods to be used in the tests
-gpp = SimulationParameters()
-gpp.working_fluid = 'co2'
-gpp.k_rock = 2.1
-gpp.rho_rock = 2300
-gpp.c_rock = 920.
-gpp.reservoir_thickness = 300
-gpp.permeability = 50e-15
-gpp.time_years = 30
+reservoir = PorousReservoir(working_fluid = 'co2',
+                            reservoir_thickness = 300,
+                            permeability = 50e-15,
+                            time_years = 30,
+                            m_dot_IP = 100)
 
-reservoir = PorousReservoir(params = gpp)
-
-initialState = FluidStateFromPT(25.e6, 40., gpp.working_fluid)
+initialState = FluidState.getStateFromPT(25.e6, 40., reservoir.params.working_fluid)
 
 class ReservoirDepletionTest(unittest.TestCase):
 
@@ -37,68 +46,40 @@ class ReservoirDepletionTest(unittest.TestCase):
     def testNoTransient(self):
         reservoir.modelPressureTransient = False
         reservoir.modelTemperatureDepletion = False
-        reservoir.solve(initialState = initialState,
-                        m_dot = 100)
-        results = reservoir.gatherOutput()
-        self.assertTrue(*testAssert(results.end_P_Pa, 2.0351e7, 'test2_pressure'))
-        self.assertTrue(*testAssert(results.end_T_C, 102.5, 'test2_temp'))
-        self.assertTrue(*testAssert(results.end_h_Jkg, 4.30e5, 'test2_enthalpy'))
-        self.assertTrue(*testAssert(results.psi, 1.2713, 'test2_Psi'))
+        results = reservoir.solve(initialState = initialState)
+
+        self.assertTrue(*testAssert(results.state.P_Pa, 2.0351e7, 'test2_pressure'))
+        self.assertTrue(*testAssert(results.state.T_C, 102.5, 'test2_temp'))
+        self.assertTrue(*testAssert(results.state.h_Jkg, 4.30e5, 'test2_enthalpy'))
+        self.assertTrue(*testAssert(results.psi, 1.0151, 'test2_Psi'))
 
     def testTransientPNoT(self):
         reservoir.modelPressureTransient = False
         reservoir.modelTemperatureDepletion = True
-        reservoir.solve(initialState = initialState,
-                        m_dot = 100)
+        results = reservoir.solve(initialState = initialState)
 
-        results = reservoir.gatherOutput()
-        self.assertTrue(*testAssert(results.end_P_Pa, 2.0351e7, 'test3_pressure'))
-        self.assertTrue(*testAssert(results.end_T_C, 70.678, 'test3_temp'))
-        self.assertTrue(*testAssert(results.end_h_Jkg, 3.5056e5, 'test3_enthalpy'))
-        self.assertTrue(*testAssert(results.psi, 0.92775, 'test3_Psi'))
+        self.assertTrue(*testAssert(results.state.P_Pa, 2.0351e7, 'test3_pressure'))
+        self.assertTrue(*testAssert(results.state.T_C, 71.7201, 'test3_temp'))
+        self.assertTrue(*testAssert(results.state.h_Jkg, 3.5324e5, 'test3_enthalpy'))
+        self.assertTrue(*testAssert(results.psi, 0.8457, 'test3_Psi'))
 
     def testTransientPT(self):
         reservoir.modelPressureTransient = True
         reservoir.modelTemperatureDepletion = True
-        reservoir.solve(initialState = initialState,
-                        m_dot = 100)
+        results = reservoir.solve(initialState = initialState)
 
-        results = reservoir.gatherOutput()
-        self.assertTrue(*testAssert(results.end_P_Pa, 1.9325e7, 'test4_pressure'))
-        self.assertTrue(*testAssert(results.end_T_C, 70.678, 'test4_temp'))
-        self.assertTrue(*testAssert(results.end_h_Jkg, 3.5452e5, 'test4_enthalpy'))
-        self.assertTrue(*testAssert(results.psi, 0.92775, 'test4_Psi'))
+        self.assertTrue(*testAssert(results.state.P_Pa, 1.9325e7, 'test4_pressure'))
+        self.assertTrue(*testAssert(results.state.T_C, 71.7201, 'test4_temp'))
+        self.assertTrue(*testAssert(results.state.h_Jkg, 3.5732e5, 'test4_enthalpy'))
+        self.assertTrue(*testAssert(results.psi, 0.8457, 'test4_Psi'))
 
     def testTransientTNoP(self):
         reservoir.modelPressureTransient = False
         reservoir.modelTemperatureDepletion = True
-        reservoir.solve(initialState = initialState,
-                        m_dot = 200)
+        reservoir.params.m_dot_IP = 200
+        results = reservoir.solve(initialState = initialState)
 
-        results = reservoir.gatherOutput()
-        self.assertTrue(*testAssert(results.end_P_Pa, 1.5702e7, 'test5_pressure'))
-        self.assertTrue(*testAssert(results.end_T_C, 53.352, 'test5_temp'))
-        self.assertTrue(*testAssert(results.end_h_Jkg, 3.2103e5, 'test5_enthalpy'))
-        self.assertTrue(*testAssert(results.psi, 1.3877, 'test5_Psi'))
-
-    # def test(self):
-    #     reservoir = PorousReservoir(
-    #                 params = gpp,
-    #                 well_spacing = 707.,
-    #                 thickness = 300,
-    #                 permeability = 50e-15,
-    #                 T_surface_rock = 15,
-    #                 depth = 2500,
-    #                 dT_dz = 0.035,
-    #                 wellRadius = 0.205,
-    #                 reservoirConfiguration = 'Doublet',
-    #                 fluid = 'Water',
-    #                 modelPressureTransient = False,
-    #                 modelTemperatureDepletion = False)
-    #     initialState = FluidStateFromPT(25.e6, 15., reservoir.fluid)
-    #     reservoir.solve(
-    #                     initialState = initialState,
-    #                     m_dot = 100,
-    #                     time_years = 30)
-    #     results = reservoir.gatherOutput()
-    #     print(results.end_P_Pa, results.end_T_C,  results.end_h_Jkg)
+        self.assertTrue(*testAssert(results.state.P_Pa, 1.5702e7, 'test5_pressure'))
+        self.assertTrue(*testAssert(results.state.T_C, 55.8873, 'test5_temp'))
+        self.assertTrue(*testAssert(results.state.h_Jkg, 3.2876e5, 'test5_enthalpy'))
+        self.assertTrue(*testAssert(results.psi, 1.2962, 'test5_Psi'))

@@ -1,3 +1,18 @@
+# Licensed under LGPL 2.1, please see LICENSE for details
+# https://www.gnu.org/licenses/lgpl-2.1.html
+#
+# The work on this project has been performed at the GEG Group at ETH Zurich:
+# --> https://geg.ethz.ch
+#
+# The initial version of this file has been implemented by:
+#
+#     Philipp Schaedle (https://github.com/philippschaedle)
+#     Benjamin M. Adams
+#
+# Further changes are done by:
+#
+
+############################
 import numpy as np
 
 from src.heatExchanger import heatExchanger
@@ -26,7 +41,7 @@ def heatExchangerOptMdot(T_1_in, P_1, fluid_1, T_2_in, P_2, fluid_2, dT_pinch, T
         elif maximizeHeatFromStream == '2':
             q_exchanged = heat_exchanger_results.q_exchanged_2
         else:
-            raise ValueError('heatExchangerOptMdot:unknownOptimizeMethod - Unknown Optimize Method')
+            raise Exception('GenGeo::heatExchangerOptMdot:unknownOptimizeMethod - Unknown Optimize Method')
 
         # if temp too low, make sure mdot_ratio is increasing
         if not np.isnan(T_1_out_min) and heat_exchanger_results.T_1_out < T_1_out_min and d_mdot_ratio < 0:

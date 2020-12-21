@@ -1,7 +1,23 @@
+# Licensed under LGPL 2.1, please see LICENSE for details
+# https://www.gnu.org/licenses/lgpl-2.1.html
+#
+# The work on this project has been performed at the GEG Group at ETH Zurich:
+# --> https://geg.ethz.ch
+#
+# The initial version of this file has been implemented by:
+#
+#     Philipp Schaedle (https://github.com/philippschaedle)
+#     Benjamin M. Adams
+#
+# Further changes are done by:
+#
+
+############################
 import numpy as np
 
-from src.capitalCostCoolingTower import CapitalCostCoolingTower
+from src.coolingCondensingTower import CoolingCondensingTower
 
+from models.simulationParameters import SimulationParameters
 from utils.readXlsxData import readCostTable
 
 class CapitalCostSurfacePlantCPGResults(object):
@@ -12,16 +28,18 @@ class CapitalCostSurfacePlantCPGResults(object):
 class CapitalCostSurfacePlantCPG(object):
     """CapitalCostSurfacePlantCPG."""
 
-    def __init__(self, cost_year):
-        self.cost_year = cost_year
-        self.ppi_T_G = readCostTable(cost_year, 'PPI_T-G')
-        self.ppi_pump = readCostTable(cost_year, 'PPI_Pump')
+    def __init__(self, params = None, **kwargs):
+        self.params = params
+        if self.params == None:
+            self.params = SimulationParameters(**kwargs)
+        self.ppi_T_G = readCostTable('PPI_T-G')
+        self.ppi_pump = readCostTable('PPI_Pump')
 
     def solve(self, energy_results, fluid_system):
 
         dT_range_CT =  0.
-        T_ambient_C = fluid_system.T_ambient_C
-        dT_approach_CT = fluid_system.dT_approach
+        T_ambient_C = self.params.T_ambient_C
+        dT_approach_CT = self.params.dT_approach
 
         Q_condenser = energy_results.Q_condenser_total
         Q_desuperheater = energy_results.Q_desuperheater_total
@@ -32,32 +50,32 @@ class CapitalCostSurfacePlantCPG(object):
 
         # Check heats & powers
         if W_turbine < 0:
-            raise Exception('CapitalCost_SurfacePlant:NegativeTurbinePower - Negative Turbine Power')
+            raise Exception('GenGeo::CapitalCostSurfacePlantCPG:NegativeTurbinePower - Negative Turbine Power')
         elif Q_desuperheater > 0 or Q_condenser > 0:
-            raise Exception('CapitalCost_SurfacePlant:PositiveCondenserHeat - Positive Condenser Heat')
+            raise Exception('GenGeo::CapitalCostSurfacePlantCPG:PositiveCondenserHeat - Positive Condenser Heat')
         elif W_pump_inj > 0:
-            raise Exception('CapitalCost_SurfacePlant:PositiveCpgPumpPower - Positive CPG Pump Power')
+            raise Exception('GenGeo::CapitalCostSurfacePlantCPG:PositiveCPGPumpPower - Positive CPG Pump Power')
 
         # Check temps
         if dT_approach_CT < 0 or dT_range_CT < 0:
-            raise Exception('CapitalCost_SurfacePlant:NegativedT - Negative Temp Difference')
+            raise Exception('GenGeo::CapitalCostSurfacePlantCPG:NegativedT - Negative Temp Difference')
 
         results = CapitalCostSurfacePlantCPGResults()
 
         # C_T_G
         # Regular fluid
         S_T_fluid = 1.20 #CO2
-        results.C_T_G = 0.67 * self.ppi_T_G * (S_T_fluid*2830*(W_turbine/1e3)**0.745 + 3680*(W_turbine/1e3)**0.617)
+        results.C_T_G = 0.67 * self.ppi_T_G[self.params.cost_year] * (S_T_fluid*2830*(W_turbine/1e3)**0.745 + 3680*(W_turbine/1e3)**0.617)
 
         # C_pump_inj
         C_pump_surface_inj = 1750 * (1.34*-1*(W_pump_inj/1e3))**0.7
         S_pump_inj = 2.09 #CO2
-        results.C_pump_inj = self.ppi_pump * S_pump_inj * C_pump_surface_inj
+        results.C_pump_inj = self.ppi_pump[self.params.cost_year] * S_pump_inj * C_pump_surface_inj
 
         # C_coolingTowers
         TDC = 1.2
-        results.C_coolingTowers= CapitalCostCoolingTower.cost(Q_desuperheater, Q_condenser, TDC,
-                                                    T_ambient_C, dT_approach_CT, dT_range_CT, self.cost_year)
+        results.C_coolingTowers = CoolingCondensingTower.specificCaptitalCost(Q_desuperheater, Q_condenser, TDC,
+                                                    T_ambient_C, dT_approach_CT, dT_range_CT, self.params.cost_year, self.params.cooling_mode)
 
         # C_primaryEquipment
         C_primaryEquipment = results.C_T_G + results.C_pump_inj + results.C_coolingTowers

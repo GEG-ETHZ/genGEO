@@ -1,3 +1,18 @@
+# Licensed under LGPL 2.1, please see LICENSE for details
+# https://www.gnu.org/licenses/lgpl-2.1.html
+#
+# The work on this project has been performed at the GEG Group at ETH Zurich:
+# --> https://geg.ethz.ch
+#
+# The initial version of this file has been implemented by:
+#
+#     Philipp Schaedle (https://github.com/philippschaedle)
+#     Benjamin M. Adams
+#
+# Further changes are done by:
+#
+
+############################
 import numpy as np
 
 class LCOESimpleOutput(object):
@@ -6,40 +21,36 @@ class LCOESimpleOutput(object):
 
 class LCOESimple(object):
     """LCOESimple."""
-    def __init__(self, F_OM, discountRate, Lifetime, CapacityFactor):
-        self.F_OM = F_OM
-        self.discountRate = discountRate
-        self.Lifetime = Lifetime
-        self.CapacityFactor = CapacityFactor
+    def __init__(self, params = None, **kwargs):
+        self.params = params
+        if self.params == None:
+            self.params = SimulationParameters(**kwargs)
 
         #Check heats & powers
-        if F_OM < 0:
-            raise ValueError('LCOE_Simple:NegativeF_OM - Negative O&M Fraction!')
-        elif discountRate < 0:
-            raise ValueError('LCOE_Simple:NegativeDiscountRate - Negative Discount Rate!')
-        elif Lifetime <= 0:
-            raise ValueError('LCOE_Simple:NegativeLifetime - Negative Lifetime!')
-        elif CapacityFactor <= 0 or CapacityFactor > 1:
-            raise ValueError('LCOE_Simple:BadCapacityFactor - Bad Capacity Factor!')
+        if self.params.F_OM < 0:
+            raise Exception('GenGeo::LCOESimple:NegativeF_OM - Negative O&M Fraction!')
+        elif self.params.discount_rate < 0:
+            raise Exception('GenGeo::LCOESimple:NegativeDiscountRate - Negative Discount Rate!')
+        elif self.params.lifetime <= 0:
+            raise Exception('GenGeo::LCOESimple:Negativelifetime - Negative lifetime!')
+        elif self.params.capacity_factor <= 0 or self.params.capacity_factor > 1:
+            raise Exception('GenGeo::LCOESimple:Badcapacity_factor - Bad Capacity Factor!')
 
-    def specificCapitalCost(self, CapitalCost):
-        if self.Capacity_W <= 0 or CapitalCost <= 0:
+    def specificCapitalCost(self, capital_cost, capacity_W):
+        if capacity_W <= 0 or capital_cost <= 0:
             return np.nan
-        return CapitalCost / self.Capacity_W
+        return capital_cost / capacity_W
 
-    def lCOE(self, CapitalCost):
-        if self.Capacity_W <= 0 or CapitalCost <= 0:
+    def lCOE(self, capital_cost, capacity_W):
+        if capacity_W <= 0 or capital_cost <= 0:
             return np.nan
-        CRF = self.discountRate * (1 + self.discountRate)**self.Lifetime / ((1 + self.discountRate)**self.Lifetime - 1)
-        return CapitalCost * (CRF + self.F_OM) / (self.Capacity_W * self.CapacityFactor * 8760)
+        CRF = self.params.discount_rate * (1 + self.params.discount_rate)**self.params.lifetime / ((1 + self.params.discount_rate)**self.params.lifetime - 1)
+        return capital_cost * (CRF + self.params.F_OM) / (capacity_W * self.params.capacity_factor * 8760)
 
-    def solve(self, CapitalCost, energy_results):
-        self.Capacity_W = energy_results.W_net_total
-        self.LCOE = self.lCOE(CapitalCost)
-        self.specific_capital_cost = self.specificCapitalCost(CapitalCost)
-
-    def gatherOutput(self):
-        output = LCOESimpleOutput()
-        output.LCOE = self.LCOE
-        output.specific_capital_cost = self.specific_capital_cost
-        return output
+    def solve(self, capital_cost, energy_results):
+        results = LCOESimpleOutput()
+        capacity_W = energy_results.W_net_total
+        results.LCOE = self.lCOE(capital_cost, capacity_W)
+        results.specific_capital_cost = self.specificCapitalCost(capital_cost, capacity_W)
+        self.output = results
+        return results

@@ -1,6 +1,23 @@
+# Licensed under LGPL 2.1, please see LICENSE for details
+# https://www.gnu.org/licenses/lgpl-2.1.html
+#
+# The work on this project has been performed at the GEG Group at ETH Zurich:
+# --> https://geg.ethz.ch
+#
+# The initial version of this file has been implemented by:
+#
+#     Philipp Schaedle (https://github.com/philippschaedle)
+#     Benjamin M. Adams
+#
+# Further changes are done by:
+#
+
+############################
 import numpy as np
 
 from src.fullSystemOptMdotBase import FullSystemOptMdotBase
+
+from enum import Enum
 
 class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
     """
@@ -10,11 +27,16 @@ class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
     def __init__(self, system):
         super().__init__(system)
 
-    def solve(self, time_years):
+    def getDirection(self):
+        return SolverOptimizationType.Maximize
 
+    def getTargetVar(self):
+        return None
+
+    def solve(self):
         old_var = np.nan
         best_var = np.nan
-        best_m_dot = np.nan
+        #best_m_dot = np.nan
 
         #Starting Massflow Guess (add 10)
         m_dot_IP = 10
@@ -29,7 +51,7 @@ class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
         # reversingFraction is the change past minimum to reverse
         reversing_fraction = 3e-2
 
-        opt_dir = np.sign(self.getDirection())
+        opt_dir = np.sign(self.getDirection().value)
         opt_dir_dict = {-1: 'Minimize',
                          1: 'Maximize'}
 
@@ -41,10 +63,11 @@ class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
                 m_dot_IP = abs(d_m_dot)
                 print('mdot<=0; peak %s'%peaks)
 
-            print('Trying a mass flowrate of %s'%m_dot_IP)
+            print('Trying a mass flowrate of %.2f' %m_dot_IP)
             try:
-                system = self.full_system.solve(m_dot_IP, time_years)
-                var_out = self.getTargetVar()
+                self.full_system.params.m_dot_IP = m_dot_IP
+                solveResult = self.full_system.solve()
+                var_out = self.getTargetVar(solveResult)
 
                 # See if this mass flowrate is better than previous values
 
@@ -105,8 +128,13 @@ class FullSystemSolverPeakIterator(FullSystemOptMdotBase):
             m_dot_IP = m_dot_IP + d_m_dot
 
         # one final solve with the optimum flowrate
-        system = self.full_system.solve(m_dot_IP, time_years)
+        self.full_system.params.m_dot_IP = m_dot_IP
+        results = self.full_system.solve()
+        results.optMdot = m_dot_IP
 
-        t_val = self.getTargetVar()
+        return results
 
-        return m_dot_IP
+
+class SolverOptimizationType(Enum):
+    Minimize = -1
+    Maximize = 1

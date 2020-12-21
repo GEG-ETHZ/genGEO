@@ -1,23 +1,24 @@
-import numpy as np
+# Licensed under LGPL 2.1, please see LICENSE for details
+# https://www.gnu.org/licenses/lgpl-2.1.html
+#
+# The work on this project has been performed at the GEG Group at ETH Zurich:
+# --> https://geg.ethz.ch
+#
+# The initial version of this file has been implemented by:
+#
+#     Philipp Schaedle (https://github.com/philippschaedle)
+#     Benjamin M. Adams
+#
+# Further changes are done by:
+#
 
-from utils.fluidStateFromPT import FluidStateFromPT
+############################
+import numpy as np
 
 class PorousReservoirResults(object):
     """PorousReservoirResults."""
-    def __init__(self, fluid, wellspacing):
-        self.fluid = fluid
-        self.wellspacing = wellspacing
+    def __init__(self):
         self.dP = None
-        self.end_P_Pa = None
-        self.end_T_C = None
         self.heat = None
-        self.reservoirT = None
         self.psi = None
-        self.end_h_Jkg = None
-
-    def finalState(self):
-        return FluidStateFromPT(self.end_P_Pa, self.end_T_C, self.fluid)
-
-    # # TODO: do we need this?
-    def getPressure(self):
-        return self.end_P_Pa / 1.e6
+        self.state = None
