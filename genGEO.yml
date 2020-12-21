@@ -17,9 +17,9 @@
 #
 # genGeo anaconda environment
 #
-# install: conda env create -f genGeo.yml 
-# update:  conda env update -f genGeo.yml 
-name: genGeo
+# install: conda env create -f genGeo.yml
+# update:  conda env update -f genGeo.yml
+name: genGEO
 channels:
   - conda-forge
   - defaults

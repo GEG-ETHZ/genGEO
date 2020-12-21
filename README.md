@@ -1,7 +1,7 @@
-genGeo
-======
 
-![genGeo logo](media/logo.jpg)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4383138.svg)](https://doi.org/10.5281/zenodo.4383138)
+
+![genGEO logo](media/logo.jpg)
 
 genGEO is a coupled reservoir-electricity-cost geothermal simulator. It is an open-source, object-oriented python code which may be extended to include any geothermal or power generation scenario.
 
@@ -10,13 +10,13 @@ An example file is provided with [exampleCPGSystemStudy.py](exampleCPGSystemStud
 
 Install
 ---
-genGeo uses [conda](https://docs.conda.io/projects/conda/en/latest/index.html) for easy package management and comes with an yml file to create an environment with all required packages.
+genGEO uses [conda](https://docs.conda.io/projects/conda/en/latest/index.html) for easy package management and comes with an yml file to create an environment with all required packages.
 
 For conda users please run the following for installation:
-- `conda env create -f genGeo.yml`
+- `conda env create -f genGEO.yml`
 
 and for updates:
-- `conda env update -f genGeo.yml`
+- `conda env update -f genGEO.yml`
 
 For non conda users, please install the following packages:
 - python=3.7
@@ -27,13 +27,13 @@ For non conda users, please install the following packages:
 
 Testing
 ---
-To test if genGeo works fine on your system, please run the tests with the following command:
+To test if genGEO works fine on your system, please run the tests with the following command:
 
-`cd <path_to_genGeo> ; ./runTests.sh`
+`cd <path_to_genGEO> ; ./runTests.sh`
 
 For the full test which also tests the optimization mode please run:
 
-`cd <path_to_genGeo> ; ./runTests.sh full`
+`cd <path_to_genGEO> ; ./runTests.sh full`
 
 
 Contact
