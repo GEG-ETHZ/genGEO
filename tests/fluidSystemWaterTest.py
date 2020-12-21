@@ -12,7 +12,7 @@ from tests.testAssertion import testAssert
 class FluidSystemWaterTest(unittest.TestCase):
 
     def testFluidSystemWaterSolverMdot1(self):
-        params = SimulationParameters(working_fluid = 'water', well_multiplier = 4., orc_fluid = 'R245fa', capacity_factor = 0.9)
+        params = SimulationParameters(working_fluid = 'water', orc_fluid = 'R245fa', capacity_factor = 0.9)
         params.m_dot_IP = 1
         
         output = FullSystemORC.getDefaultWaterSystem(params).solve()
@@ -25,7 +25,7 @@ class FluidSystemWaterTest(unittest.TestCase):
         print(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 0.0083879, 'test_solver1_LCOE_brownfield'))
 
     def testFluidSystemWaterSolverMdot40(self):
-        params = SimulationParameters(working_fluid = 'water', well_multiplier = 4., orc_fluid = 'R245fa', capacity_factor = 0.9)
+        params = SimulationParameters(working_fluid = 'water', orc_fluid = 'R245fa', capacity_factor = 0.9)
         params.m_dot_IP = 40
         
         output = FullSystemORC.getDefaultWaterSystem(params).solve()
@@ -39,7 +39,7 @@ class FluidSystemWaterTest(unittest.TestCase):
 
     def testFluidSystemWaterSolverOptMdot(self):
         
-        params = SimulationParameters(working_fluid = 'water', well_multiplier = 4., orc_fluid = 'R245fa', capacity_factor = 0.9)
+        params = SimulationParameters(working_fluid = 'water', orc_fluid = 'R245fa', capacity_factor = 0.9)
         
         full_system = FullSystemORC.getDefaultWaterSystem(params)
         full_system_solver = FullSystemSolver(full_system)

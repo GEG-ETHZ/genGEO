@@ -28,6 +28,8 @@ class FluidSystemCO2(object):
         results = FluidSystemCO2Output()
         results.pp = PowerPlantEnergyOutput()
 
+        mdot_well_multiplier = self.params.wellFieldType.getWellMdotMultiplier()
+
         # Find condensation pressure
         T_condensation = self.params.T_ambient_C + self.params.dT_approach
         P_condensation = FluidState.getStateFromTQ(T_condensation, 0, self.params.working_fluid).P_Pa + 50e3
@@ -61,7 +63,7 @@ class FluidSystemCO2(object):
 
             surface_injection_state = FluidState.getStateFromPh(P_pump_outlet, h_pump_outlet, self.params.working_fluid)
 
-            results.injection_well    = self.injection_well.solve(surface_injection_state)
+            results.injection_well    = self.injection_well.solve(surface_injection_state, mdot_well_multiplier)
 
             # if dP_pump is negative, this is a throttle after the injection well
             if (dP_pump < 0):
@@ -92,7 +94,7 @@ class FluidSystemCO2(object):
             raise Exception('GenGeo::FluidSystemCO2:ExceedsMaxReservoirPressure - '
                         'Exceeds Max Reservoir Pressure of %.3f MPa!'%(self.params.P_reservoir_max()/1e6))
 
-        results.production_well  = self.production_well.solve(results.reservoir.state)
+        results.production_well  = self.production_well.solve(results.reservoir.state, mdot_well_multiplier)
 
         # Subtract surface frictional losses between production wellhead and surface plant
         ff = frictionFactor(self.params.well_radius, results.production_well.state.P_Pa, results.production_well.state.h_Jkg,

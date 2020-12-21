@@ -34,8 +34,10 @@ class FluidSystemWater(object):
         dP_loops = 1
         stop =  False
 
+        mdot_well_multiplier = self.params.wellFieldType.getWellMdotMultiplier()
+
         while np.isnan(dP_downhole) or abs(dP_downhole) > 10e3:
-            results.injection_well    = self.injection_well.solve(injection_state)
+            results.injection_well    = self.injection_well.solve(injection_state, mdot_well_multiplier)
             results.reservoir         = self.reservoir.solve(results.injection_well.state)
 
             # if already at P_system_min, stop looping
@@ -65,15 +67,15 @@ class FluidSystemWater(object):
                         'Exceeds Max Reservoir Pressure of %.3f MPa!'%(self.params.P_reservoir_max()/1e6))
 
         # Production Well (Lower, to production pump)
-        results.production_well1  = self.production_well1.solve(results.reservoir.state)
+        results.production_well1  = self.production_well1.solve(results.reservoir.state, mdot_well_multiplier)
         # Upper half of production well
-        results.pump              = self.pump.solve(results.production_well1.state, injection_state.P_Pa)
+        results.pump              = self.pump.solve(results.production_well1.state, injection_state.P_Pa, mdot_well_multiplier)
 
         # Subtract surface frictional losses between production wellhead and surface plant
         ff = frictionFactor(self.params.well_radius, results.pump.well.state.P_Pa, results.pump.well.state.h_Jkg,
             self.params.m_dot_IP, self.params.working_fluid, self.params.epsilon)
         if self.params.has_surface_gathering_system == True:
-            dP_surfacePipes = ff * self.params.well_spacing / (self.params.well_radius*2)**5 * 8 * self.params.m_dot_IP**2 / results.pump.well.state.rho_kgm3 / 3.14159**2
+            dP_surfacePipes = ff * self.params.well_spacing / (self.params.well_radius*2)**5 * 8 * self.params.m_dot_IP**2 / results.pump.well.state.rho_kgm3 / np.pi**2
         else:
             dP_surfacePipes = 0
         

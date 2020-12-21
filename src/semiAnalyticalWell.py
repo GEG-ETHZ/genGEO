@@ -25,11 +25,12 @@ class SemiAnalyticalWell(object):
         # default is set to be 15 C
         self.T_e_initial = T_e_initial
 
-    def solve(self, initial_state):
+    def solve(self, initial_state, m_dot_multiplier = 1):
+
+        m_dot = self.params.m_dot_IP * m_dot_multiplier
+
         # results
         results = SemiAnalyticalWellResults(self.params.well_segments, self.params.working_fluid)
-
-        m_dot = self.params.m_dot_IP * self.params.well_multiplier
 
         P_f_initial = initial_state.P_Pa
         T_f_initial = initial_state.T_C

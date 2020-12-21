@@ -27,7 +27,7 @@ class DownHolePump(object):
         self.friction_factor = frictionFactor(self.params.well_radius, initial_P, initial_h, \
                             self.params.m_dot_IP, self.params.working_fluid, self.params.epsilon)
 
-    def solve(self, initial_state, P_inj_surface):
+    def solve(self, initial_state, P_inj_surface, well_mdot_multiplier):
 
         if self.ff_m_dot != self.params.m_dot_IP:
             self.computeSurfacePipeFrictionFactor()
@@ -52,7 +52,7 @@ class DownHolePump(object):
                 temp_at_pump_depth = self.well.T_e_initial + self.params.dT_dz * self.params.pump_depth
 
                 state_in = FluidState.getStateFromPT(P_prod_pump_out, T_prod_pump_out, self.params.working_fluid)
-                results.well = self.well.solve(state_in)
+                results.well = self.well.solve(state_in, well_mdot_multiplier)
 
                 # calculate surface pipe friction loss
                 if self.params.has_surface_gathering_system:

@@ -18,15 +18,14 @@ class SemiAnalyticalWellTest(unittest.TestCase):
         #  Testing SemiAnalyticalWell for vertical production well settings
         ###
         # Water
-        well = SemiAnalyticalWell(working_fluid = 'water',
-                                time_years = 10.,
-                                dz_total = 2500.,
-                                T_e_initial = 102.5,
-                                m_dot_IP = 136.)
+        params = SimulationParameters(working_fluid = 'water',
+                                        time_years = 10.,
+                                        m_dot_IP=136.)
 
         # initial state
-        initial_state = FluidState.getStateFromPT(25.e6, 97., well.params.working_fluid)
-
+        initial_state = FluidState.getStateFromPT(25.e6, 97., params.working_fluid)
+        
+        well = SemiAnalyticalWell(params, T_e_initial=102.5, dz_total=2500.)
         wellresult = well.solve(initial_state)
 
         self.assertMessages(well.params.working_fluid,
@@ -61,7 +60,7 @@ class SemiAnalyticalWellTest(unittest.TestCase):
 
         # initial state
         initial_state = FluidState.getStateFromPT(1.e6, 25., gpp.working_fluid)
-        vertical_well_results = vertical_well.solve(initial_state = initial_state)
+        vertical_well_results = vertical_well.solve(initial_state)
 
         self.assertMessages(gpp.working_fluid,
                         (vertical_well_results.state.P_Pa, 3.533e7),
@@ -74,7 +73,7 @@ class SemiAnalyticalWellTest(unittest.TestCase):
 
         # initial state
         initial_state = FluidState.getStateFromPT(vertical_well_results.state.P_Pa, vertical_well_results.state.T_C, gpp.working_fluid)
-        horizontal_well_results = horizontal_well.solve(initial_state = initial_state)
+        horizontal_well_results = horizontal_well.solve(initial_state)
 
         self.assertMessages(gpp.working_fluid,
                         (horizontal_well_results.state.P_Pa, 3.533e7),
@@ -98,7 +97,7 @@ class SemiAnalyticalWellTest(unittest.TestCase):
 
         # initial state
         initial_state = FluidState.getStateFromPT(1.e6, 25., gpp.working_fluid)
-        vertical_well_results = vertical_well.solve(initial_state = initial_state)
+        vertical_well_results = vertical_well.solve(initial_state)
 
         self.assertMessages(gpp.working_fluid,
                         (vertical_well_results.state.P_Pa, 1.7245e6),
@@ -111,7 +110,7 @@ class SemiAnalyticalWellTest(unittest.TestCase):
 
         # initial state
         initial_state = FluidState.getStateFromPT(vertical_well_results.state.P_Pa, vertical_well_results.state.T_C, gpp.working_fluid)
-        horizontal_well_results = horizontal_well.solve(initial_state = initial_state)
+        horizontal_well_results = horizontal_well.solve(initial_state)
 
         self.assertMessages(gpp.working_fluid,
                         (horizontal_well_results.state.P_Pa, 1.7235e6),
@@ -135,7 +134,7 @@ class SemiAnalyticalWellTest(unittest.TestCase):
 
         # initial state
         initial_state = FluidState.getStateFromPT(1.e6, 25., gpp.working_fluid)
-        vertical_well_results = vertical_well.solve(initial_state = initial_state)
+        vertical_well_results = vertical_well.solve(initial_state)
 
         self.assertMessages(gpp.working_fluid,
                         (vertical_well_results.state.P_Pa, 5.1170e5),
@@ -159,9 +158,10 @@ class SemiAnalyticalWellTest(unittest.TestCase):
 
         # initial state
         initial_state = FluidState.getStateFromPT(1.e6, 25., gpp.working_fluid)
-        vertical_well_results = vertical_well.solve(initial_state = initial_state)
+        vertical_well_results = vertical_well.solve(initial_state)
 
         self.assertMessages(gpp.working_fluid,
                         (vertical_well_results.state.P_Pa, 1.1431e6),
                         (vertical_well_results.state.T_C, 222.2246),
                         (vertical_well_results.state.h_Jkg, 6.8717e5))
+

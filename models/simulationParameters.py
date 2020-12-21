@@ -14,7 +14,6 @@ class SimulationParameters(object):
                 depth = 2500.,
                 pump_depth = 500.,
                 well_radius = 0.205,
-                well_multiplier = 1.,
                 well_spacing = 707.,
                 monitoring_well_radius = 0.108,
                 dT_dz = 0.035,
@@ -62,7 +61,6 @@ class SimulationParameters(object):
         self.depth = depth
         self.pump_depth = pump_depth
         self.well_radius = well_radius
-        self.well_multiplier = well_multiplier
         self.well_spacing = well_spacing
         self.monitoring_well_radius = monitoring_well_radius
         self.dT_dz = dT_dz

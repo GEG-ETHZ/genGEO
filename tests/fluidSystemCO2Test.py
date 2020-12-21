@@ -13,7 +13,7 @@ from tests.testAssertion import testAssert
 class FluidSystemCO2Test(unittest.TestCase):
 
     def testFluidSystemCO2Mdot10(self):
-        params = SimulationParameters(working_fluid = 'co2', well_multiplier = 4., capacity_factor = 0.9)
+        params = SimulationParameters(working_fluid = 'co2', capacity_factor = 0.9)
         params.m_dot_IP = 10
         output = FullSystemCPG.getDefaultCPGSystem(params).solve()
 
@@ -26,7 +26,7 @@ class FluidSystemCO2Test(unittest.TestCase):
 
 
     def testFluidSystemCO2Mdot80(self):
-        params = SimulationParameters(working_fluid = 'co2', well_multiplier = 4., capacity_factor = 0.9)
+        params = SimulationParameters(working_fluid = 'co2', capacity_factor = 0.9)
         params.m_dot_IP = 80
         output = FullSystemCPG.getDefaultCPGSystem(params).solve()
 
@@ -38,7 +38,7 @@ class FluidSystemCO2Test(unittest.TestCase):
         print(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 2.6650e-4, 'test_LCOE_brownfield'))
 
     def testFluidSystemCO2Mdot200(self):
-        params = SimulationParameters(working_fluid = 'co2', well_multiplier = 4., capacity_factor = 0.9)
+        params = SimulationParameters(working_fluid = 'co2', capacity_factor = 0.9)
         params.m_dot_IP = 200
         output = FullSystemCPG.getDefaultCPGSystem(params).solve()
 
@@ -50,7 +50,7 @@ class FluidSystemCO2Test(unittest.TestCase):
         print(np.isnan(output.capital_cost_model.LCOE_brownfield.LCOE), 'test_LCOE_brownfield')
 
     def testFluidSystemCO2Mdot100(self):
-        params = SimulationParameters(working_fluid = 'co2', well_multiplier = 4., capacity_factor = 0.9)
+        params = SimulationParameters(working_fluid = 'co2', capacity_factor = 0.9)
         params.m_dot_IP = 100
         params.depth = 2400.
         params.permeability = 1e-8 / 100.
@@ -65,7 +65,7 @@ class FluidSystemCO2Test(unittest.TestCase):
         print(*testAssert(output.capital_cost_model.LCOE_brownfield.LCOE, 1.5247e-4, 'test_LCOE_brownfield'))
 
     def testFluidSystemCO2SolverOptMdot(self):
-        params = SimulationParameters(working_fluid = 'co2', well_multiplier = 4., capacity_factor = 0.9)
+        params = SimulationParameters(working_fluid = 'co2', capacity_factor = 0.9)
         
         full_system = FullSystemCPG.getDefaultCPGSystem(params)
         full_system_solver = FullSystemSolver(full_system)
