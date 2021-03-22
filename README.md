@@ -23,7 +23,7 @@ For non conda users, please install the following packages:
 - pandas
 - scipy
 - coolprop
-- xlrd
+- xlrd=1.2.0
 
 Testing
 ---
