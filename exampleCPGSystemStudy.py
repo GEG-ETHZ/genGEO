@@ -50,9 +50,10 @@ for depth in depths:
         try:
             output = full_system_solver.solve()
             lcoe_b = output.capital_cost_model.LCOE_brownfield.LCOE * 1e6
-            lcoe_g = output.capital_cost_model.LCOE_greefield.LCOE * 1e6
+            lcoe_g = output.capital_cost_model.LCOE_greenfield.LCOE * 1e6
             power = output.energy_results.W_net / 1e6
             optMdot = output.optMdot
+            error_str = ''
 
         except Exception as error:
             error_str = str(error).replace("\n", "").replace(",", " - ")
